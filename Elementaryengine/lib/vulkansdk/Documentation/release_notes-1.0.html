@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="icon" href="vulkan_lunarg_icon.png">
+<link rel="stylesheet" href="github-markdown.css">
+<style>
+    body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
+    }
+</style>
+</head>
+<body>
+<article class="markdown-body">
+<h1>
+<a id="user-content-vulkan-sdk-for-windows-release-notes" class="anchor" href="#user-content-vulkan-sdk-for-windows-release-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vulkan SDK for Windows Release Notes</h1>
+<p><a name="user-content-vsdkrel-1.0.65"></a></p>
+<h2>
+<a id="user-content-vulkan-sdk-10650-release-notes" class="anchor" href="#user-content-vulkan-sdk-10650-release-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vulkan SDK 1.0.65.0 Release Notes</h2>
+<h5>
+<a id="user-content-version-10650-for-windows" class="anchor" href="#user-content-version-10650-for-windows" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.0.65.0 for Windows</h5>
+<h6>
+<a id="user-content-november-2-2017" class="anchor" href="#user-content-november-2-2017" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>November 2, 2017</h6>
+<p><strong>Visual Studio Versions:</strong> Visual Studio 2013 is no longer supported by the Vulkan SDK.
+This means that Visual Studio 2013 may not be able to build the demos or samples in the SDK.
+Writing Vulkan programs with Visual Studio 2013 may still work but is not actively supported.
+In order to ensure that all functionality of the SDK works properly, it is necessary to use Visual Studio 2015 or 2017.</p>
+<p>This SDK supports Vulkan API revision 1.0.65.  The prior SDK supported Vulkan API revision 1.0.61.</p>
+<p><strong>Drivers:</strong> LunarG recommends that you update your Vulkan-capable hardware drivers to the latest recommended
+version from your hardware vendor.  A list of <a href="#user-content-known-driver-issues">Known Driver Issues</a> appears at the end of
+this document with more information.</p>
+<p><strong>CMake:</strong> CMake 3.2 or later is now required to build the source code contents of the SDK. Any user with an older version will need to upgrade.</p>
+<h3>
+<a id="user-content-overview-of-new-features-in-sdk-1065" class="anchor" href="#user-content-overview-of-new-features-in-sdk-1065" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview of new features in SDK 1.0.65</h3>
+<ul>
+<li>Scores of bug fixes, validation coverage and accuracy improvements, and many feature additions</li>
+<li>Extensions introduced since the 1.0.61 SDK:
+<ul>
+<li>VK_AMD_shader_image_load_store_lod</li>
+<li>VK_AMD_shader_info</li>
+<li>VK_EXT_global_priority</li>
+</ul>
+</li>
+</ul>
+<h4>
+<a id="user-content-sdk-components" class="anchor" href="#user-content-sdk-components" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SDK Components</h4>
+<p>This version of the SDK components are based on the following specifications and source code repositories:</p>
+<ul>
+<li>
+<p><a href="https://www.khronos.org/registry/vulkan" TARGET="_blank"><strong>Vulkan Specification including extensions</strong></a></p>
+</li>
+<li>
+<p><a href="https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/tree/sdk-1.0.65" TARGET="_blank"><strong>Vulkan Loader and Validation</strong></a></p>
+</li>
+<li>
+<p><a href="https://www.khronos.org/registry/spir-v/" TARGET="_blank"><strong>SPIR-V Specification</strong> version 1.1</a></p>
+</li>
+<li>
+<p><a href="https://github.com/KhronosGroup/glslang/commit/715c353a15836e5ae192a64a4cf54e2ce7e8d66a" TARGET="_blank"><strong>Glslang library and tools</strong></a></p>
+</li>
+<li>
+<p><a href="https://github.com/KhronosGroup/SPIRV-HEADERS/commit/061097878467b8e040fbf153a837d844ef9f9f96" TARGET="_blank"><strong>SPIR-V headers</strong></a></p>
+</li>
+<li>
+<p><a href="https://github.com/KhronosGroup/SPIRV-Tools/commit/5834719fc17d4735fce0102738b87b70255cfd5f" TARGET="_blank"><strong>SPIR-V tools</strong></a></p>
+</li>
+<li>
+<p><a href="https://github.com/LunarG/VulkanTools/tree/sdk-1.0.65" TARGET="_blank"><strong>Vulkan Tools</strong></a></p>
+</li>
+<li>
+<p><a href="https://github.com/LunarG/VulkanSamples/tree/sdk-1.0.65" TARGET="_blank"><strong>Vulkan Samples</strong></a></p>
+</li>
+</ul>
+<h3>
+<a id="user-content-last-commits-are-designated-by-the-following-git-tags-in-the-respective-repositories" class="anchor" href="#user-content-last-commits-are-designated-by-the-following-git-tags-in-the-respective-repositories" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Last Commits are designated by the following Git Tags in the respective repositories:</h3>
+<ul>
+<li>LoaderAndValidationLayers:    sdk-1.0.65.0</li>
+<li>VulkanTools:                  sdk-1.0.65.0</li>
+<li>VulkanSamples:                sdk-1.0.65.0</li>
+</ul>
+<h3>
+<a id="user-content-fixed-issues" class="anchor" href="#user-content-fixed-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fixed Issues</h3>
+<p><strong>Fixed Vulkan-LoaderAndValidationLayers Github Issues:</strong></p>
+<ul>
+<li>#2152 VK_ERROR_INITIALIZATION_FAILED with 280x</li>
+<li>#2146 Validation layers have multiple bugs with destroyed render passes bug</li>
+<li>#2145 vkCmdCopyImage and compressed texture destination issue question</li>
+<li>#2144 Descriptor set layout shader stage binding validation</li>
+<li>#2143 Exposing extension entry points from loader?</li>
+<li>#2139 Link errors when trying to use functions from some extensions</li>
+<li>#2137 Add warning on mismatch between <code>sharingMode</code> and <code>queueFamilyIndexCount</code>
+</li>
+<li>#2134 Report names, associated with VK objects via EXT_debug_marker, if provided by app. enhancement</li>
+<li>#2128 VK_DEBUG_REPORT_INFORMATION_BIT_EXT: Message clarity on successful insertion of validation layer enhancement loader</li>
+<li>#2127 Resizing the window in vulkan-smokescreen led to crash</li>
+<li>#2124 Vsync in cube demo malfunctions in high-contrast mode help wanted</li>
+<li>#2123 Core validation layer: Invalid validation error reported for a specific RP configuration bug</li>
+<li>#2121 vulkan.pc contains extraneous <code>Libs</code> bug</li>
+<li>#2120 32-bit builds unknown_ext_chain_gas.asm:373: Error: operand type mismatch for `push' question</li>
+<li>#2112 Core validation: Report error when an app requests both VK_AMD_negative_viewport_height and VK_KHR_maintenance1 extensions at device creation time. incomplete</li>
+<li>#2111 text relocations in 32-bit loader build on Linux bug loader</li>
+<li>#2106 Crash in vkCreateComputePipelines when layout is VK_NULL_HANDLE bug</li>
+<li>#2104 Invalid buffer in bufferViewMap causes crash bug</li>
+<li>#2099 [Help] How to fix the <code>descriptor not accessible from stage</code> error ?</li>
+<li>#2098 Consistently prefix handle values with 0x enhancement</li>
+<li>#2096 Memory validation does not account for external memory bug incomplete</li>
+<li>#2090 Wrong ParameterValidation(ERROR) when using VK_KHR_get_physical_device_properties2 bug</li>
+<li>#2089 No error when recreating swapchain while rendering to an existing swapchain image incomplete</li>
+<li>#2086 VkDrawIndexed validation layer suggestion incomplete</li>
+<li>#2079 Layer tests terminate with RangeCheck exception in VS2017 enhancement</li>
+<li>#2074 Write test to verify no pipeline state / renderpass lifetime issues</li>
+<li>#2070 Core validation crashes accessing renderpass info after destruction</li>
+<li>#2051 Filtering extensions, NVidia 385.41 and VK_KH(R/X)_external_memory_capabilities help wanted loader</li>
+<li>#2037 Core / Parameter Validation: Identity swizzle requirement is not checked for framebuffer attachments incomplete</li>
+<li>#2035 VK_ERROR_OUT_OF_HOST_MEMORY when extent is not specified for vkCreateSwapchainKHR incomplete</li>
+<li>#2019 vkCreateDescriptorSetLayout Crash - Heap Corruption bug</li>
+<li>#1937 Implement VUID-VkImageViewCreateInfo-image-01014 validation check incomplete</li>
+<li>#1787 Memory leaks in vkCreateInstance with standard validation layer enabled bug</li>
+<li>#1771 Failing tests bug</li>
+<li>#1425 Error message: PSO with VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST when patchControlPoints = 0 enhancement</li>
+<li>#1146 READ_BIT in srcAccessMask bug</li>
+<li>#948 EnumeratePhysicalDevices resets surfaceFormatCount bug</li>
+<li>#802 Core validation mishandles invalidation of dynamic state when a new pipeline is bound bug</li>
+<li>#711 Validation suggestion: Need to validate clear regions passed to vkCmdClearAttachments() incomplete</li>
+<li>#699 Layer Validation: Add Valid Usage Cases and Tests for INVALID_MEM_OBJ and vkFreeMemory incomplete</li>
+<li>#640 Adjust Validation Layer Checking if vkCmdCopyImage Restrictions are Lifted incomplete</li>
+<li>#438 Add tests for threading validation layer tests</li>
+<li>#287 Validate Image and image view parameter compatibility requirements incomplete</li>
+</ul>
+<p><strong>Fixed LunarXchange Issues:</strong></p>
+<ul>
+<li>#719 - Layer VK_LAYER_LUNARG_api_dump print value of pointer different from value in GDB</li>
+<li>#718 - VkLayer_standard_validation.json missingt</li>
+<li>#716 - Error during build of SDK cube example</li>
+<li>#715 - SDK Setup Linux CLion</li>
+<li>#714 - Missing inline declarations for function template</li>
+<li>#713 - Can't run the Vulkan Sample for can't open"GLSLANG_DLIB_NOTFOUND.obj"</li>
+<li>#711 - Crash when enumerating hardware (nVidia+Intel)</li>
+<li>#707 - Vulkan incorrectly tries to invoke AMD/NVIDIA driver in virtual machine</li>
+<li>#706 - Incorrect minImageTransferGranularity depth check</li>
+</ul>
+<p><strong>Fixed VulkanTools Github issues:</strong></p>
+<ul>
+<li>#296 DevSim should emit warning when exceeding device limits</li>
+<li>#253 api_dump layer does not log vkGetDeviceProcAddr and vkGetInstanceProcAddr calls</li>
+</ul>
+<h3>
+<a id="user-content-known-issues" class="anchor" href="#user-content-known-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Known Issues</h3>
+<ul>
+<li>Loader and validation layer open issues are available in the <a href="https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/issues" TARGET="_blank">Vulkan-LoaderAndValidationLayers Github Repository</a>
+</li>
+<li>VkTrace and other tool-related open issues are available in the <a href="https://github.com/LunarG/VulkanTools/issues" TARGET="_blank">VulkanTools Github Repository</a>
+</li>
+<li>Vulkan Sample-related open issues are available in the <a href="https://github.com/LunarG/VulkanSamples/issues" TARGET="_blank">VulkanSamples Github Repository</a>
+</li>
+</ul>
+<h3>
+<a id="user-content-known-driver-issues" class="anchor" href="#user-content-known-driver-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Known Driver Issues</h3>
+<p>None</p>
+<h4>
+<a id="user-content-important-notes-about-experimental-extensions" class="anchor" href="#user-content-important-notes-about-experimental-extensions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Important Notes About Experimental Extensions</h4>
+<p>The <code>KHX</code> and <code>NVX</code> identifiers in the name indicate that the extension is experimental, and is being considered for
+future standardization.  In the case of a <code>KHX</code> extension, this extension is being considered as either a <code>KHR</code> extension
+or core Vulkan API functionality.  <code>NVX</code> extensions are being considered for either a final <code>NV</code> or a more general
+(<code>EXT</code>, <code>KHR</code>) extension.</p>
+<p>As experimental extensions:</p>
+<ul>
+<li>Developers are encouraged to experiment with them and provide feedback, but <strong>should not</strong> use them as the basis for production applications.</li>
+<li>These experimental extensions are expected to be supported for a limited time only.</li>
+<li>They <strong>may</strong> change their interfaces and behavior in significant ways as a result of feedback</li>
+<li>They <strong>may</strong> be withdrawn or replaced with a different stable (<code>KHR</code>, <code>EXT</code>, ...) extension or core functionality at any time.</li>
+<li>Implementations of these extensions receive limited or no testing when submitted to the Khronos conformance process.</li>
+<li>Using experimental extensions with the validation layers may produce inaccurate validation results.</li>
+</ul>
+</article>
+</body>
+</html>
