@@ -9,9 +9,17 @@ public:
 	~EEngine();
 	void start();
 	void loop();
+
+	// GLFW and vulkan stuff
 	GLFWwindow* window;
 	VkInstance instance;
-	ESettings* activeSettings;
+	VkDevice device;
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+	VkQueue graphicsQueue;
+	VkSurfaceKHR surface;
+	VkQueue presentQueue;
 	VkDebugReportCallbackEXT callback;
+
+	ESettings* activeSettings;
 };
 
