@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{289E690D-1748-3C46-856E-098DD32BE2FD}</ProjectGUID>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1 "-BD:/Programming/VS/Feather Physx 2/Feather Engine/Bullet" --check-stamp-file "D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeCCompiler.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\BulletConfig.cmake.in;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1 "-BD:/Programming/VS/Feather Physx 2/Feather Engine/Bullet" --check-stamp-file "D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeCCompiler.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\BulletConfig.cmake.in;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1 "-BD:/Programming/VS/Feather Physx 2/Feather Engine/Bullet" --check-stamp-file "D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeCCompiler.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\BulletConfig.cmake.in;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1 "-BD:/Programming/VS/Feather Physx 2/Feather Engine/Bullet" --check-stamp-file "D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeCCompiler.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\3.7.1\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\BulletConfig.cmake.in;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/ZERO_CHECK.vcxproj">
+      <Project>B912900E-2482-3E15-8040-A69209AB34CF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/BasicDemo/AppBasicExampleGui.vcxproj">
+      <Project>AEB6FC95-84F6-34BD-AF59-03A0ACAF10C4</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/BasicDemo/App_BasicExample.vcxproj">
+      <Project>807A4ED9-B158-3156-83BA-88C7E180E0D0</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/ExampleBrowser/App_ExampleBrowser.vcxproj">
+      <Project>AC8ADC93-6D0E-39F3-8F69-8B22871C5608</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/HelloWorld/App_HelloWorld.vcxproj">
+      <Project>FE00964C-924E-331B-A923-D349BEAA2868</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/SharedMemory/App_SharedMemoryPhysics.vcxproj">
+      <Project>C3A0E51B-6ED5-3103-AE40-5406EE0DCDA5</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/SharedMemory/App_SharedMemoryPhysics_GUI.vcxproj">
+      <Project>AA8C72ED-2943-3B13-B618-AB8F71D34A31</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/SharedMemory/App_SharedMemoryPhysics_VR.vcxproj">
+      <Project>6002BAB6-C56E-3E17-9F34-FBA80EFAA513</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/Bullet3Serialize/Bullet2FileLoader/Bullet2FileLoader.vcxproj">
+      <Project>FF15E7DF-2D04-3035-93DD-88A2C2B06702</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/Bullet3Collision/Bullet3Collision.vcxproj">
+      <Project>8614BBF6-F303-3532-BB1A-B30EFAAB1396</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/Bullet3Common/Bullet3Common.vcxproj">
+      <Project>3AC662CE-45A5-3AA2-B240-99E47A9D1481</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/Bullet3Dynamics/Bullet3Dynamics.vcxproj">
+      <Project>B2FFF69C-6D42-3B7E-8794-275A119236A8</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/Bullet3Geometry/Bullet3Geometry.vcxproj">
+      <Project>A6826D4D-1917-34BB-8554-CC48BF9D2838</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/Bullet3OpenCL/Bullet3OpenCL_clew.vcxproj">
+      <Project>DB6AE463-5945-30C7-AF5E-C51A19440356</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/BulletCollision/BulletCollision.vcxproj">
+      <Project>E207494D-B6D8-3D0E-9579-8CB3305A06DE</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/BulletDynamics/BulletDynamics.vcxproj">
+      <Project>6B5131BE-EEFB-3715-884D-ED8DD2A9D2DA</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/ExampleBrowser/BulletExampleBrowserLib.vcxproj">
+      <Project>CBBCAD27-2EBA-34CF-96B5-FA5485674607</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/Extras/Serialize/BulletFileLoader/BulletFileLoader.vcxproj">
+      <Project>3E7C90B2-58D6-3890-BFDC-10812705AAB2</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/BulletInverseDynamics/BulletInverseDynamics.vcxproj">
+      <Project>E8B0CEBC-FF10-302E-8D76-E0EF8DCB50F9</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/Extras/InverseDynamics/BulletInverseDynamicsUtils.vcxproj">
+      <Project>B670ADB9-98F3-39FB-8DFB-F66458B7946C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/BulletSoftBody/BulletSoftBody.vcxproj">
+      <Project>80220CD3-955E-3ABC-B40B-0CAE68CB29DE</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/Extras/Serialize/BulletWorldImporter/BulletWorldImporter.vcxproj">
+      <Project>25C65788-B7A5-3ABF-9C17-8517072E3732</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/Extras/Serialize/BulletXmlWorldImporter/BulletXmlWorldImporter.vcxproj">
+      <Project>9827028D-66AB-373E-970E-E8EE6F2B4A23</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/ThirdPartyLibs/BussIK/BussIK.vcxproj">
+      <Project>EB86B9A2-81AA-3397-937B-9F453C5239FF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/Extras/ConvexDecomposition/ConvexDecomposition.vcxproj">
+      <Project>5E08DDAE-FAD2-3929-ACFC-DF64723FA542</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/Extras/GIMPACTUtils/GIMPACTUtils.vcxproj">
+      <Project>8B2293E1-4310-3A7B-AFDC-C4267E60E3E5</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/Extras/HACD/HACD.vcxproj">
+      <Project>36E4550F-4243-336D-B36F-A6813B36E87D</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/LinearMath/LinearMath.vcxproj">
+      <Project>971E764C-BA31-3641-AE0B-DDD144188918</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/OpenGLWindow/OpenGLWindow.vcxproj">
+      <Project>7B89CD6D-510F-33EA-8C54-9B6327DBE590</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/BulletDynamics/pendulum/Test_BulletDynamics.vcxproj">
+      <Project>BEBC75FF-6775-3A0F-A3AB-A2DF8552DBDE</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/Test_BulletInverseDynamics.vcxproj">
+      <Project>A1367E7D-C8EC-35C3-9E43-9866AD36E4D7</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/Test_BulletInverseDynamicsJacobian.vcxproj">
+      <Project>F6225418-7E6B-31AE-A264-E87B4FDDCCC4</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/Test_BulletInverseForwardDynamics.vcxproj">
+      <Project>77F29F80-EA4E-3ACF-9CB0-2DDF993F5D60</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/collision/Test_Collision.vcxproj">
+      <Project>B67273B6-072B-3557-9E08-CA08AF767AAC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/SharedMemory/Test_PhysicsClientServer.vcxproj">
+      <Project>C341B0EF-B7EB-39BD-81A5-079477BE8C37</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/gtest-1.7.0/gtest.vcxproj">
+      <Project>3FCCA5D5-93AB-347F-956C-DF933D1835B6</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/examples/ThirdPartyLibs/Gwen/gwen.vcxproj">
+      <Project>05003EEB-EFDD-39A8-B6ED-FBC3C2D5A1E8</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

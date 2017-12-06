@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\MultiBody\Pendulum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\BulletDynamics\pendulum\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{38554BCB-EE13-3EBE-924D-6BB467F9D8BC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

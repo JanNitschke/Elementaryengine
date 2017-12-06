@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\CMakeFiles\d764867b20c5fc5560742d0ec4c41889\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{9FE86391-6B4D-330D-974D-8416103B680A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\OpenGLExampleBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\OpenGLGuiHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GL_ShapeDrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\CollisionShape2TriangleMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\b3Clock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\ChromeTraceUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\b3ResourcePath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\GraphingTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\GwenParameterInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\GwenProfileWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\GwenTextureWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\gwenUserInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\CollisionShape2TriangleMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\b3Clock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\ChromeTraceUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\b3ResourcePath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\b3ERPCFMHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\b3ReferenceFrameHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\GraphingTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\GwenParameterInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\GwenProfileWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\GwenTextureWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\gwenInternalData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\GwenGUISupport\gwenUserInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ExampleBrowser\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{38554BCB-EE13-3EBE-924D-6BB467F9D8BC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{0CB6FCD9-0152-36C2-90B6-92FBCE2BDB68}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

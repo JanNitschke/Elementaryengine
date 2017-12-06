@@ -1,0 +1,394 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{77F29F80-EA4E-3ACF-9CB0-2DDF993F5D60}</ProjectGUID>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>Test_BulletInverseForwardDynamics</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_BulletInverseForwardDynamics.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_BulletInverseForwardDynamics</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_BulletInverseForwardDynamics.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_BulletInverseForwardDynamics</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\MinSizeRel\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_BulletInverseForwardDynamics.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_BulletInverseForwardDynamics</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\RelWithDebInfo\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_BulletInverseForwardDynamics.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_BulletInverseForwardDynamics</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_DEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_DEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\Programming\VS\Bullet\lib\Debug\BulletInverseDynamicsUtils_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\BulletInverseDynamics_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\Bullet3Common_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\LinearMath_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\gtest_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\BulletDynamics_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\BulletCollision_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\BulletInverseDynamicsUtils_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\BulletInverseDynamics_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\Bullet3Common_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\LinearMath_Debug.lib;D:\Programming\VS\Bullet\lib\Debug\gtest_Debug.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/Debug/Test_BulletInverseForwardDynamics.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/Debug/Test_BulletInverseForwardDynamics.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\Programming\VS\Bullet\lib\Release\BulletInverseDynamicsUtils.lib;D:\Programming\VS\Bullet\lib\Release\BulletInverseDynamics.lib;D:\Programming\VS\Bullet\lib\Release\Bullet3Common.lib;D:\Programming\VS\Bullet\lib\Release\LinearMath.lib;D:\Programming\VS\Bullet\lib\Release\gtest.lib;D:\Programming\VS\Bullet\lib\Release\BulletDynamics.lib;D:\Programming\VS\Bullet\lib\Release\BulletCollision.lib;D:\Programming\VS\Bullet\lib\Release\BulletInverseDynamicsUtils.lib;D:\Programming\VS\Bullet\lib\Release\BulletInverseDynamics.lib;D:\Programming\VS\Bullet\lib\Release\Bullet3Common.lib;D:\Programming\VS\Bullet\lib\Release\LinearMath.lib;D:\Programming\VS\Bullet\lib\Release\gtest.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/Release/Test_BulletInverseForwardDynamics.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/Release/Test_BulletInverseForwardDynamics.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\BulletInverseDynamicsUtils_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\BulletInverseDynamics_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\Bullet3Common_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\LinearMath_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\gtest_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\BulletDynamics_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\BulletCollision_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\BulletInverseDynamicsUtils_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\BulletInverseDynamics_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\Bullet3Common_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\LinearMath_MinsizeRel.lib;D:\Programming\VS\Bullet\lib\MinSizeRel\gtest_MinsizeRel.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/MinSizeRel/Test_BulletInverseForwardDynamics.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/MinSizeRel/Test_BulletInverseForwardDynamics.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\.;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\src;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\gtest-1.7.0\include;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\BulletInverseDynamicsUtils_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\BulletInverseDynamics_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\Bullet3Common_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\LinearMath_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\gtest_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\BulletDynamics_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\BulletCollision_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\BulletInverseDynamicsUtils_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\BulletInverseDynamics_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\Bullet3Common_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\LinearMath_RelWithDebugInfo.lib;D:\Programming\VS\Bullet\lib\RelWithDebInfo\gtest_RelWithDebugInfo.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/RelWithDebInfo/Test_BulletInverseForwardDynamics.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/InverseDynamics/RelWithDebInfo/Test_BulletInverseForwardDynamics.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/test/InverseDynamics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1 "-BD:/Programming/VS/Feather Physx 2/Feather Engine/Bullet" --check-stamp-file "D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\CMakeFiles\generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/test/InverseDynamics/CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/test/InverseDynamics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1 "-BD:/Programming/VS/Feather Physx 2/Feather Engine/Bullet" --check-stamp-file "D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\CMakeFiles\generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/test/InverseDynamics/CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/test/InverseDynamics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1 "-BD:/Programming/VS/Feather Physx 2/Feather Engine/Bullet" --check-stamp-file "D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\CMakeFiles\generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/test/InverseDynamics/CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/test/InverseDynamics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1 "-BD:/Programming/VS/Feather Physx 2/Feather Engine/Bullet" --check-stamp-file "D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\CMakeFiles\generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:/Jan/Downloads/bullet3-2.86.1/bullet3-2.86.1/test/InverseDynamics/CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt;D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Programming\VS\Feather Physx 2\Feather Engine\Bullet\test\InverseDynamics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\ConvertRigidBodies2MultiBody.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\MultiBodyCreationInterface.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\BulletUrdfImporter.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\UrdfParser.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\URDF2Bullet.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\URDFImporterInterface.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\URDFJointTypes.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportSTLDemo\ImportSTLSetup.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportSTLDemo\LoadMeshFromSTL.h" />
+    <ClInclude Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportColladaDemo\ColladaGraphicsInstance.h" />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\test\InverseDynamics\test_invdyn_bullet.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\b3ResourcePath.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\UrdfParser.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ThirdPartyLibs\stb_image\stb_image.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Utils\b3Clock.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\Extras\Serialize\BulletWorldImporter\btBulletWorldImporter.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\Extras\Serialize\BulletWorldImporter\btWorldImporter.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\Extras\Serialize\BulletFileLoader\bChunk.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\Extras\Serialize\BulletFileLoader\bFile.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\Extras\Serialize\BulletFileLoader\bDNA.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\Extras\Serialize\BulletFileLoader\btBulletFile.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ThirdPartyLibs\tinyxml\tinystr.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ThirdPartyLibs\tinyxml\tinyxml.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ThirdPartyLibs\tinyxml\tinyxmlerror.cpp"  />
+    <ClCompile Include="D:\Jan\Downloads\bullet3-2.86.1\bullet3-2.86.1\examples\ThirdPartyLibs\tinyxml\tinyxmlparser.cpp"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/ZERO_CHECK.vcxproj">
+      <Project>B912900E-2482-3E15-8040-A69209AB34CF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/Bullet3Common/Bullet3Common.vcxproj">
+      <Project>3AC662CE-45A5-3AA2-B240-99E47A9D1481</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/BulletCollision/BulletCollision.vcxproj">
+      <Project>E207494D-B6D8-3D0E-9579-8CB3305A06DE</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/BulletDynamics/BulletDynamics.vcxproj">
+      <Project>6B5131BE-EEFB-3715-884D-ED8DD2A9D2DA</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/BulletInverseDynamics/BulletInverseDynamics.vcxproj">
+      <Project>E8B0CEBC-FF10-302E-8D76-E0EF8DCB50F9</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/Extras/InverseDynamics/BulletInverseDynamicsUtils.vcxproj">
+      <Project>B670ADB9-98F3-39FB-8DFB-F66458B7946C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/src/LinearMath/LinearMath.vcxproj">
+      <Project>971E764C-BA31-3641-AE0B-DDD144188918</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Programming/VS/Feather Physx 2/Feather Engine/Bullet/test/gtest-1.7.0/gtest.vcxproj">
+      <Project>3FCCA5D5-93AB-347F-956C-DF933D1835B6</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

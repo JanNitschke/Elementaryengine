@@ -14,7 +14,7 @@
 // Ogre (www.ogre3d.org).
 
 #include "btQuickprof.h"
-
+#include "btThreads.h"
 
 
 
@@ -218,7 +218,7 @@ unsigned long long int btClock::getTimeNanoseconds()
 		QueryPerformanceCounter(&currentTime);
 		elapsedTime.QuadPart = currentTime.QuadPart - 
 			m_data->mStartTime.QuadPart;
-		elapsedTime.QuadPart *= 1e9;
+		elapsedTime.QuadPart *= 1000000000;
 		elapsedTime.QuadPart /= m_data->mClockFrequency.QuadPart;
 
 		return (unsigned long long) elapsedTime.QuadPart;
@@ -287,7 +287,7 @@ static btClock gProfileClock;
 
 inline void Profile_Get_Ticks(unsigned long int * ticks)
 {
-	*ticks = gProfileClock.getTimeMicroseconds();
+	*ticks = (unsigned long int)gProfileClock.getTimeMicroseconds();
 }
 
 inline float Profile_Get_Tick_Rate(void)
@@ -518,7 +518,7 @@ CProfileIterator *	CProfileManager::Get_Iterator( void )
 { 
 
 		int threadIndex = btQuickprofGetCurrentThreadIndex2();
-		if (threadIndex<0)
+		if ((threadIndex<0) || threadIndex >= BT_QUICKPROF_MAX_THREAD_COUNT)
 			return 0;
 
 		return new CProfileIterator( &gRoots[threadIndex]); 
@@ -549,7 +549,7 @@ void						CProfileManager::CleanupMemory(void)
 void	CProfileManager::Start_Profile( const char * name )
 {
 	int threadIndex = btQuickprofGetCurrentThreadIndex2();
-	if (threadIndex<0)
+	if ((threadIndex<0) || threadIndex >= BT_QUICKPROF_MAX_THREAD_COUNT)
 		return;
 
 	if (name != gCurrentNodes[threadIndex]->Get_Name()) {
@@ -566,7 +566,7 @@ void	CProfileManager::Start_Profile( const char * name )
 void	CProfileManager::Stop_Profile( void )
 {
 	int threadIndex = btQuickprofGetCurrentThreadIndex2();
-	if (threadIndex<0)
+	if ((threadIndex<0) || threadIndex >= BT_QUICKPROF_MAX_THREAD_COUNT)
 		return;
 
 	// Return will indicate whether we should back up to our parent (we may
@@ -590,7 +590,7 @@ void	CProfileManager::Reset( void )
 {
 	gProfileClock.reset();
 	int threadIndex = btQuickprofGetCurrentThreadIndex2();
-	if (threadIndex<0)
+	if ((threadIndex<0) || threadIndex >= BT_QUICKPROF_MAX_THREAD_COUNT)
 		return;
 	gRoots[threadIndex].Reset();
 	gRoots[threadIndex].Call();
@@ -680,39 +680,51 @@ void	CProfileManager::dumpAll()
 	CProfileManager::Release_Iterator(profileIterator);
 }
 
-
-
-
-unsigned int btQuickprofGetCurrentThreadIndex2()
-{
-	const unsigned int kNullIndex = ~0U;
-#ifdef _WIN32
-	__declspec( thread ) static unsigned int sThreadIndex = kNullIndex;
-#else
-#ifdef __APPLE__
-	#if TARGET_OS_IPHONE
-		unsigned int sThreadIndex = 0;
-		return -1;
-	#else
-		static __thread unsigned int sThreadIndex = kNullIndex;
-	#endif
-#else//__APPLE__
-#if __linux__
-	static __thread unsigned int sThreadIndex = kNullIndex;
-#else
-	unsigned int sThreadIndex = 0;
-	return -1;
+// clang-format off
+#if defined(_WIN32) && (defined(__MINGW32__) || defined(__MINGW64__))
+  #define BT_HAVE_TLS 1
+#elif __APPLE__ && !TARGET_OS_IPHONE
+  // TODO: Modern versions of iOS support TLS now with updated version checking.
+  #define BT_HAVE_TLS 1
+#elif __linux__
+  #define BT_HAVE_TLS 1
 #endif
-#endif//__APPLE__
-	
-#endif
-	static int gThreadCounter=0;
 
-	if ( sThreadIndex == kNullIndex )
-	{
-		sThreadIndex = gThreadCounter++;
-	}
-	return sThreadIndex;
+// __thread is broken on Andorid clang until r12b. See
+// https://github.com/android-ndk/ndk/issues/8
+#if defined(__ANDROID__) && defined(__clang__)
+  #if __has_include(<android/ndk-version.h>)
+    #include <android/ndk-version.h>
+  #endif  // __has_include(<android/ndk-version.h>)
+  #if defined(__NDK_MAJOR__) && \
+    ((__NDK_MAJOR__ < 12) || ((__NDK_MAJOR__ == 12) && (__NDK_MINOR__ < 1)))
+    #undef BT_HAVE_TLS
+  #endif
+#endif  // defined(__ANDROID__) && defined(__clang__)
+// clang-format on
+
+unsigned int btQuickprofGetCurrentThreadIndex2() {
+  const unsigned int kNullIndex = ~0U;
+
+#if BT_THREADSAFE
+  return btGetCurrentThreadIndex();
+#else
+#if defined(BT_HAVE_TLS)
+  static __thread unsigned int sThreadIndex = kNullIndex;
+#elif defined(_WIN32)
+  __declspec(thread) static unsigned int sThreadIndex = kNullIndex;
+#else
+  unsigned int sThreadIndex = 0;
+  return -1;
+#endif
+
+  static int gThreadCounter = 0;
+
+  if (sThreadIndex == kNullIndex) {
+    sThreadIndex = gThreadCounter++;
+  }
+  return sThreadIndex;
+#endif //BT_THREADSAFE
 }
 
 void	btEnterProfileZoneDefault(const char* name)
