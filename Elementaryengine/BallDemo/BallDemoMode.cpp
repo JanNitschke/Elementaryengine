@@ -40,17 +40,9 @@ void BallDemoMode::Load()
 	m->attachTo(a);
 	a->OnTick = FallingTick;
 	a->renderEnvironment = false;
-	//DefaultMaterial* wood = new DefaultMaterial();
-	//wood->ambient = vec3(0.01f, 0.01f, 0.01f);
-	//wood->diffuse = vec3(0.6f, 0.6f, 0.6f);
-	//wood->specular = vec3(0.1f);
-	//wood->shininess = 32;
-	//wood->diffuseMap = new Texture("Assets/Textures/Wood.jpg");
-	//wood->specularMap = new Texture("Assets/Textures/WoodSpec.jpg");
-	//wood->TextureScale = vec2(3.0f);
 
 	PBRMaterial* pbrwood = new PBRMaterial();
-	pbrwood->albedo = vec3(100);
+	pbrwood->albedo = vec3(1);
 	pbrwood->albedoMap = new Texture("Assets/Textures/Wood.jpg");
 	pbrwood->ao = vec3(0.01f);
 	pbrwood->metallic = 0;
@@ -60,16 +52,8 @@ void BallDemoMode::Load()
 
 	m->meshes[0]->material = pbrwood;
 
-	//DefaultMaterial* beton = new DefaultMaterial();
-	//beton->ambient = vec3(0.5, 0.5, 0.5);
-	//beton->diffuse = vec3(0.6f);
-	//beton->specular = vec3(0.8f);
-	//beton->shininess = 64;
-	//beton->diffuseMap = new Texture("Assets/Textures/Plaster.jpg");
-	//beton->specularMap = new Texture("Assets/Textures/PlasterSpec.jpg");
-
 	PBRMaterial* beton = new PBRMaterial();
-	beton->albedo = vec3(100);
+	beton->albedo = vec3(1);
 	beton->albedoMap = new Texture("Assets/Textures/Plaster.jpg");
 	beton->ao = vec3(0.01f);
 	beton->metallic = 0;
@@ -77,7 +61,7 @@ void BallDemoMode::Load()
 	beton->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg");
 
 	PBRMaterial* grass = new PBRMaterial();
-	grass->albedo = vec3(100);
+	grass->albedo = vec3(1);
 	grass->albedoMap = new Texture("Assets/Textures/RockGrass.jpg");
 	grass->ao = vec3(0.01f);
 	grass->metallic = 0;
@@ -88,7 +72,7 @@ void BallDemoMode::Load()
 	m2->meshes[0]->material = beton;
 
 	PBRMaterial* rust = new PBRMaterial();
-	rust->albedo = vec3(20);
+	rust->albedo = vec3(0.2);
 	rust->albedoMap = new Texture("Assets/Textures/r2albedo.jpg");
 	rust->ao = vec3(0.5);
 	rust->metallic = 1;
@@ -101,11 +85,8 @@ void BallDemoMode::Load()
 
 
 	Model* m3 = new Model("Assets/Meshs/Sphere.obj");
-	DefaultMaterial* lampmat = new DefaultMaterial();
-	lampmat->ambient = vec3(1000.0f);
-	lampmat->diffuse = vec3(1.0f);
-	lampmat->specular = vec3(1.0f);
-	lampmat->shininess = 8;
+	PBRMaterial* lampmat = new PBRMaterial();
+	lampmat->ao = vec3(1000.0f);
 
 	m3->meshes[0]->material = lampmat;
 

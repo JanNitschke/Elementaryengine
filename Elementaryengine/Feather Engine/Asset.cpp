@@ -178,12 +178,6 @@ void Asset::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l
 	}
 }
 
-void Asset::RenderEnvironmentMap(vector<mat4> view, mat4 projection)
-{
-	for each (AssetComponent* c in components) {
-		c->RenderEnvMap(view, projection,this);
-	}
-}
 
 
 void Asset::Render(vec3 pos, vec3 rot, vec3 scale, mat4 view, mat4 projection)
@@ -219,9 +213,7 @@ DllExport void Asset::setTickFunction(void(*tickFunction)(GLFWwindow *window, do
 
 void Asset::SetupAsset()
 {
-	unsigned int eMapFBO;
-	glGenFramebuffers(1, &eMapFBO);
-	envMapFBO = eMapFBO;
+
 }
 
 void Asset::setHeightmapCollision(const char * path)

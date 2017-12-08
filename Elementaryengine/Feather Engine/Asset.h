@@ -38,7 +38,6 @@ public:
 	// Code to draw the asset, may get passed to the more specific class
 	virtual void Render(mat4 view, mat4 projection);
 	virtual void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l);
-	virtual void RenderEnvironmentMap(vector<mat4> view, mat4 projection);
 	virtual void Render(vec3 pos, vec3 rot, vec3 scale, mat4 view, mat4 projection);
 	// called ecery frame for game logic
 	DllExport virtual void Tick(GLFWwindow * window, double deltaTime);

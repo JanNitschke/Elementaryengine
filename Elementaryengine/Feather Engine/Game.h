@@ -6,6 +6,7 @@
 #include <Lamp.h>
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h>
+#include <EOpenGl.h>
 
 class GameMode;
 #include <GameMode.h>
@@ -36,10 +37,11 @@ public:
 	~Game();
 
 	///<summary>
-	///The GLFW handle of the main window
+	/// Opengl functions
 	///</summary> 
-	static GLFWwindow* window;
+	EOpenGl* eOpenGl = new EOpenGl();
 
+	EDisplaySettings* displaySettings;
 	///<summary>
 	///The Gamemode to load
 	///</summary> 
@@ -48,7 +50,7 @@ public:
 	///<summary>
 	///Name of the game and window title
 	///</summary> 
-	char* name ="Feather Engine";
+	char* name ="Elementaryengine";
 
 	///<summary>
 	///Is this instance a client or a Server.
@@ -65,11 +67,6 @@ public:
 	///</summary> 
 	static bool requireServer;
 
-	///<summary>
-	///Stops the gameand exits main loop
-	///</summary> 
-	int windowHeight;
-	int windowWidth;
 
 	///<summary>
 	///The active camera
@@ -144,10 +141,6 @@ public:
 	///</summary> 
 	void Render();
 
-	///<summary>
-	///Renders the environment maps of all elements of the assets vector wich have set "renderEnvironment" to true
-	///</summary> 
-	void RenderEnvironmentMaps();
 
 	///<summary>
 	///Renders the shadow maps of all lights

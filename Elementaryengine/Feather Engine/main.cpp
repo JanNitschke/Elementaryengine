@@ -12,10 +12,7 @@ using namespace std;
 
 int main(void)
 {
-	//char* name = "Feather Engine";
 	Game game = Game::Instance();
-	game.windowHeight = 900;
-	game.windowWidth = 1600;
 	game.Start();
 	return 0;
 }

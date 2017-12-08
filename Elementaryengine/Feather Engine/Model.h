@@ -22,7 +22,6 @@ public:
 
 	void Render(mat4 view, mat4 projection, Asset* parent);
 	void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a);
-	void RenderEnvMap(vector<mat4> view, mat4 projection, Asset* a);
 
 private:
 	/*  Model Data  */

@@ -33,13 +33,6 @@ void Model::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l
 	}
 }
 
-void Model::RenderEnvMap(vector<mat4> view, mat4 projection, Asset* a)
-{
-	for each (Mesh* m in meshes)
-	{
-		m->RenderEnvMap(view, projection,a);
-	}
-}
 
 void Model::loadModel(string path)
 {

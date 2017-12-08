@@ -28,6 +28,3 @@ void AssetComponent::RenderLightmap(vector<mat4> view, mat4 projection, AssetCom
 {
 }
 
-void AssetComponent::RenderEnvMap(vector<mat4> view, mat4 projection, Asset* a)
-{
-}

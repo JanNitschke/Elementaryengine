@@ -28,7 +28,6 @@ public:
 	~Mesh();
 	virtual void Render(mat4 view, mat4 projection, Asset* parent);
 	virtual void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a);
-	virtual void RenderEnvMap(vector<mat4> view, mat4 projection, Asset* a);
 	Material* material;
 	GLuint VertexArrayID;
 	GLuint vertexbuffer;
@@ -36,7 +35,7 @@ public:
 	static Shader* defaultShader;
 	static Shader* lightmapShader;
 	static Shader* pbrShader;
-	static Shader* pbrEnvShader;
+	static Shader* geometryShader;
 	static Shader* terrainShader;
 	static Shader* terrainLightmapShader;
 	static Shader* terrainEnvShader;
@@ -48,8 +47,6 @@ public:
 	unsigned int VAO, VBO, EBO;
 	GLuint VPMatrixID;
 	GLuint ModelMatrixID;
-	GLuint lightColorSSBO = 0;
-	GLuint lightPositionSSBO = 0;
 	void SetupMesh();
 };
 

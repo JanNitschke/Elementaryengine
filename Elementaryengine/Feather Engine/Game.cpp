@@ -31,7 +31,6 @@ void Game::SetActiveCam(Camera * camera)
 
 bool Game::requireServer = false;
 bool Game::isServer = false;
-GLFWwindow* Game::window;
 vec3 Game::directionalLightColor;
 vec3 Game::directionalLightDirection;
 vector<Asset*> Game::assets;
@@ -43,101 +42,11 @@ btDiscreteDynamicsWorld* Game::dynamicsWorld;
 // start the game and run the main loop
 void Game::Start()
 {
-	// if networking is needed setup enet
-	if (isServer || requireServer) {
-	/*	if (enet_initialize() != 0)
-		{
-			fprintf(stderr, "Failed to initialize GLFW\n");
-			return;
-		}*/
-	}
-	//test if its a server: 
-	if (isServer) {
 
-		///* Bind the server to the default localhost.     */
-		///* A specific host address can be specified by   */
-		///* enet_address_set_host (& address, "x.x.x.x"); */
-		//address.host = ENET_HOST_ANY;
-		///* Bind the server to port 1234. */
-		//address.port = 1234;
-		//server = enet_host_create(&address /* the address to bind the server host to */,
-		//	32      /* allow up to 32 clients and/or outgoing connections */,
-		//	2      /* allow up to 2 channels to be used, 0 and 1 */,
-		//	0      /* assume any amount of incoming bandwidth */,
-		//	0      /* assume any amount of outgoing bandwidth */);
-		//if (server == NULL)
-		//{
-		//	fprintf(stderr,
-		//		"An error occurred while trying to create an ENet server host.\n");
-		//	exit(EXIT_FAILURE);
-		//}
-	} else {
-		//if (requireServer) {
-		//	ENetHost * client;
-		//	client = enet_host_create(NULL /* create a client host */,
-		//		1 /* only allow 1 outgoing connection */,
-		//		2 /* allow up 2 channels to be used, 0 and 1 */,
-		//		57600 / 8 /* 56K modem with 56 Kbps downstream bandwidth */,
-		//		14400 / 8 /* 56K modem with 14 Kbps upstream bandwidth */);
-		//	if (client == NULL)
-		//	{
-		//		fprintf(stderr,
-		//			"An error occurred while trying to create an ENet client host.\n");
-		//		exit(EXIT_FAILURE);
-		//	}
-		//}
-		// Initialise GLFW
-		if (!glfwInit())
-		{
-			fprintf(stderr, "Failed to initialize GLFW\n");
-			getchar();
-			return;
-		}
-
-		glfwWindowHint(GLFW_SAMPLES, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // for MacOS
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_SAMPLES, 4);
-
-		// Open a window and create its OpenGL context
-		window = glfwCreateWindow(windowWidth, windowHeight, name, NULL, NULL);
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-		if (window == NULL) {
-			fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. \n");
-			getchar();
-			glfwTerminate();
-			return;
-		}
-
-		glfwMakeContextCurrent(window);
-
-		// Initialize GLEW
-		if (glewInit() != GLEW_OK) {
-			fprintf(stderr, "Failed to initialize GLEW\n");
-			getchar();
-			glfwTerminate();
-			return;
-		}
-
-		// Ensure we can capture the escape key being pressed below
-		glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-
-		// Dark background
-		glClearColor(0.050f, 0.125f, 0.247f, 0);
-
-		// Enable depth test and backface culling
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glShadeModel(GL_SMOOTH);
-		glEnable(GL_MULTISAMPLE);
-	}
-
-
+	displaySettings = new EDisplaySettings;
+	displaySettings->windowname = name;
+	eOpenGl->Initialise(displaySettings);
+	return;
 
 	//Setup Bullet physics
 	btBroadphaseInterface* broadphase = new btDbvtBroadphase();
@@ -150,21 +59,17 @@ void Game::Start()
 	dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
 
 
-
 	// Setup components (shaders, textures etc.)
-	if (!isServer) {
-		Mesh::SetupMeshComp();
-		Lamp::SetupLampComp();
-		Asset::SetupAsset();
-	}
 
+	Mesh::SetupMeshComp();
+	Lamp::SetupLampComp();
+	Asset::SetupAsset();
+	
 	LoadScene();
 
-	if (!isServer) {
-		View = activeCam->GetView();
-		float viewaspect = (float)windowWidth / (float)windowHeight;
-		Projection = glm::perspective(glm::radians(60.0f), viewaspect, 0.1f, 100.0f);
-	}
+
+	float viewaspect = (float)displaySettings->windowWidth / (float)displaySettings->windowHeight;
+	Projection = glm::perspective(glm::radians(60.0f), viewaspect, 0.1f, 100.0f);
 	//For an ortho camera :
 	//Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
 
@@ -185,7 +90,7 @@ void Game::Start()
 	}*/
 
 	// Close OpenGL window and terminate GLFW
-	glfwTerminate();
+	eOpenGl->CleanUp();
 }
 
 
@@ -219,7 +124,7 @@ void Game::loop()
 		smoothFps = (9 * smoothFps / 10) + (.1 / deltaTime);
 		printf(" \r fps smooth: %i accurate: %f ", (int)(smoothFps + .5), 1 / deltaTime);
 		if (!isServer) {
-			processInput(window);
+			processInput(eOpenGl->window);
 		}
 		assets = nextAssets;
 		View = activeCam->GetView();
@@ -229,31 +134,29 @@ void Game::loop()
 		}
 		for each (Asset* asset in assets)
 		{
-			asset->Tick(window, deltaTime);
+			asset->Tick(eOpenGl->window, deltaTime);
 		}
 		dynamicsWorld->stepSimulation(deltaTime, 1);
 
 		if (!isServer) {
 			RenderShadowMaps();
-			RenderEnvironmentMaps();
 			Render();
 			RenderHUD();
 
-
 			// Swap buffers
-			glfwSwapBuffers(window);
+			glfwSwapBuffers(eOpenGl->window);
 			glfwPollEvents();
 		}
 		
 
 
 	} // Check if the ESC key was pressed or the window was closed
-	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-		glfwWindowShouldClose(window) == 0);
+	while (glfwGetKey(eOpenGl->window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+		glfwWindowShouldClose(eOpenGl->window) == 0);
 }
 bool Game::isKeyDown(int key)
 {
-	return (glfwGetKey(window, key) == GLFW_PRESS);
+	return (glfwGetKey(Instance().eOpenGl->window, key) == GLFW_PRESS);
 }
 void Game::setLight(vec3 color, vec3 direction)
 {
@@ -262,58 +165,52 @@ void Game::setLight(vec3 color, vec3 direction)
 }
 void Game::Render()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->gBuffer	);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, windowWidth, windowHeight);
+	glViewport(0, 0, displaySettings->windowWidth, displaySettings->windowHeight);
+	
+	// geometry pass
+	Mesh::geometryShader->use();
 
 	for each (Asset* a in assets)
 	{
 			a->Render(View, Projection);
 	}
-}
 
-void Game::RenderEnvironmentMaps()
-{
-	glViewport(0, 0, Asset::ENVIRONMENT_WIDTH, Asset::ENVIRONMENT_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, Asset::envMapFBO);
-	for each (Asset* asset in assets)
-	{
-		if (asset->renderEnvironment) {
-			float aspect = (float)Asset::ENVIRONMENT_WIDTH / (float)Asset::ENVIRONMENT_HEIGHT;
-			float Enear = 0.10f;
-			float Efar = 25.0f;
-			mat4 envProj = glm::perspective(glm::radians(90.0f), aspect, Enear, Efar);
-			vec3 aPos = asset->position;
-			vector<mat4> envTransforms;
-			envTransforms.push_back(envProj *
-				glm::lookAt(aPos, aPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			envTransforms.push_back(envProj *
-				glm::lookAt(aPos, aPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			envTransforms.push_back(envProj *
-				glm::lookAt(aPos, aPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-			envTransforms.push_back(envProj *
-				glm::lookAt(aPos, aPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-			envTransforms.push_back(envProj *
-				glm::lookAt(aPos, aPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-			envTransforms.push_back(envProj *
-				glm::lookAt(aPos, aPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+	// lighting pass
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	Shader* shader = Mesh::pbrShader;
+	shader->use();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gPosition);
+	shader->setInt("gPosition", 0);
 
-			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, asset->environmentMap->id, 0);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, asset->environmentMap->id);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			int i = 0;
-			for each (Asset* a in assets)
-			{
-				if (a != asset) {
-					a->RenderEnvironmentMap(envTransforms, mat4(1));
-				}
-			}
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-	}
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gNormal);
+	shader->setInt("gNormal", 1);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gAlbedoSpec);
+	shader->setInt("gAlbedoSpec", 2);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gMaterial);
+	shader->setInt("gMaterial", 3);
+
+	eSetLampsCommand(shader, eOpenGl->lightColorSSBO, eOpenGl->lightPositionSSBO);
+	eOpenGl->renderQuad();
+
+
+	// copy content of geometry's depth buffer to default framebuffer's depth buffer
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, eOpenGl->gBuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+											   // blit to default framebuffer. Note that this may or may not work as the internal formats of both the FBO and default framebuffer have to match.
+											   // the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the 		
+											   // depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
+	glBlitFramebuffer(0, 0, displaySettings->windowWidth, displaySettings->windowHeight, 0, 0, displaySettings->windowWidth, displaySettings->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }

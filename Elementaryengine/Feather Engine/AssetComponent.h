@@ -13,6 +13,5 @@ public:
 	Asset* parent;
 	virtual void Render(mat4 view, mat4 projection, Asset* parent);
 	virtual void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a);
-	virtual void RenderEnvMap(vector<mat4> view, mat4 projection, Asset* a);
 };
 

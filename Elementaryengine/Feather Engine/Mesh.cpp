@@ -15,12 +15,13 @@
 #include <GLFW\glfw3.h>
 #include <Lamp.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <ERenderCommand.h>
 
 using namespace glm;
 Shader* Mesh::defaultShader;
 Shader* Mesh::lightmapShader;
 Shader* Mesh::pbrShader;
-Shader* Mesh::pbrEnvShader;
+Shader* Mesh::geometryShader;
 Shader* Mesh::terrainEnvShader;
 Shader* Mesh::terrainLightmapShader;
 Shader* Mesh::terrainShader;
@@ -51,13 +52,13 @@ void Mesh::SetupMeshComp()
 {
 	defaultShader = new Shader("..\\shaders\\DefaultShader.vert", "..\\shaders\\DefaultShader.frag");
 	lightmapShader = new Shader("..\\shaders\\LightmapShader.vert", "..\\shaders\\LightmapShader.geom","..\\shaders\\LightmapShader.frag");
-	pbrShader = new Shader("..\\shaders\\DefaultShader.vert", "..\\shaders\\PBRShader.frag");
-	pbrEnvShader = new Shader("..\\shaders\\EnvShader.vert", "..\\shaders\\EnvShader.geom", "..\\shaders\\PBRShader.frag");
+	pbrShader = new Shader("..\\shaders\\geometry.vert", "..\\shaders\\PBRShader.frag");
+	geometryShader = new Shader("..\\shaders\\DefaultShader.vert", "..\\shaders\\geometry.frag");
 	grassShader = new Shader("..\\shaders\\TerrainShader.vert","..\\shaders\\Grass.geom" , "..\\shaders\\Grass.frag");
 	terrainShader = new Shader("..\\shaders\\TerrainShader.vert", "..\\shaders\\TerrainShader.geom", "..\\shaders\\PBRShader.frag");
 	//terrainLightmapShader = new Shader("..\\shaders\\TerrainLightmapShader.vert", "..\\shaders\\LightmapShader.geom", "..\\shaders\\LightmapShader.frag");
 	//terrainEnvShader = new Shader("..\\shaders\\TerrainEnvShader.vert", "..\\shaders\\TerrainEnvShader.geom", "..\\shaders\\PBRShader.frag");
-	colorCorrection = new Texture("Assets/Textures/colorCorrection.jpg");
+	//colorCorrection = new Texture("Assets/Textures/colorCorrection.jpg");
 }
 
 void Mesh::SetupMesh()
@@ -88,8 +89,6 @@ void Mesh::SetupMesh()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 
 
-	glGenBuffers(1, &lightColorSSBO);
-	glGenBuffers(1, &lightPositionSSBO);
 
 	glBindVertexArray(0);
 	/**/
@@ -98,7 +97,7 @@ void Mesh::SetupMesh()
 
 void Mesh::Render(mat4 view, mat4 projection, Asset* parent)
 {
-	Shader* shader;
+	Shader* shader = Mesh::geometryShader;
 	mat4 Model = mat4(1.0f);
 	Model = translate(Model, parent->position + posOffset);
 	Model = glm::scale(Model, parent->scale + scaleOffset);
@@ -106,101 +105,16 @@ void Mesh::Render(mat4 view, mat4 projection, Asset* parent)
 	mat4 rotate = glm::toMat4(q);
 	Model = Model;
 	mat4 VP = projection * view;
-	if (DefaultMaterial* mat = dynamic_cast<DefaultMaterial*>(material)) {
-		shader = defaultShader;
-		shader->use();
-		shader->setMat4f("Model", Model);
-		shader->setMat4f("VP", VP);
 
-		shader->set3Float("directionalLightDirection", Game::directionalLightDirection);
-		shader->set3Float("directionalLightColor", Game::directionalLightColor);
-		shader->set3Float("viewPos", Game::activeCam->position);
+	Game* g = &Game::Instance();
+	EOpenGl* eOpenGl = g->eOpenGl;
 
-		//Material loading
-		shader->set3Float("material.ambient", mat->ambient);
-		shader->set3Float("material.diffuse", mat->diffuse);
-		shader->set3Float("material.specular", mat->specular);
-		shader->setFloat("material.shininess", mat->shininess);
-		shader->set2Float("TextureCoordinateMultiply", material->TextureScale);
-		shader->setFloat("far_plane", 25);
+	eSetMaterialCommand(shader, dynamic_cast<PBRMaterial*>(material));
+	eSetMat4fCommand(shader, VP, "VP");
+	eSetMat4fCommand(shader, rotate, "Rot");
+	eSetMat4fCommand(shader, Model, "Model");
+	eDrawCommand(VAO,EBO,indices);
 
-		if (mat->diffuseMap != nullptr) {
-			shader->setInt("material.Texture", 1);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, mat->diffuseMap->id);
-		}
-		if (mat->specularMap != nullptr) {
-			shader->setInt("material.specularMap", 2);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, mat->specularMap->id);
-		}
-
-		if (mat->ambientMap != nullptr) {
-			shader->setInt("material.ambientMap", 3);
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, mat->ambientMap->id);
-		}
-
-	}
-	if (PBRMaterial* mat = dynamic_cast<PBRMaterial*>(material)) {
-		shader = pbrShader;
-		SetupPbrUniforms(Model,mat,shader);
-		shader->setMat4f("VP", VP);
-		shader->setInt("renderRef", 1);
-
-		shader->setInt("envMap", 5);
-		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, parent->environmentMap->id);
-
-		shader->setInt("colorCorrection", 6);
-		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, Mesh::colorCorrection->id);
-	}
-	shader->setMat4f("Rot",rotate);
-
-	vector<vec4> lightColors;
-	vector<vec4> lightPositions;
-	int i = 0;
-	for each (Lamp* l in Game::lamps) {
-		vec3 outcol = l->color;
-		vec3 outpos = l->parent->position;
-		lightColors.push_back(vec4(outcol,0));
-		lightPositions.push_back(vec4(outpos,0));
-		glActiveTexture(GL_TEXTURE8 + i);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, l->depthmap->id);
-		string str = "depthMaps[";
-		str.append(std::to_string(i));
-		str.append("]");
-		shader->setInt(str,i + 8);
-		i++;
-	}
-	//Color SSBO
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightColorSSBO);
-	GLuint block_index_c = 0;
-	block_index_c = glGetProgramResourceIndex(shader->ID, GL_SHADER_STORAGE_BLOCK, "lightColors");
-	GLuint ssbo_binding_point_index_c = 3;
-	glShaderStorageBlockBinding(shader->ID, block_index_c, ssbo_binding_point_index_c);
-	GLsizeiptr lcs = sizeof(glm::vec4) * (lightColors.size());
-	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_c, lightColorSSBO);
-	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_c, lightColorSSBO, 0, lcs);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, lcs, lightColors.data(), GL_DYNAMIC_DRAW);
-
-	//position SSBO
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightColorSSBO);
-	GLuint block_index_p = 0;
-	block_index_p = glGetProgramResourceIndex(shader->ID, GL_SHADER_STORAGE_BLOCK, "lightPositions");
-	GLuint ssbo_binding_point_index_p = 4;
-	glShaderStorageBlockBinding(shader->ID, block_index_p, ssbo_binding_point_index_p);
-	GLsizeiptr lps = sizeof(glm::vec4) * lightPositions.size();
-	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_p, lightPositionSSBO);
-	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_p, lightPositionSSBO, 0, lps);
-
-	glBufferData(GL_SHADER_STORAGE_BUFFER, lps, lightPositions.data(), GL_DYNAMIC_DRAW);
-
-
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
 }
 
 void Mesh::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a)
@@ -218,68 +132,10 @@ void Mesh::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l,
 	shader->setFloat("far_plane", 25);
 	shader->set3Float("lightPos", l->parent->position);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
-}
-
-void Mesh::RenderEnvMap(vector<mat4> view, mat4 projection, Asset* a)
-{
-	if (PBRMaterial* mat = dynamic_cast<PBRMaterial*>(material)) {
-		Shader* shader = pbrEnvShader;
-		mat4 Model(1.0f);
-		Model = translate(Model, a->position + posOffset);
-		Model = scale(Model, a->scale + scaleOffset);
-		Model = Model * glm::toMat4(a->q);;
-
-		SetupPbrUniforms(Model, mat, shader);
-		shader->setInt("renderRef", 0);
-		glUniformMatrix4fv(glGetUniformLocation(shader->ID, "envMatrices"), view.size(), GL_FALSE, glm::value_ptr(view[0]));
-
-
-		vector<vec4> lightColors;
-		vector<vec4> lightPositions;
-		int i = 0;
-		for each (Lamp* l in Game::lamps) {
-			vec3 outcol = l->color;
-			vec3 outpos = l->parent->position;
-			lightColors.push_back(vec4(outcol, 0));
-			lightPositions.push_back(vec4(outpos, 0));
-			glActiveTexture(GL_TEXTURE7 + i);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, l->depthmap->id);
-			string str = "depthMaps[";
-			str.append(std::to_string(i));
-			str.append("]");
-			shader->setInt(str, i + 7);
-			i++;
-		}
-		//Color SSBO
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightColorSSBO);
-		GLuint block_index_c = 0;
-		block_index_c = glGetProgramResourceIndex(shader->ID, GL_SHADER_STORAGE_BLOCK, "lightColors");
-		GLuint ssbo_binding_point_index_c = 3;
-		glShaderStorageBlockBinding(shader->ID, block_index_c, ssbo_binding_point_index_c);
-		GLsizeiptr lcs = sizeof(glm::vec4) * (lightColors.size());
-		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_c, lightColorSSBO);
-		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_c, lightColorSSBO, 0, lcs);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, lcs, lightColors.data(), GL_DYNAMIC_DRAW);
-
-		//position SSBO
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightColorSSBO);
-		GLuint block_index_p = 0;
-		block_index_p = glGetProgramResourceIndex(shader->ID, GL_SHADER_STORAGE_BLOCK, "lightPositions");
-		GLuint ssbo_binding_point_index_p = 4;
-		glShaderStorageBlockBinding(shader->ID, block_index_p, ssbo_binding_point_index_p);
-		GLsizeiptr lps = sizeof(glm::vec4) * lightPositions.size();
-		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_p, lightPositionSSBO);
-		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_p, lightPositionSSBO, 0, lps);
-
-		glBufferData(GL_SHADER_STORAGE_BUFFER, lps, lightPositions.data(), GL_DYNAMIC_DRAW);
-
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-	}
 }
 
 void Mesh::SetupPbrUniforms(mat4 model, PBRMaterial* mat, Shader* shader)

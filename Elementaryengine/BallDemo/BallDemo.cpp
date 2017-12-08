@@ -15,8 +15,6 @@ int main()
 {
 	//char* name = "Feather Engine";
 	Game game = Game::Instance();
-	game.windowHeight = 900;
-	game.windowWidth = 1600;
 	game.name = "Ball demo";
 	BallDemoMode* mode = new BallDemoMode();
 	mode->game = &game;

@@ -174,6 +174,8 @@
     <ClCompile Include="Asset.cpp" />
     <ClCompile Include="AssetComponent.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EOpenGl.cpp" />
+    <ClCompile Include="ERenderCommand.cpp" />
     <ClCompile Include="FPCam.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Import.cpp" />
@@ -202,6 +204,8 @@
     <ClInclude Include="Asset.h" />
     <ClInclude Include="AssetComponent.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="EOpenGl.h" />
+    <ClInclude Include="ERenderCommand.h" />
     <ClInclude Include="Feather.h" />
     <ClInclude Include="FPCam.h" />
     <ClInclude Include="Game.h" />

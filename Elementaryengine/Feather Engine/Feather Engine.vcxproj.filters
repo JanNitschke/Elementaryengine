@@ -66,6 +66,12 @@
     <ClCompile Include="Terrain.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="EOpenGl.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="ERenderCommand.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -138,6 +144,12 @@
       <Filter>Headerdateien\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="Terrain.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EOpenGl.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ERenderCommand.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
