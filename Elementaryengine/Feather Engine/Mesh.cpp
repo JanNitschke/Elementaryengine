@@ -22,10 +22,12 @@ Shader* Mesh::defaultShader;
 Shader* Mesh::lightmapShader;
 Shader* Mesh::pbrShader;
 Shader* Mesh::geometryShader;
+Shader* Mesh::voxelShader;
 Shader* Mesh::terrainEnvShader;
 Shader* Mesh::terrainLightmapShader;
 Shader* Mesh::terrainShader;
 Shader* Mesh::grassShader;
+Shader* Mesh::ssrShader;
 Texture* Mesh::colorCorrection;
 Mesh::Mesh()
 {
@@ -53,12 +55,14 @@ void Mesh::SetupMeshComp()
 	defaultShader = new Shader("..\\shaders\\DefaultShader.vert", "..\\shaders\\DefaultShader.frag");
 	lightmapShader = new Shader("..\\shaders\\LightmapShader.vert", "..\\shaders\\LightmapShader.geom","..\\shaders\\LightmapShader.frag");
 	pbrShader = new Shader("..\\shaders\\geometry.vert", "..\\shaders\\PBRShader.frag");
+	ssrShader = new Shader("..\\shaders\\geometry.vert", "..\\shaders\\SSR.frag");
 	geometryShader = new Shader("..\\shaders\\DefaultShader.vert", "..\\shaders\\geometry.frag");
+	voxelShader = new Shader("..\\shaders\\voxelise.vert", "..\\shaders\\voxelise.geom", "..\\shaders\\voxelise.frag");
 	grassShader = new Shader("..\\shaders\\TerrainShader.vert","..\\shaders\\Grass.geom" , "..\\shaders\\Grass.frag");
 	terrainShader = new Shader("..\\shaders\\TerrainShader.vert", "..\\shaders\\TerrainShader.geom", "..\\shaders\\PBRShader.frag");
 	//terrainLightmapShader = new Shader("..\\shaders\\TerrainLightmapShader.vert", "..\\shaders\\LightmapShader.geom", "..\\shaders\\LightmapShader.frag");
 	//terrainEnvShader = new Shader("..\\shaders\\TerrainEnvShader.vert", "..\\shaders\\TerrainEnvShader.geom", "..\\shaders\\PBRShader.frag");
-	//colorCorrection = new Texture("Assets/Textures/colorCorrection.jpg");
+	colorCorrection = new Texture("Assets/Textures/colorCorrection.jpg");
 }
 
 void Mesh::SetupMesh()
@@ -95,9 +99,9 @@ void Mesh::SetupMesh()
 }
 
 
-void Mesh::Render(mat4 view, mat4 projection, Asset* parent)
+void Mesh::Render(mat4 view, mat4 projection, Asset* parent, Shader* s)
 {
-	Shader* shader = Mesh::geometryShader;
+	Shader* shader = s;
 	mat4 Model = mat4(1.0f);
 	Model = translate(Model, parent->position + posOffset);
 	Model = glm::scale(Model, parent->scale + scaleOffset);
@@ -113,6 +117,7 @@ void Mesh::Render(mat4 view, mat4 projection, Asset* parent)
 	eSetMat4fCommand(shader, VP, "VP");
 	eSetMat4fCommand(shader, rotate, "Rot");
 	eSetMat4fCommand(shader, Model, "Model");
+	eSetMat4fCommand(shader, Game::Instance().VoxelProj, "voxelprojection");
 	eDrawCommand(VAO,EBO,indices);
 
 }
@@ -125,7 +130,6 @@ void Mesh::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l,
 	Model = scale(Model, a->scale + scaleOffset);
 	Model = Model * glm::toMat4(a->q);;
 
-	shader->use();
 	shader->setMat4f("Model", Model);
 
 	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "shadowMatrices"), view.size(), GL_FALSE, glm::value_ptr(view[0]));

@@ -14,6 +14,13 @@ struct EDisplaySettings
 	int windowWidth = 1600;
 
 };
+struct DrawElementsIndirectCommand{
+	GLuint  count;
+	GLuint  primCount;
+	GLuint  firstIndex;
+	GLint   baseVertex;
+	GLuint  baseInstance;
+};
 
 class EOpenGl
 {
@@ -22,7 +29,7 @@ public:
 	~EOpenGl();
 	// Gemetry Buffer 
 	unsigned int gBuffer;
-	unsigned int gPosition, gNormal, gColorSpec, gAlbedoSpec, gMaterial;
+	unsigned int gPosition, gNormal, gColorSpec, gAlbedoSpec, gMaterial, gDepth;
 	GLuint lightColorSSBO = 0;
 	GLuint lightPositionSSBO = 0;
 	unsigned int quadVAO = 0;
@@ -31,6 +38,7 @@ public:
 	// VXAO
 	unsigned int vBuffer;
 	unsigned int gridsize = 512;
+	unsigned int vMap;
 
 	void renderQuad();
 	void Initialise(EDisplaySettings* settings);
@@ -40,4 +48,3 @@ public:
 	///</summary> 
 	GLFWwindow* window;
 };
-

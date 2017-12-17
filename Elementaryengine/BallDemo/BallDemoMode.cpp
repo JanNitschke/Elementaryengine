@@ -35,7 +35,7 @@ void BallDemoMode::Load()
 	Model* mpbr2 = new Model("Assets/Meshs/Sphere.obj");
 	Model* ter = new Model("Assets/Meshs/terrain512.obj");
 
-	Asset* a = new Asset(vec3(0,-3,0),vec3(5,0.1f,5),0,assetShapes::cube);
+	Asset* a = new Asset(vec3(0,-3,0),vec3(50,0.1f,50),0,assetShapes::cube);
 	a->setFriction(2);
 	m->attachTo(a);
 	a->OnTick = FallingTick;
@@ -48,9 +48,8 @@ void BallDemoMode::Load()
 	pbrwood->metallic = 0;
 	pbrwood->roughness = 0.4f;
 	pbrwood->roughnessMap = new Texture("Assets/Textures/WoodSpec.jpg");
-	pbrwood->TextureScale = vec2(3.0f);
+	pbrwood->TextureScale = vec2(1.0f);
 
-	m->meshes[0]->material = pbrwood;
 
 	PBRMaterial* beton = new PBRMaterial();
 	beton->albedo = vec3(1);
@@ -77,11 +76,12 @@ void BallDemoMode::Load()
 	rust->ao = vec3(0.5);
 	rust->metallic = 1;
 	rust->metallicMap = new Texture("Assets/Textures/r2metal.jpg");
-	rust->roughness = 0.2f;
+	rust->roughness = 0.0f;
 	rust->roughnessMap = new Texture("Assets/Textures/r2rough.jpg");
-
-	mpbr->meshes[0]->material = rust;
-	mpbr2->meshes[0]->material = rust;
+	rust->TextureScale = vec2(20.0f);
+	mpbr->meshes[0]->material = pbrwood;
+	mpbr2->meshes[0]->material = pbrwood;
+	m->meshes[0]->material = rust;
 
 
 	Model* m3 = new Model("Assets/Meshs/Sphere.obj");
@@ -105,7 +105,7 @@ void BallDemoMode::Load()
 	l2->attachTo(b2);
 	l2->color = vec3(0.8f);
 	b2->scale = vec3(.10f);
-	b2->position = vec3(2.5f, 6, 1.0f);
+	b2->position = vec3(0.5f, 6, 1.0f);
 	m3->attachTo(b2);
 	
 	Asset* c = new Asset(vec3(0.5f, 20, 0),vec3(.4f),100,assetShapes::ball);
@@ -129,6 +129,13 @@ void BallDemoMode::Load()
 	//terrain->material = grass;
 	//terrain->grassMap = new Texture("Assets/Textures/RockSpec.jpg"); 
 	//terrain->attachTo(t);
+
+	// 400 baseline defered : 30 fps
+	for (int i = 0; i < 400; i++)
+	{
+		Asset* a = new Asset(vec3(2, -0.5 + i,-5), vec3(.40f), 10, assetShapes::ball);
+		mpbr->attachTo(a);
+	}
 }
 
 void BallDemoMode::Start()

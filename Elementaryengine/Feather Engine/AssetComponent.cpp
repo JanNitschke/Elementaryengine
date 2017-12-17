@@ -3,7 +3,6 @@
 #include <functional>
 #include <Asset.h>
 
-
 AssetComponent::AssetComponent()
 {
 }
@@ -20,7 +19,7 @@ void AssetComponent::attachTo(Asset * a)
 	a->components.push_back(this);
 }
 
-void AssetComponent::Render(mat4 view, mat4 projection, Asset* parent)
+void AssetComponent::Render(mat4 view, mat4 projection, Asset* parent, Shader* s)
 {
 }
 

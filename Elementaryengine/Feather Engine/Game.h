@@ -35,6 +35,16 @@ public:
 	///DO NOT DESTROY THE GAME OBJECT WITHOUT CALLING Game::Stop() FIRST!
 	///</summary> 
 	~Game();
+	unsigned int shadowMaps;
+	unsigned int lBuffer, frameOut;
+
+	//multi draw indirect stuff
+	unsigned int gVertexBuffer;
+	unsigned int gArrayTexutre;
+	unsigned int gElementBuffer;
+	unsigned int gIndirectBuffer;
+	unsigned int gDrawIdBuffer;
+	GLuint vao;
 
 	///<summary>
 	/// Opengl functions
@@ -100,6 +110,13 @@ public:
 	glm::mat4 Projection;
 
 	///<summary>
+	///Projection matrix for Voxelisation;
+	///</summary> 
+	glm::mat4 VoxelProj;
+
+	int renderstate = 0;
+
+	///<summary>
 	///View matrix for the 3D scene;
 	///</summary> 
 	glm::mat4 View;
@@ -140,7 +157,11 @@ public:
 	///Draws all elements of the assets vector
 	///</summary> 
 	void Render();
-
+	
+	///<summary>
+	///Draws all elements of the assets vector
+	///</summary> 
+	void SetupRender();
 
 	///<summary>
 	///Renders the shadow maps of all lights

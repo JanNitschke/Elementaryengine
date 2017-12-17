@@ -1,5 +1,6 @@
 #pragma once
 #include <Feather.h>
+#include <Shader.h>
 #define DllImport   __declspec( dllimport )
 #define DllExport   __declspec( dllexport )
 using namespace glm;
@@ -11,7 +12,7 @@ public:
 	~AssetComponent();
 	void attachTo(Asset* a);
 	Asset* parent;
-	virtual void Render(mat4 view, mat4 projection, Asset* parent);
+	virtual void Render(mat4 view, mat4 projection, Asset* parent, Shader* s);
 	virtual void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a);
 };
 

@@ -13,6 +13,8 @@ using namespace std;
 #include <iostream>
 int main()
 {
+	int a; 
+	cin >> a;
 	//char* name = "Feather Engine";
 	Game game = Game::Instance();
 	game.name = "Ball demo";

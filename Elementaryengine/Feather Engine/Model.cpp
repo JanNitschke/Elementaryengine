@@ -16,11 +16,11 @@ Model::Model(char * path)
 	loadModel(path);
 }
 
-void Model::Render(mat4 view, mat4 projection, Asset* parent)
+void Model::Render(mat4 view, mat4 projection, Asset* parent, Shader* s)
 {
 	for each (Mesh* m in meshes)
 	{
-		m->Render(view,projection,parent);
+		m->Render(view,projection,parent,s);
 	}
 }
 

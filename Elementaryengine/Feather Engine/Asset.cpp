@@ -8,26 +8,6 @@ unsigned int Asset::envMapFBO;
 
 Asset::Asset()
 {
-	if (!Game::isServer) {
-		environmentMap = new Texture(1);
-		glGenTextures(1, &environmentMap->id);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, environmentMap->id);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, envMapFBO);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, environmentMap->id, 0);
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		for (unsigned int i = 0; i < 6; ++i)
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
-				ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	}
 
 
 
@@ -39,26 +19,7 @@ Asset::Asset()
 }
 Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 {
-	if (!Game::isServer) {
-		environmentMap = new Texture(1);
-		glGenTextures(1, &environmentMap->id);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, environmentMap->id);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, envMapFBO);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, environmentMap->id, 0);
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		for (unsigned int i = 0; i < 6; ++i)
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
-				ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	}
+	
 	
 
 	Game::nextAssets.push_back(this);
@@ -165,9 +126,9 @@ DllExport btRigidBody * Asset::getRigidBody()
 }
 
 
-void Asset::Render(mat4 view, mat4 projection)
+void Asset::Render(mat4 view, mat4 projection, Shader* s)
 {
-	Render(position,  rotation, scale,  view,  projection);
+	Render(position,  rotation, scale,  view,  projection,s);
 }
 
 void Asset::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l)
@@ -180,11 +141,11 @@ void Asset::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l
 
 
 
-void Asset::Render(vec3 pos, vec3 rot, vec3 scale, mat4 view, mat4 projection)
+void Asset::Render(vec3 pos, vec3 rot, vec3 scale, mat4 view, mat4 projection, Shader* s)
 {
 	for each (AssetComponent* c in components)
 	{
-		c->Render(view, projection, this);
+		c->Render(view, projection, this,s);
 	}
 }
 // called every frame for game logic

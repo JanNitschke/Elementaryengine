@@ -1,6 +1,6 @@
 #include "EOpenGl.h"
 #include "iostream"
-
+#include "Lamp.h"
 
 EOpenGl::EOpenGl()
 {
@@ -21,14 +21,13 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	}
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // for MacOS
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow(settings->windowWidth, settings->windowHeight, settings->windowname , NULL, NULL);
-	return;
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -62,7 +61,6 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glShadeModel(GL_SMOOTH);
 	glEnable(GL_MULTISAMPLE);
 
 	//Setup framebuffer
@@ -102,16 +100,20 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gMaterial, 0);
 
+	glGenTextures(1, &gDepth);
+	glBindTexture(GL_TEXTURE_2D, gDepth);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, settings->windowWidth, settings->windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, gDepth, 0);
+
+
 	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
 	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 	glDrawBuffers(4, attachments);
 
-	// create and attach depth buffer (renderbuffer)
-	unsigned int rboDepth;
-	glGenRenderbuffers(1, &rboDepth);
-	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, settings->windowWidth, settings->windowHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+
+
 	// finally check if framebuffer is complete
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Framebuffer not complete!" << std::endl;
@@ -122,9 +124,31 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	glGenBuffers(1, &lightColorSSBO);
 	glGenBuffers(1, &lightPositionSSBO);
 
-	// VXAO
-	
+	//// VXAO
+	//glGenFramebuffers(1, &vBuffer);
+	//glBindFramebuffer(GL_FRAMEBUFFER, vBuffer);
+	//gridsize = 512;
+	//glGenTextures(1, &vMap);
+	//glBindTexture(GL_TEXTURE_3D, vMap);
+	//glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+/*
+	GLubyte* image;
+	image = new GLubyte[gridsize * gridsize * gridsize * 4];
 
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, gridsize, gridsize, gridsize, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, image);
+	delete[] image;
+
+	//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, vMap, 0);*/
+
+	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//	std::cout << "Framebuffer 3d not complete!" << glCheckFramebufferStatus(GL_FRAMEBUFFER)  << std::endl;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 void EOpenGl::renderQuad()
 {

@@ -9,6 +9,7 @@ using namespace std;
 #include <Shader.h>
 #include <FPCam.h>
 #include <Lamp.h>
+#include <iostream>
 //#include <enet\enet.h>
 using namespace FeatherEngine;
 
@@ -46,7 +47,6 @@ void Game::Start()
 	displaySettings = new EDisplaySettings;
 	displaySettings->windowname = name;
 	eOpenGl->Initialise(displaySettings);
-	return;
 
 	//Setup Bullet physics
 	btBroadphaseInterface* broadphase = new btDbvtBroadphase();
@@ -64,14 +64,18 @@ void Game::Start()
 	Mesh::SetupMeshComp();
 	Lamp::SetupLampComp();
 	Asset::SetupAsset();
-	
+	glGenTextures(1, &shadowMaps);
+	glGenFramebuffers(1, &lBuffer);
+	glGenTextures(1, &frameOut);
 	LoadScene();
+
 
 
 	float viewaspect = (float)displaySettings->windowWidth / (float)displaySettings->windowHeight;
 	Projection = glm::perspective(glm::radians(60.0f), viewaspect, 0.1f, 100.0f);
 	//For an ortho camera :
 	//Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
+	VoxelProj = glm::ortho(-64.0f,64.0f,-64.0f,64.0f,-64.0f,64.0f); // In world coordinates
 
 
 	loop();
@@ -137,8 +141,8 @@ void Game::loop()
 			asset->Tick(eOpenGl->window, deltaTime);
 		}
 		dynamicsWorld->stepSimulation(deltaTime, 1);
-
 		if (!isServer) {
+		//	SetupRender();
 			RenderShadowMaps();
 			Render();
 			RenderHUD();
@@ -165,23 +169,52 @@ void Game::setLight(vec3 color, vec3 direction)
 }
 void Game::Render()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->gBuffer	);
+	//// voxel pass
+	//Shader* s = Mesh::voxelShader;
+	//s->use();
+	//glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->vBuffer);
+	////glEnable(GL_BLEND);
+	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glViewport(0, 0, eOpenGl->gridsize, eOpenGl->gridsize);
+	//eSetLampsCommand(s, eOpenGl->lightColorSSBO, eOpenGl->lightPositionSSBO);
+	/*
+	for each (Asset* a in assets)
+	{
+		a->Render(View, Projection, s);
+	}
+	*/
+	// geometry pass
+	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->gBuffer);
+	glDisable(GL_BLEND);
+	glClearColor(0.050f, 0.125f, 0.247f, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, displaySettings->windowWidth, displaySettings->windowHeight);
-	
-	// geometry pass
 	Mesh::geometryShader->use();
 
 	for each (Asset* a in assets)
 	{
-			a->Render(View, Projection);
+			a->Render(View, Projection, Mesh::geometryShader);
 	}
 
-	// lighting pass
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// lighting pass	
+	glBindFramebuffer(GL_FRAMEBUFFER, lBuffer);
+
+	glBindTexture(GL_TEXTURE_2D, frameOut);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, displaySettings->windowWidth, displaySettings->windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameOut, 0);
+
 	Shader* shader = Mesh::pbrShader;
 	shader->use();
+	glDisable(GL_DEPTH_TEST);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, eOpenGl->gPosition);
@@ -198,9 +231,66 @@ void Game::Render()
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, eOpenGl->gMaterial);
 	shader->setInt("gMaterial", 3);
+	shader->setFloat("far_plane", 25);
+
+	shader->setInt("colorCorrection",4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, Mesh::colorCorrection->id);
 
 	eSetLampsCommand(shader, eOpenGl->lightColorSSBO, eOpenGl->lightPositionSSBO);
+
 	eOpenGl->renderQuad();
+
+
+
+	//post fx 	
+	glBlitFramebuffer(0, 0, displaySettings->windowWidth, displaySettings->windowHeight, 0, 0, displaySettings->windowWidth, displaySettings->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	shader = Mesh::ssrShader;
+	shader->use();
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gPosition);
+	shader->setInt("gPosition", 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gNormal);
+	shader->setInt("gNormal", 1);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gAlbedoSpec);
+	shader->setInt("gAlbedoSpec", 2);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gMaterial);
+	shader->setInt("gMaterial", 3);
+	shader->setFloat("far_plane", 25);
+
+	shader->setInt("colorCorrection", 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, Mesh::colorCorrection->id);
+
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, frameOut);
+	shader->setInt("gColor", 5);
+
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gDepth);
+	shader->setInt("gDepth", 6);
+
+
+	eSetLampsCommand(shader, eOpenGl->lightColorSSBO, eOpenGl->lightPositionSSBO);
+	shader->set3Float("viewPos", activeCam->position);
+	shader->setMat4f("invView", inverse(View));
+	shader->setMat4f("invProj", inverse(Projection));
+	shader->setMat4f("view", View);
+	shader->setMat4f("proj", Projection);
+
+	eOpenGl->renderQuad();
+
 
 
 	// copy content of geometry's depth buffer to default framebuffer's depth buffer
@@ -210,17 +300,119 @@ void Game::Render()
 											   // blit to default framebuffer. Note that this may or may not work as the internal formats of both the FBO and default framebuffer have to match.
 											   // the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the 		
 											   // depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
-	glBlitFramebuffer(0, 0, displaySettings->windowWidth, displaySettings->windowHeight, 0, 0, displaySettings->windowWidth, displaySettings->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+
+}
+
+void Game::SetupRender()
+{
+	vector<Vertex> vVertex;
+	vector<unsigned int>gIndex;
+	int currentIndexOffset = 0;
+	int currentVertexOffset = 0;
+	int instance = 0;
+	vector<DrawElementsIndirectCommand> dICommands;
+	for each (Asset* a in assets)
+	{
+		for each (AssetComponent* c in a->components)
+		{
+			if (Model* d = dynamic_cast<Model*>(c)) {
+				for each(Mesh* m in d->meshes) {
+					// Reserve storage for Indices
+					gIndex.reserve(gIndex.size() + m->indices.size());
+					// Append Indices
+					gIndex.insert(gIndex.end(), m->indices.begin(), m->indices.end());
+					
+					// Reserve storage for Indices
+					vVertex.reserve((vVertex.size() + m->vertices.size()) * sizeof(Vertex));
+					// Append Indices
+					vVertex.insert(vVertex.end(), m->vertices.begin(), m->vertices.end());
+					DrawElementsIndirectCommand c = DrawElementsIndirectCommand();
+					c.count = m->vertices.size();
+					// TODO: change this later for grouping mesh copys
+					c.primCount = 1;
+					c.firstIndex = currentIndexOffset;
+					c.baseVertex = currentVertexOffset;
+					c.baseInstance = instance;
+					instance++;
+					currentIndexOffset += m->indices.size();
+					currentVertexOffset += m->vertices.size();
+				}
+			}
+		}
+	}
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	//Create a vertex buffer object
+	glGenBuffers(1, &gVertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, gVertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vVertex), &vVertex, GL_STATIC_DRAW);
+
+
+	// vertex positions
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	// vertex normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+	// vertex texture coords
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+
+	//Create an element buffer
+	glGenBuffers(1, &gElementBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gElementBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gIndex), &gIndex, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &gIndirectBuffer);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(dICommands), &dICommands, GL_STATIC_DRAW);
+
+	GLuint vDrawId[100];
+	for (GLuint i(0); i<100; i++)
+	{
+		vDrawId[i] = i;
+	}
+
+	glGenBuffers(1, &gDrawIdBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, gDrawIdBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vDrawId), vDrawId, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribIPointer(3, 1, GL_UNSIGNED_INT, 0, (GLvoid*)0);
+	glVertexAttribDivisor(3, 1);
 
 }
 
 void Game::RenderShadowMaps()
 {
+	Shader* shader = Mesh::lightmapShader;
+	shader->use();
+	int lightcount = lamps.size();
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, shadowMaps);
+
+	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_RGBA16F, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT, 6 * lightcount, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
 	glViewport(0, 0, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, Lamp::depthMapFBO);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowMaps, 0);
+
+	glClearColor(1000,1000,1000,1);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, shadowMaps);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+	int count = 0;
 	for each (Lamp* l in lamps)
 	{
+
 		float aspect = (float)Lamp::SHADOW_WIDTH / (float)Lamp::SHADOW_WIDTH;
 		float Snear = 1.0f;
 		float Sfar = 25.0f;
@@ -240,21 +432,23 @@ void Game::RenderShadowMaps()
 		shadowTransforms.push_back(shadowProj *
 			glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, l->depthmap->id, 0);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
+		shader->setInt("layer", count);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, l->depthmap->id);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		count++;
+	
 		int i = 0;
-		for each (Asset* a in assets)
+		vector<Asset*> relevantAssets(assets.size());
+		vec3 ppos = l->parent->position;
+		auto it = std::copy_if(assets.begin(), assets.end(), relevantAssets.begin(), [&ppos](Asset* a) {return (length(a->position - ppos) < 25.0f) ; });
+		relevantAssets.resize(std::distance(relevantAssets.begin(), it));  // shrink container to new size
+
+		for each (Asset* a in relevantAssets)
 		{
 				a->RenderLightmap(shadowTransforms, mat4(1), l);
 		}
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-		glBindTexture(GL_TEXTURE_2D, 0);
+
 	}	
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Game::processInput(GLFWwindow * window)
