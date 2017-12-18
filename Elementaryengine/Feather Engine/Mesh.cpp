@@ -98,6 +98,14 @@ void Mesh::SetupMesh()
 	/**/
 }
 
+mat4 Mesh::Model()
+{
+	mat4 model = mat4(1.0f);
+	model = translate(model, parent->position + posOffset);
+	model = glm::scale(model, parent->scale + scaleOffset);
+	return model;
+}
+
 
 void Mesh::Render(mat4 view, mat4 projection, Asset* parent, Shader* s)
 {

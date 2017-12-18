@@ -88,7 +88,7 @@ void eSetLampsCommand(Shader * shader, GLuint lightColorSSBO, GLuint lightPositi
 	glBufferData(GL_SHADER_STORAGE_BUFFER, lcs, lightColors.data(), GL_DYNAMIC_DRAW);
 
 	//position SSBO
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightColorSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightPositionSSBO);
 	GLuint block_index_p = 0;
 	block_index_p = glGetProgramResourceIndex(shader->ID, GL_SHADER_STORAGE_BLOCK, "lightPositions");
 	GLuint ssbo_binding_point_index_p = 4;

@@ -228,6 +228,7 @@ public:
 	void netDisconnect();
 
 	//ENetPeer *peer;
+	bool meshChanged = true;
 
 private:
 	///<summary>
@@ -248,5 +249,14 @@ private:
 	/////If multiplayer what rights does this client have
 	/////</summary> 
 	//Authority authority;
+	
+	//Render Buffers etc.
+	vector<Vertex> vVertex;
+	vector<unsigned int>gIndex;
+	int currentIndexOffset = 0;
+	int currentVertexOffset = 0;
+	int instance = 0;
+	vector<DrawElementsIndirectCommand> dICommands;
+
 };
  

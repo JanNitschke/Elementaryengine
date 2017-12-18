@@ -10,6 +10,11 @@ using namespace std;
 #include <FPCam.h>
 #include <Lamp.h>
 #include <iostream>
+
+#include <glm\gtx\quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+
+
 //#include <enet\enet.h>
 using namespace FeatherEngine;
 
@@ -68,6 +73,13 @@ void Game::Start()
 	glGenFramebuffers(1, &lBuffer);
 	glGenTextures(1, &frameOut);
 	LoadScene();
+
+	// Setup Render buffers for mdei
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &gElementBuffer);
+	glGenBuffers(1, &gIndirectBuffer);
+	glGenBuffers(1, &gVertexBuffer);
+	glGenBuffers(1, &gDrawIdBuffer);
 
 
 
@@ -142,8 +154,8 @@ void Game::loop()
 		}
 		dynamicsWorld->stepSimulation(deltaTime, 1);
 		if (!isServer) {
-		//	SetupRender();
-			RenderShadowMaps();
+			SetupRender();
+		//	RenderShadowMaps();
 			Render();
 			RenderHUD();
 
@@ -187,6 +199,8 @@ void Game::Render()
 	}
 	*/
 	// geometry pass
+	//old
+	/*
 	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->gBuffer);
 	glDisable(GL_BLEND);
 	glClearColor(0.050f, 0.125f, 0.247f, 0);
@@ -201,6 +215,30 @@ void Game::Render()
 	{
 			a->Render(View, Projection, Mesh::geometryShader);
 	}
+	*/
+
+	// new
+	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->gBuffer);
+	glDisable(GL_BLEND);
+	glClearColor(0.050f, 0.125f, 0.247f, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, displaySettings->windowWidth, displaySettings->windowHeight);
+	Mesh::geometryShader->use();
+	Mesh::geometryShader->setMat4f("VP", Projection * View);
+
+	glBindVertexArray(vao);
+	//glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gElementBuffer);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
+
+	glMultiDrawElementsIndirect(GL_TRIANGLES,
+		GL_UNSIGNED_INT,
+		(GLvoid*)0,
+		instance,
+		0);
+
 
 	// lighting pass	
 	glBindFramebuffer(GL_FRAMEBUFFER, lBuffer);
@@ -306,82 +344,119 @@ void Game::Render()
 
 void Game::SetupRender()
 {
-	vector<Vertex> vVertex;
-	vector<unsigned int>gIndex;
-	int currentIndexOffset = 0;
-	int currentVertexOffset = 0;
-	int instance = 0;
-	vector<DrawElementsIndirectCommand> dICommands;
-	for each (Asset* a in assets)
+	if (meshChanged) {
+		vVertex.clear();
+		vVertex.resize(0);
+		gIndex.clear();
+		gIndex.resize(0);
+		dICommands.clear();
+		dICommands.resize(0);
+		currentIndexOffset = 0;
+		currentVertexOffset = 0;
+		instance = 0;
+
+		for each (Asset* a in assets)
+		{
+			for each (AssetComponent* c in a->components)
+			{
+				if (Model* d = dynamic_cast<Model*>(c)) {
+					for each(Mesh* m in d->meshes) {
+						// Append Indices
+						gIndex.insert(gIndex.end(), m->indices.begin(), m->indices.end());
+
+						// Append Indices
+						vVertex.insert(vVertex.end(), m->vertices.begin(), m->vertices.end());
+
+						DrawElementsIndirectCommand c = DrawElementsIndirectCommand();
+						c.count = m->indices.size();
+						// TODO: change this later for grouping mesh copys
+						c.primCount = 1;
+						c.firstIndex = currentIndexOffset;
+						c.baseVertex = currentVertexOffset;
+						c.baseInstance = instance;
+						instance++;
+						currentIndexOffset += m->indices.size();
+						currentVertexOffset += m->vertices.size();
+						dICommands.push_back(c);
+					}
+				}
+			}
+		}
+
+
+		glBindVertexArray(vao);
+		//Create a vertex buffer object
+		glBindBuffer(GL_ARRAY_BUFFER, gVertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, vVertex.size() * sizeof(Vertex), &vVertex[0], GL_STATIC_DRAW);
+
+
+		// vertex positions
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+		// vertex normals
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+		// vertex texture coords
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+
+		//Create an element buffer
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gElementBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, gIndex.size() * sizeof(unsigned int), &gIndex[0], GL_STATIC_DRAW);
+
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
+		glBufferData(GL_DRAW_INDIRECT_BUFFER, dICommands.size() * sizeof(DrawElementsIndirectCommand), &dICommands[0], GL_STATIC_DRAW);
+
+		vector<GLuint> vDrawId(instance);
+		for (GLuint i(0); i<instance; i++)
+		{
+			vDrawId[i] = i;
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, gDrawIdBuffer);
+		glBufferData(GL_ARRAY_BUFFER, vDrawId.size() * sizeof(GLuint), &vDrawId[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(3);
+		glVertexAttribIPointer(3, 1, GL_UNSIGNED_INT, 0, (GLvoid*)0);
+		glVertexAttribDivisor(3, 1);
+		meshChanged = false;
+	}
+	vector<DrawMeshAtributes> drawAtrib;
+	for each (Asset* as in assets)
 	{
-		for each (AssetComponent* c in a->components)
+		for each (AssetComponent* c in as->components)
 		{
 			if (Model* d = dynamic_cast<Model*>(c)) {
 				for each(Mesh* m in d->meshes) {
-					// Reserve storage for Indices
-					gIndex.reserve(gIndex.size() + m->indices.size());
-					// Append Indices
-					gIndex.insert(gIndex.end(), m->indices.begin(), m->indices.end());
-					
-					// Reserve storage for Indices
-					vVertex.reserve((vVertex.size() + m->vertices.size()) * sizeof(Vertex));
-					// Append Indices
-					vVertex.insert(vVertex.end(), m->vertices.begin(), m->vertices.end());
-					DrawElementsIndirectCommand c = DrawElementsIndirectCommand();
-					c.count = m->vertices.size();
-					// TODO: change this later for grouping mesh copys
-					c.primCount = 1;
-					c.firstIndex = currentIndexOffset;
-					c.baseVertex = currentVertexOffset;
-					c.baseInstance = instance;
-					instance++;
-					currentIndexOffset += m->indices.size();
-					currentVertexOffset += m->vertices.size();
+					DrawMeshAtributes a = DrawMeshAtributes();
+					mat4 model = mat4(1.0f);
+					model = translate(model, as->position + m->posOffset);
+					model = glm::scale(model, as->scale + m->scaleOffset);
+					a.Model = model;
+					a.Rot = glm::toMat4(as->q);
+					PBRMaterial* mat = dynamic_cast<PBRMaterial*>(m->material);
+					a.albedo = mat->albedo;
+					a.ao = mat->ao;
+					a.roughness = mat->roughness;
+					a.metallic = mat->metallic;
+					drawAtrib.push_back(a);
 				}
 			}
 		}
 	}
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	//Create a vertex buffer object
-	glGenBuffers(1, &gVertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, gVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vVertex), &vVertex, GL_STATIC_DRAW);
 
+	//meshdata SSBO
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, eOpenGl->meshDataSSBO);
+	GLuint block_index = 0;
+	block_index = glGetProgramResourceIndex(Mesh::geometryShader->ID, GL_SHADER_STORAGE_BLOCK, "lightPositions");
+	GLuint ssbo_binding_point_index = 5;
+	glShaderStorageBlockBinding(Mesh::geometryShader->ID, block_index, ssbo_binding_point_index);
+	GLsizeiptr s = sizeof(DrawMeshAtributes) * drawAtrib.size();
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_p, lightPositionSSBO);
+	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, eOpenGl->meshDataSSBO, 0, s);
 
-	// vertex positions
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	// vertex normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-	// vertex texture coords
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-
-
-	//Create an element buffer
-	glGenBuffers(1, &gElementBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gElementBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gIndex), &gIndex, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &gIndirectBuffer);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
-	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(dICommands), &dICommands, GL_STATIC_DRAW);
-
-	GLuint vDrawId[100];
-	for (GLuint i(0); i<100; i++)
-	{
-		vDrawId[i] = i;
-	}
-
-	glGenBuffers(1, &gDrawIdBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, gDrawIdBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vDrawId), vDrawId, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(3);
-	glVertexAttribIPointer(3, 1, GL_UNSIGNED_INT, 0, (GLvoid*)0);
-	glVertexAttribDivisor(3, 1);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, s, drawAtrib.data(), GL_DYNAMIC_DRAW);
 
 }
 

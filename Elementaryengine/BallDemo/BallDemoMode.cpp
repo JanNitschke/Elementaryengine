@@ -131,7 +131,9 @@ void BallDemoMode::Load()
 	//terrain->attachTo(t);
 
 	// 400 baseline defered : 30 fps
-	for (int i = 0; i < 400; i++)
+	Asset* asc = new Asset(vec3(2, -0.5, 1), vec3(.40f), 10, assetShapes::cube);
+	m->attachTo(asc);
+	for (int i = 0; i < 100; i++)
 	{
 		Asset* a = new Asset(vec3(2, -0.5 + i,-5), vec3(.40f), 10, assetShapes::ball);
 		mpbr->attachTo(a);

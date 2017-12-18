@@ -21,6 +21,18 @@ struct DrawElementsIndirectCommand{
 	GLint   baseVertex;
 	GLuint  baseInstance;
 };
+struct DrawMeshAtributes {
+	mat4 Model;
+	mat4 Rot;
+	vec3 albedo;
+	vec3 ao;
+	float roughness;
+	float metallic;
+	int i0;
+	int i1;
+	int i3;
+	int i4;
+};
 
 class EOpenGl
 {
@@ -32,6 +44,8 @@ public:
 	unsigned int gPosition, gNormal, gColorSpec, gAlbedoSpec, gMaterial, gDepth;
 	GLuint lightColorSSBO = 0;
 	GLuint lightPositionSSBO = 0;
+	GLuint meshDataSSBO = 0;
+
 	unsigned int quadVAO = 0;
 	unsigned int quadVBO;
 

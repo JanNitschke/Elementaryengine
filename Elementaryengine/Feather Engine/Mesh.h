@@ -50,5 +50,6 @@ public:
 	GLuint VPMatrixID;
 	GLuint ModelMatrixID;
 	void SetupMesh();
+	mat4 Model();
 };
 
