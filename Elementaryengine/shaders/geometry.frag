@@ -1,5 +1,5 @@
 // shadertype=glsl
-#version 430 core
+#version 460 core
 layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec4 gAlbedoSpec;
@@ -21,6 +21,9 @@ struct DrawAtributes{
 	vec3 ao;
 	float roughness;
 	float metallic;
+    uint albedoTex;
+	uint metallicTex;
+	uint roughnessTex;
 };
 layout(std430, binding = 5) buffer Atrib 
 {

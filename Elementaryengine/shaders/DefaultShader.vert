@@ -1,8 +1,7 @@
-#version 430 core
+#version 460 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
-layout (location = 3) in uint drawid;
 
 out vec2 TexCoord;
 out vec3 FragPos;
@@ -17,6 +16,9 @@ struct DrawAtributes{
 	vec3 ao;
 	float roughness;
 	float metallic;
+	uint albedoTex;
+	uint metallicTex;
+	uint roughnessTex;
 };
 layout(std430, binding = 5) buffer Atrib 
 {
@@ -25,6 +27,7 @@ layout(std430, binding = 5) buffer Atrib
 
 void main()
 {
+	int drawid = gl_DrawID;
     TexCoord = aTexCoord; 
 	FragPos = vec3(atrib[drawid].Model * atrib[drawid].Rot * vec4(aPos, 1.0));
     gl_Position = VP * atrib[drawid].Model * atrib[drawid].Rot * vec4(aPos, 1.0);

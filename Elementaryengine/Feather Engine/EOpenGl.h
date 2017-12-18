@@ -28,10 +28,10 @@ struct DrawMeshAtributes {
 	vec3 ao;
 	float roughness;
 	float metallic;
+	int albedoTex;
+	int metallicTex;
+	int roughnessTex;
 	int i0;
-	int i1;
-	int i3;
-	int i4;
 };
 
 class EOpenGl

@@ -36,8 +36,11 @@ public:
 	///</summary> 
 	~Game();
 	unsigned int shadowMaps;
+	unsigned int textureArray;
+	unsigned int TextureSize = 1024;
+	unsigned int TextureCount = 512;
 	unsigned int lBuffer, frameOut;
-
+	vector<unsigned int> freeLayers;
 	//multi draw indirect stuff
 	unsigned int gVertexBuffer;
 	unsigned int gArrayTexutre;

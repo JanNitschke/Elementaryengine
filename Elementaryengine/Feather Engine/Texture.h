@@ -16,11 +16,15 @@ class Texture
 {
 public:
 	DllExport Texture(char path);
+	DllExport Texture(char path,bool toArray);
 	DllExport Texture();
 	// 1 = envmap
 
 	DllExport Texture(int type);
 	DllExport Texture(const char* path);
+	unsigned int handle;
+	unsigned int layer;
+
 	void Load(const char* path);
 	~Texture();
 	unsigned int id;

@@ -72,7 +72,18 @@ void Game::Start()
 	glGenTextures(1, &shadowMaps);
 	glGenFramebuffers(1, &lBuffer);
 	glGenTextures(1, &frameOut);
-	LoadScene();
+	glGenTextures(1, &textureArray);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA, TextureSize, TextureSize, TextureCount);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	for (unsigned int i = 0; i < TextureCount; i++)
+	{
+		freeLayers.push_back(i);
+	}
 
 	// Setup Render buffers for mdei
 	glGenVertexArrays(1, &vao);
@@ -81,6 +92,7 @@ void Game::Start()
 	glGenBuffers(1, &gVertexBuffer);
 	glGenBuffers(1, &gDrawIdBuffer);
 
+	LoadScene();
 
 
 	float viewaspect = (float)displaySettings->windowWidth / (float)displaySettings->windowHeight;
@@ -155,7 +167,7 @@ void Game::loop()
 		dynamicsWorld->stepSimulation(deltaTime, 1);
 		if (!isServer) {
 			SetupRender();
-		//	RenderShadowMaps();
+			RenderShadowMaps();
 			Render();
 			RenderHUD();
 
@@ -231,8 +243,8 @@ void Game::Render()
 
 	glBindVertexArray(vao);
 	//glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gElementBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gElementBuffer);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
-
 	glMultiDrawElementsIndirect(GL_TRIANGLES,
 		GL_UNSIGNED_INT,
 		(GLvoid*)0,
@@ -408,18 +420,6 @@ void Game::SetupRender()
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
 		glBufferData(GL_DRAW_INDIRECT_BUFFER, dICommands.size() * sizeof(DrawElementsIndirectCommand), &dICommands[0], GL_STATIC_DRAW);
 
-		vector<GLuint> vDrawId(instance);
-		for (GLuint i(0); i<instance; i++)
-		{
-			vDrawId[i] = i;
-		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, gDrawIdBuffer);
-		glBufferData(GL_ARRAY_BUFFER, vDrawId.size() * sizeof(GLuint), &vDrawId[0], GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(3);
-		glVertexAttribIPointer(3, 1, GL_UNSIGNED_INT, 0, (GLvoid*)0);
-		glVertexAttribDivisor(3, 1);
 		meshChanged = false;
 	}
 	vector<DrawMeshAtributes> drawAtrib;
@@ -440,6 +440,9 @@ void Game::SetupRender()
 					a.ao = mat->ao;
 					a.roughness = mat->roughness;
 					a.metallic = mat->metallic;
+					a.metallicTex = mat->metallicMap->handle;
+					a.roughnessTex = mat->roughnessMap->handle;
+					a.albedoTex = mat->albedoMap->handle;
 					drawAtrib.push_back(a);
 				}
 			}

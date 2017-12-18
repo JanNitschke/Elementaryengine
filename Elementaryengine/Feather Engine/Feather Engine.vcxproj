@@ -217,6 +217,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="stb_image_resize.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>

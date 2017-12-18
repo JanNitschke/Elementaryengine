@@ -152,6 +152,9 @@
     <ClInclude Include="ERenderCommand.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="stb_image_resize.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Feather Engine.rc">
