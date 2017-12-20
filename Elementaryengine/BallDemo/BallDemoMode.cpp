@@ -29,11 +29,8 @@ void BallDemoMode::Load()
 {
 	game->SetActiveCam(new FPCam());
 	Model* m = new Model("Assets/Meshs/Cube.obj");
-	Model* m2 = new Model("Assets/Meshs/Sphere.obj");
-	Model* mpbr = new Model("Assets/Meshs/Sphere.obj");
-
-	Model* mpbr2 = new Model("Assets/Meshs/Sphere.obj");
-	Model* ter = new Model("Assets/Meshs/terrain512.obj");
+	Model* lamp = new Model("Assets/Meshs/Sphere.obj");
+	Model* table = new Model("Assets/Meshs/tt.obj");
 
 	Asset* a = new Asset(vec3(0,-3,0),vec3(50,0.1f,50),0,assetShapes::cube);
 	a->setFriction(2);
@@ -43,82 +40,87 @@ void BallDemoMode::Load()
 
 	PBRMaterial* pbrwood = new PBRMaterial();
 	pbrwood->albedo = vec3(1);
-	pbrwood->albedoMap = new Texture("Assets/Textures/Wood.jpg");
+	pbrwood->albedoMap = new Texture("Assets/Textures/Wood.jpg",true);
 	pbrwood->ao = vec3(0.01f);
 	pbrwood->metallic = 0;
 	pbrwood->roughness = 0.4f;
-	pbrwood->roughnessMap = new Texture("Assets/Textures/WoodSpec.jpg");
+	pbrwood->roughnessMap = new Texture("Assets/Textures/WoodSpec.jpg",true);
 	pbrwood->TextureScale = vec2(1.0f);
 
 
-	PBRMaterial* beton = new PBRMaterial();
-	beton->albedo = vec3(1);
-	beton->albedoMap = new Texture("Assets/Textures/Plaster.jpg");
-	beton->ao = vec3(0.01f);
-	beton->metallic = 0;
-	beton->roughness = 0.4f;
-	beton->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg");
+	PBRMaterial* twood = new PBRMaterial();
+	twood->albedo = vec3(1);
+	twood->albedoMap = new Texture("Assets/Textures/tt.jpg", true);
+	twood->ao = vec3(0.01f);
+	twood->metallic = 0;
+	twood->roughness = 3.0f;
+	twood->roughnessMap = new Texture("Assets/Textures/ttr.jpg", true);
+	twood->TextureScale = vec2(1.0f);
 
-	PBRMaterial* grass = new PBRMaterial();
-	grass->albedo = vec3(1);
-	grass->albedoMap = new Texture("Assets/Textures/RockGrass.jpg");
-	grass->ao = vec3(0.01f);
-	grass->metallic = 0;
-	grass->roughness = 10.0f;
-	grass->TextureScale = vec2(50);
-	grass->roughnessMap = new Texture("Assets/Textures/RockSpec.jpg");
+	PBRMaterial* floor = new PBRMaterial();
+	floor->albedo = vec3(1);
+	floor->albedoMap = new Texture("Assets/Textures/Plaster.jpg", true);
+	floor->ao = vec3(0.01f);
+	floor->metallic = 0;
+	floor->roughness = 1.3f;
+	floor->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg", true);
+	floor->TextureScale = vec2(1.0f);
 
-	m2->meshes[0]->material = beton;
+	//PBRMaterial* beton = new PBRMaterial();
+	//beton->albedo = vec3(1);
+	//beton->albedoMap = new Texture("Assets/Textures/Plaster.jpg");
+	//beton->ao = vec3(0.01f);
+	//beton->metallic = 0;
+	//beton->roughness = 0.4f;
+	//beton->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg");
 
-	PBRMaterial* rust = new PBRMaterial();
-	rust->albedo = vec3(0.2);
-	rust->albedoMap = new Texture("Assets/Textures/r2albedo.jpg");
-	rust->ao = vec3(0.5);
-	rust->metallic = 1;
-	rust->metallicMap = new Texture("Assets/Textures/r2metal.jpg");
-	rust->roughness = 0.0f;
-	rust->roughnessMap = new Texture("Assets/Textures/r2rough.jpg");
-	rust->TextureScale = vec2(20.0f);
-	mpbr->meshes[0]->material = pbrwood;
-	mpbr2->meshes[0]->material = pbrwood;
-	m->meshes[0]->material = rust;
+	//PBRMaterial* grass = new PBRMaterial();
+	//grass->albedo = vec3(1);
+	//grass->albedoMap = new Texture("Assets/Textures/RockGrass.jpg");
+	//grass->ao = vec3(0.01f);
+	//grass->metallic = 0;
+	//grass->roughness = 10.0f;
+	//grass->TextureScale = vec2(50);
+	//grass->roughnessMap = new Texture("Assets/Textures/RockSpec.jpg");
 
 
-	Model* m3 = new Model("Assets/Meshs/Sphere.obj");
+	//PBRMaterial* rust = new PBRMaterial();
+	//rust->albedo = vec3(0.4);
+	//rust->albedoMap = new Texture("Assets/Textures/r2albedo.jpg",true);
+	//rust->ao = vec3(0.5);
+	//rust->metallic = 1;
+	//rust->metallicMap = new Texture("Assets/Textures/r2metal.jpg",true);
+	//rust->roughness = 0.0f;
+	//rust->roughnessMap = new Texture("Assets/Textures/r2rough.jpg",true);
+	//rust->TextureScale = vec2(1.0f);
+	m->meshes[0]->material = floor;
+	table->meshes[0]->material = twood;
+
 	PBRMaterial* lampmat = new PBRMaterial();
-	lampmat->ao = vec3(1000.0f);
 
-	m3->meshes[0]->material = lampmat;
+
+	lamp->meshes[0]->material = lampmat;
+
+
+	Asset* t = new Asset(vec3(0, 0, 0), vec3(1.4, .75,.8), 1000, assetShapes::cube);
+	table->attachTo(t);
 
 	Lamp* l = new Lamp();
 	Asset* b = new Asset();
 	l->attachTo(b);
-	l->color = vec3(3.0);
+	l->color = vec3(6.0);
 	b->scale = vec3(.10f);
 	b->position = vec3(1.0f, 1.0f, 1.0f);
 	b->OnTick = LampTick;
-	m3->attachTo(b);
+	lamp->attachTo(b);
 
-
-	Lamp* l2 = new Lamp();
-	Asset* b2 = new Asset();
-	l2->attachTo(b2);
-	l2->color = vec3(0.8f);
-	b2->scale = vec3(.10f);
-	b2->position = vec3(0.5f, 6, 1.0f);
-	m3->attachTo(b2);
+	//Lamp* l2 = new Lamp();
+	//Asset* b2 = new Asset();
+	//l2->attachTo(b2);
+	//l2->color = vec3(0.8f);
+	//b2->scale = vec3(.10f);
+	//b2->position = vec3(0.5f, 6, 1.0f);
 	
-	Asset* c = new Asset(vec3(0.5f, 20, 0),vec3(.4f),100,assetShapes::ball);
-	m2->attachTo(c);
-	c->renderEnvironment = false;
-
-	Asset* d = new Asset(vec3(2,-0.5,2),vec3(.40f),10,assetShapes::ball);
-	mpbr->attachTo(d);
-	d->renderEnvironment = true;
-
-	Asset* e = new Asset(vec3(0.1f, -0.5, 0), vec3(.4f), 10, assetShapes::ball);
-	mpbr2->attachTo(e);
-	e->renderEnvironment = true;
 
 	//Asset* t = new Asset(vec3(0, -10, 0), vec3(50, 10, 50), 0, assetShapes::cube);
 	//Mesh* mesh = ter->meshes[0];
@@ -131,13 +133,11 @@ void BallDemoMode::Load()
 	//terrain->attachTo(t);
 
 	// 400 baseline defered : 30 fps
-	Asset* asc = new Asset(vec3(2, -0.5, 1), vec3(.40f), 10, assetShapes::cube);
-	m->attachTo(asc);
-	for (int i = 0; i < 100; i++)
-	{
-		Asset* a = new Asset(vec3(2, -0.5 + i,-5), vec3(.40f), 10, assetShapes::ball);
-		mpbr->attachTo(a);
-	}
+	//for (int i = 0; i < 400; i++)
+	//{
+	//	Asset* a = new Asset(vec3(2, -0.5 + i* 0.1,-5), vec3(.040f), 10, assetShapes::ball);
+	//	mpbr->attachTo(a);
+	//}
 }
 
 void BallDemoMode::Start()
@@ -152,7 +152,7 @@ void LampTick(GLFWwindow * window, double deltaTime, Asset * asset)
 {
 	timerunning += deltaTime;
 
-	float radius = 10.0f;
+	float radius = 3.0f;
 	float lz = (float)sin(timerunning * 0.5f) * radius;
 	float lx = (float)cos(timerunning *  0.5f) * radius;
 	asset->setPosition(vec3(lx, 1.50f, lz));

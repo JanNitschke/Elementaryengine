@@ -180,7 +180,7 @@ void main(){
 	
 		float distance = length(LightPositions[i] - FragPos);
 		float attenuation = 1.0 / (distance * distance);
-		vec3 radiance = LightColors[i] * attenuation * 5; 
+		vec3 radiance = LightColors[i] * attenuation; 
 
 		vec3 F0 = vec3(0.04); 
 		F0 = mix(F0, albedo, metallic);
@@ -201,7 +201,7 @@ void main(){
 		float NdotL = max(dot(N, L), 0.0);        
 		Lo += (kD * albedo / PI + specular) * radiance * NdotL * (1 - shadow);
 	}   
-	vec3 am = vec3(0.03) * albedo * ambient;
+	vec3 am = vec3(0.3) * albedo * ambient;
 	outcolor   = am + Lo;  
 	float fragbrightness = (outcolor.x + outcolor.y + outcolor.z) / 3; 	
 	vec4 colCor = vec4(texture(colorCorrection,vec2(0,fragbrightness)));

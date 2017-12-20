@@ -66,7 +66,7 @@ void main(){
     vec3 hitPos = globalPos;
     float dDepth;
     
-    if(roughness < 0.2 && metallic > 0.5){
+    if(false){
         vec2 pos = RayCast(reflected,hitPos,dDepth).xy;
         if(pos != vec2(-1)){
             FragColor = roughness * vec4(texture(gColor,TexCoord).rgb,1) + (1 - roughness) * vec4(texture(gColor,RayCast(reflected,hitPos,dDepth).xy).rgb,1) ;

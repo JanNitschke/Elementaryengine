@@ -13,12 +13,12 @@ struct DrawAtributes{
     mat4 Model;
 	mat4 Rot;
 	vec3 albedo;
-	vec3 ao;
 	float roughness;
+	vec3 ao;
 	float metallic;
-	uint albedoTex;
-	uint metallicTex;
-	uint roughnessTex;
+	int albedoTex;
+	int metallicTex;
+	int roughnessTex;
 };
 layout(std430, binding = 5) buffer Atrib 
 {
