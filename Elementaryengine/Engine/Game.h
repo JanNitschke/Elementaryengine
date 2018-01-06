@@ -97,6 +97,7 @@ public:
 	///</summary> 
 	static vector<Asset*> assets;
 
+	static vector <Mesh*> meshs;
 	///<summary>
 	///Assets to loop trough next frame. You may delete items from this, but the destructor usualy does this by itself.
 	///</summary> 

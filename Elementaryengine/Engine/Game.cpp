@@ -44,6 +44,7 @@ vec3 Game::directionalLightColor;
 vec3 Game::directionalLightDirection;
 vector<Asset*> Game::assets;
 vector<Asset*> Game::nextAssets;
+vector<Mesh*> Game::meshs;
 vector<Lamp*> Game::lamps;
 Camera* Game::activeCam;
 btDiscreteDynamicsWorld* Game::dynamicsWorld;
@@ -408,6 +409,25 @@ void Game::SetupRender()
 						dICommands.push_back(c);
 					}
 				}
+				else if (Mesh* m = dynamic_cast<Mesh*>(c)) {
+					// Append Indices
+					gIndex.insert(gIndex.end(), m->indices.begin(), m->indices.end());
+
+					// Append Indices
+					vVertex.insert(vVertex.end(), m->vertices.begin(), m->vertices.end());
+
+					DrawElementsIndirectCommand c = DrawElementsIndirectCommand();
+					c.count = m->indices.size();
+					// TODO: change this later for grouping mesh copys
+					c.primCount = 1;
+					c.firstIndex = currentIndexOffset;
+					c.baseVertex = currentVertexOffset;
+					c.baseInstance = instance;
+					instance++;
+					currentIndexOffset += m->indices.size();
+					currentVertexOffset += m->vertices.size();
+					dICommands.push_back(c);
+				}
 			}
 		}
 
@@ -462,6 +482,23 @@ void Game::SetupRender()
 					drawAtrib.push_back(a);
 				}
 			}
+			else if (Mesh* m = dynamic_cast<Mesh*>(c)) {
+				DrawMeshAtributes a = DrawMeshAtributes();
+				mat4 model = mat4(1.0f);
+				model = translate(model, as->position + m->posOffset);
+				model = glm::scale(model, as->scale + m->scaleOffset);
+				a.Model = model;
+				a.Rot = glm::toMat4(as->q);
+				PBRMaterial* mat = dynamic_cast<PBRMaterial*>(m->material);
+				a.albedo = mat->albedo;
+				a.ao = mat->ao;
+				a.roughness = mat->roughness;
+				a.metallic = mat->metallic;
+				a.metallicTex = mat->metallicMap->layer;
+				a.roughnessTex = mat->roughnessMap->layer;
+				a.albedoTex = mat->albedoMap->layer;
+				drawAtrib.push_back(a);
+			}
 		}
 	}
 
@@ -515,7 +552,7 @@ void Game::RenderShadowMaps()
 		float Snear = 1.0f;
 		float Sfar = 25.0f;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, Snear, Sfar);
-		vec3 lightPos = l->parent->position;
+		vec3 lightPos = l->parents[0]->position;
 		std::vector<glm::mat4> shadowTransforms;
 		shadowTransforms.push_back(shadowProj *
 			glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
@@ -536,7 +573,7 @@ void Game::RenderShadowMaps()
 	
 		int i = 0;
 		vector<Asset*> relevantAssets(assets.size());
-		vec3 ppos = l->parent->position;
+		vec3 ppos = l->parents[0]->position;
 		auto it = std::copy_if(assets.begin(), assets.end(), relevantAssets.begin(), [&ppos](Asset* a) {return (length(a->position - ppos) < 25.0f) ; });
 		relevantAssets.resize(std::distance(relevantAssets.begin(), it));  // shrink container to new size
 

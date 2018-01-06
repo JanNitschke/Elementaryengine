@@ -68,7 +68,7 @@ void eSetLampsCommand(Shader * shader, GLuint lightColorSSBO, GLuint lightPositi
 	vector<vec4> lightPositions;
 	for each (Lamp* l in Game::lamps) {
 		vec3 outcol = l->color;
-		vec3 outpos = l->parent->position;
+		vec3 outpos = l->parents[0]->position;
 		lightColors.push_back(vec4(outcol, 0));
 		lightPositions.push_back(vec4(outpos, 0));
 	}

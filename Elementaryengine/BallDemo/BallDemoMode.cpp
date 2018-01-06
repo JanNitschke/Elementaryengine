@@ -32,9 +32,13 @@ void BallDemoMode::Load()
 	Model* lamp = new Model("Assets/Meshs/Sphere.obj");
 	Model* table = new Model("Assets/Meshs/tt.obj");
 
+	Mesh* cube = m->meshes[0];
+	Mesh* sphere = lamp->meshes[0];
+	Mesh* tab = table->meshes[0];
+
 	Asset* a = new Asset(vec3(0,-3,0),vec3(50,0.1f,50),0,assetShapes::cube);
 	a->setFriction(2);
-	m->attachTo(a);
+	cube->attachTo(a);
 	a->OnTick = FallingTick;
 	a->renderEnvironment = false;
 
@@ -93,17 +97,17 @@ void BallDemoMode::Load()
 	//rust->roughness = 0.0f;
 	//rust->roughnessMap = new Texture("Assets/Textures/r2rough.jpg",true);
 	//rust->TextureScale = vec2(1.0f);
-	m->meshes[0]->material = floor;
-	table->meshes[0]->material = twood;
+	cube->material = floor;
+	tab->material = twood;
 
 	PBRMaterial* lampmat = new PBRMaterial();
 
 
-	lamp->meshes[0]->material = lampmat;
+	sphere->material = lampmat;
 
 
 	Asset* t = new Asset(vec3(0, 0, 0), vec3(1.4, .75,.8), 1000, assetShapes::cube);
-	table->attachTo(t);
+	tab->attachTo(t);
 
 	Lamp* l = new Lamp();
 	Asset* b = new Asset();
@@ -112,7 +116,7 @@ void BallDemoMode::Load()
 	b->scale = vec3(.10f);
 	b->position = vec3(1.0f, 1.0f, 1.0f);
 	b->OnTick = LampTick;
-	lamp->attachTo(b);
+	sphere->attachTo(b);
 
 	//Lamp* l2 = new Lamp();
 	//Asset* b2 = new Asset();

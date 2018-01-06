@@ -18,6 +18,7 @@
 #include <ERenderCommand.h>
 
 using namespace glm;
+
 Shader* Mesh::defaultShader;
 Shader* Mesh::lightmapShader;
 Shader* Mesh::pbrShader;
@@ -29,6 +30,7 @@ Shader* Mesh::terrainShader;
 Shader* Mesh::grassShader;
 Shader* Mesh::ssrShader;
 Texture* Mesh::colorCorrection;
+
 Mesh::Mesh()
 {
 }
@@ -40,6 +42,7 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture
 	if (!Game::isServer) {
 		SetupMesh();
 	}
+	Game::meshs.push_back(this);
 }
 
 
@@ -101,8 +104,8 @@ void Mesh::SetupMesh()
 mat4 Mesh::Model()
 {
 	mat4 model = mat4(1.0f);
-	model = translate(model, parent->position + posOffset);
-	model = glm::scale(model, parent->scale + scaleOffset);
+	model = translate(model, parents[0]->position + posOffset);
+	model = glm::scale(model, parents[0]->scale + scaleOffset);
 	return model;
 }
 
@@ -142,7 +145,7 @@ void Mesh::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l,
 
 	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "shadowMatrices"), view.size(), GL_FALSE, glm::value_ptr(view[0]));
 	shader->setFloat("far_plane", 25);
-	shader->set3Float("lightPos", l->parent->position);
+	shader->set3Float("lightPos", l->parents[0]->position);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBindVertexArray(VAO);

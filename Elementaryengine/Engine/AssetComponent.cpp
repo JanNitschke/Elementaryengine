@@ -10,13 +10,21 @@ AssetComponent::AssetComponent()
 
 AssetComponent::~AssetComponent()
 {
-	parent->components.erase(std::remove(parent->components.begin(), parent->components.end(), this), parent->components.end());
+	for each (auto p in parents)
+	{
+		p->components.erase(std::remove(p->components.begin(), p->components.end(), this), p->components.end());
+	}
 }
 
 void AssetComponent::attachTo(Asset * a)
 {
-	parent = a;
+	parents.push_back(a);
 	a->components.push_back(this);
+}
+
+void AssetComponent::detachFrom(Asset * a)
+{
+	parents.erase(std::remove(parents.begin(), parents.end(), a), parents.end());
 }
 
 void AssetComponent::Render(mat4 view, mat4 projection, Asset* parent, Shader* s)

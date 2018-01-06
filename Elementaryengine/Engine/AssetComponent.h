@@ -11,7 +11,9 @@ public:
 	AssetComponent();
 	~AssetComponent();
 	void attachTo(Asset* a);
-	Asset* parent;
+	void detachFrom(Asset* a);
+
+	vector<Asset*> parents;
 	virtual void Render(mat4 view, mat4 projection, Asset* parent, Shader* s);
 	virtual void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a);
 };

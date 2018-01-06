@@ -28,7 +28,6 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	glfwSwapInterval(0);
 
 	// Open a window and create its OpenGL context
-
 	if (settings->fullscreen) {
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
