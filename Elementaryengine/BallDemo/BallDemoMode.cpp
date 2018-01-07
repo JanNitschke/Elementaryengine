@@ -8,10 +8,14 @@
 #include <FPCam.h>
 #include <Terrain.h>
 
+# define M_PI           3.14159265358979323846  /* pi */
+
+
 using namespace glm;
 using namespace std;
 
 double timerunning = 0;
+bool p_pressedLastFrame = false;
 
 BallDemoMode::BallDemoMode()
 {
@@ -23,10 +27,20 @@ BallDemoMode::~BallDemoMode()
 
 void BallDemoMode::Tick(double deltaTime)
 {
+	if (Game::isKeyDown(GLFW_KEY_P)) {
+		if (!p_pressedLastFrame) {
+			Game::simulatePhysics = !Game::simulatePhysics;
+		}
+		p_pressedLastFrame = true;
+	}
+	else {
+		p_pressedLastFrame = false;
+	}
 }
 
 void BallDemoMode::Load()
 {
+	Game::simulatePhysics = false;
 	game->SetActiveCam(new FPCam());
 	Model* m = new Model("Assets/Meshs/Cube.obj");
 	Model* lamp = new Model("Assets/Meshs/Sphere.obj");
@@ -142,10 +156,16 @@ void BallDemoMode::Load()
 	//terrain->attachTo(t);
 
 	//400 baseline defered : 30 fps
-	for (int i = 0; i < 4000; i++)
+	float height = 0;
+	for (int i = 0; i < 1000; i++)
 	{
-		Asset* a = new Asset(vec3(2, -0.5 + i* 0.1,-5), vec3(.040f), 0, assetShapes::ball);
+		float radius = 0.3f;
+		float lz = (float)sin(i * (2.0f * M_PI)/ 12.0f) * radius;
+		float lx = (float)cos(i *  (2.0f * M_PI)/ 12.0f) * radius;
+		vec3 pos = vec3(lx + 2.0f,height - 0.5f,lz - 5);
+		Asset* a = new Asset(pos, vec3(.040f), 10, assetShapes::ball);
 		sphere->attachTo(a);
+		height += (((i + 1) % 12) == 0)?0.1f:0.0f;
 	}
 }
 

@@ -50,6 +50,7 @@ vector<Mesh*> Game::meshs;
 vector<Lamp*> Game::lamps;
 Camera* Game::activeCam;
 btDiscreteDynamicsWorld* Game::dynamicsWorld;
+bool Game::simulatePhysics = true;
 vector<int> Game::freeLayers;
 
 // start the game and run the main loop
@@ -61,15 +62,21 @@ void Game::Start()
 	
 	eOpenGl->Initialise(displaySettings);
 
-	//Setup Bullet physics
-	btBroadphaseInterface* broadphase = new btDbvtBroadphase();
-	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
-	btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
-	btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
-	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+	//setup Physics
+	if (usePhysx) {
 
-	dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
+	}
+	else {
+		//Setup Bullet physics
+		btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+		btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+		btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+		btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
+		btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+		dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
+	}
+
 
 
 	// Setup components (shaders, textures etc.)
@@ -120,10 +127,6 @@ void Game::Start()
 
 	//Cleanup physics
 	delete dynamicsWorld;
-	delete solver;
-	delete dispatcher;
-	delete collisionConfiguration;
-	delete broadphase;
 
 	//cleanup ENet 
 	/*atexit(enet_deinitialize);
@@ -177,7 +180,9 @@ void Game::loop()
 		{
 			asset->Tick(eOpenGl->window, deltaTime);
 		}
-		dynamicsWorld->stepSimulation(deltaTime, 1);
+		if (simulatePhysics) {
+			dynamicsWorld->stepSimulation(deltaTime, 1);
+		}
 		if (!isServer) {
 			SetupRender();
 			RenderShadowMaps();

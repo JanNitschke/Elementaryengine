@@ -204,9 +204,14 @@ public:
 	
 
 //Physics
+	bool usePhysx;
+
 	static btDiscreteDynamicsWorld* dynamicsWorld;
-	
+	static bool simulatePhysics;
+
 	RaycastHit Raycast(vec3 Start, vec3 End);
+
+
 
 //ENet Networking
 	//ENetAddress address;
