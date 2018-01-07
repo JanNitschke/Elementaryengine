@@ -139,7 +139,7 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	glGenBuffers(1, &lightColorSSBO);
 	glGenBuffers(1, &lightPositionSSBO);
 	glGenBuffers(1, &meshDataSSBO);
-
+	glGenBuffers(1, &drawIdOffsetBuffer);
 	//// VXAO
 	//glGenFramebuffers(1, &vBuffer);
 	//glBindFramebuffer(GL_FRAMEBUFFER, vBuffer);

@@ -45,6 +45,7 @@ public:
 	GLuint lightColorSSBO = 0;
 	GLuint lightPositionSSBO = 0;
 	GLuint meshDataSSBO = 0;
+	GLuint drawIdOffsetBuffer = 0;
 
 	unsigned int quadVAO = 0;
 	unsigned int quadVBO;

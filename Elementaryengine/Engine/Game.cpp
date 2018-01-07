@@ -1,6 +1,8 @@
 #include "Game.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 using namespace glm;
 #include <string>
 using namespace std;
@@ -103,7 +105,6 @@ void Game::Start()
 	glGenBuffers(1, &gElementBuffer);
 	glGenBuffers(1, &gIndirectBuffer);
 	glGenBuffers(1, &gVertexBuffer);
-	glGenBuffers(1, &gDrawIdBuffer);
 
 	LoadScene();
 
@@ -203,6 +204,119 @@ void Game::setLight(vec3 color, vec3 direction)
 	directionalLightColor = color;
 	directionalLightDirection = direction;
 }
+
+void Game::SetupRender()
+{
+	if (meshChanged || assetsChanged) {
+
+		if (meshChanged) {
+			vVertex.clear();
+			vVertex.resize(0);
+			gIndex.clear();
+			gIndex.resize(0);
+			currentIndexOffset = 0;
+			currentVertexOffset = 0;
+			instance = 0;
+		}
+		if (assetsChanged || meshChanged) {
+			dICommands.clear();
+			dICommands.resize(0);
+			drawInstanceOffset.clear();
+			drawInstanceOffset.push_back(0);
+		}
+		// redo mesh array
+		for each (Mesh* m in meshs) {
+			if (meshChanged) {
+				// Append Indices
+				gIndex.insert(gIndex.end(), m->indices.begin(), m->indices.end());
+
+				// Append Indices
+				vVertex.insert(vVertex.end(), m->vertices.begin(), m->vertices.end());
+			}
+			DrawElementsIndirectCommand c = DrawElementsIndirectCommand();
+			c.count = m->indices.size();
+			int parentcount = m->parents.size();
+			c.primCount = parentcount;
+
+			int lastoffset = drawInstanceOffset.back();
+			parentcount = (parentcount > 0) ? parentcount - 1 : 0;
+			drawInstanceOffset.push_back(lastoffset + parentcount);
+
+			c.firstIndex = currentIndexOffset;
+			c.baseVertex = currentVertexOffset;
+			c.baseInstance = instance;
+			instance++;
+			currentIndexOffset += m->indices.size();
+			currentVertexOffset += m->vertices.size();
+			dICommands.push_back(c);
+
+		}
+
+
+		glBindVertexArray(vao);
+		//Create a vertex buffer object
+		glBindBuffer(GL_ARRAY_BUFFER, gVertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, vVertex.size() * sizeof(Vertex), &vVertex[0], GL_STATIC_DRAW);
+
+
+		// vertex positions
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+		// vertex normals
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+		// vertex texture coords
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+
+		//Create an element buffer
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gElementBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, gIndex.size() * sizeof(unsigned int), &gIndex[0], GL_STATIC_DRAW);
+
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
+		glBufferData(GL_DRAW_INDIRECT_BUFFER, dICommands.size() * sizeof(DrawElementsIndirectCommand), &dICommands[0], GL_STATIC_DRAW);
+
+
+		assetsChanged = false;
+		meshChanged = false;
+	}
+	vector<DrawMeshAtributes> drawAtrib;
+
+	for each (Mesh* m in meshs) {
+
+		for each(Asset* as in m->parents) {
+			DrawMeshAtributes a = DrawMeshAtributes();
+			mat4 model = mat4(1.0f);
+			model = translate(model, as->position + m->posOffset);
+			model = glm::scale(model, as->scale + m->scaleOffset);
+			a.Model = model;
+			a.Rot = glm::toMat4(as->q);
+			PBRMaterial* mat = dynamic_cast<PBRMaterial*>(m->material);
+			a.albedo = mat->albedo;
+			a.ao = mat->ao;
+			a.roughness = mat->roughness;
+			a.metallic = mat->metallic;
+			a.metallicTex = mat->metallicMap->layer;
+			a.roughnessTex = mat->roughnessMap->layer;
+			a.albedoTex = mat->albedoMap->layer;
+			drawAtrib.push_back(a);
+		}
+	}
+
+
+	//drawIdOffsetbuffer;
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, eOpenGl->drawIdOffsetBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * drawInstanceOffset.size(), drawInstanceOffset.data(), GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, eOpenGl->drawIdOffsetBuffer);
+
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, eOpenGl->meshDataSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawMeshAtributes) * drawAtrib.size(), drawAtrib.data(), GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, eOpenGl->meshDataSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
 void Game::Render()
 {
 	//// voxel pass
@@ -220,24 +334,6 @@ void Game::Render()
 	for each (Asset* a in assets)
 	{
 		a->Render(View, Projection, s);
-	}
-	*/
-	// geometry pass
-	//old
-	/*
-	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->gBuffer);
-	glDisable(GL_BLEND);
-	glClearColor(0.050f, 0.125f, 0.247f, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, displaySettings->windowWidth, displaySettings->windowHeight);
-	Mesh::geometryShader->use();
-
-	for each (Asset* a in assets)
-	{
-			a->Render(View, Projection, Mesh::geometryShader);
 	}
 	*/
 
@@ -308,12 +404,9 @@ void Game::Render()
 
 	eOpenGl->renderQuad();
 
-
-
 	//post fx 	
 	glBlitFramebuffer(0, 0, displaySettings->windowWidth, displaySettings->windowHeight, 0, 0, displaySettings->windowWidth, displaySettings->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
 	shader = Mesh::ssrShader;
 	shader->use();
@@ -371,155 +464,6 @@ void Game::Render()
 
 }
 
-void Game::SetupRender()
-{
-	if (meshChanged) {
-		vVertex.clear();
-		vVertex.resize(0);
-		gIndex.clear();
-		gIndex.resize(0);
-		dICommands.clear();
-		dICommands.resize(0);
-		currentIndexOffset = 0;
-		currentVertexOffset = 0;
-		instance = 0;
-
-		for each (Asset* a in assets)
-		{
-			for each (AssetComponent* c in a->components)
-			{
-				if (Model* d = dynamic_cast<Model*>(c)) {
-					for each(Mesh* m in d->meshes) {
-						// Append Indices
-						gIndex.insert(gIndex.end(), m->indices.begin(), m->indices.end());
-
-						// Append Indices
-						vVertex.insert(vVertex.end(), m->vertices.begin(), m->vertices.end());
-
-						DrawElementsIndirectCommand c = DrawElementsIndirectCommand();
-						c.count = m->indices.size();
-						// TODO: change this later for grouping mesh copys
-						c.primCount = 1;
-						c.firstIndex = currentIndexOffset;
-						c.baseVertex = currentVertexOffset;
-						c.baseInstance = instance;
-						instance++;
-						currentIndexOffset += m->indices.size();
-						currentVertexOffset += m->vertices.size();
-						dICommands.push_back(c);
-					}
-				}
-				else if (Mesh* m = dynamic_cast<Mesh*>(c)) {
-					// Append Indices
-					gIndex.insert(gIndex.end(), m->indices.begin(), m->indices.end());
-
-					// Append Indices
-					vVertex.insert(vVertex.end(), m->vertices.begin(), m->vertices.end());
-
-					DrawElementsIndirectCommand c = DrawElementsIndirectCommand();
-					c.count = m->indices.size();
-					// TODO: change this later for grouping mesh copys
-					c.primCount = 1;
-					c.firstIndex = currentIndexOffset;
-					c.baseVertex = currentVertexOffset;
-					c.baseInstance = instance;
-					instance++;
-					currentIndexOffset += m->indices.size();
-					currentVertexOffset += m->vertices.size();
-					dICommands.push_back(c);
-				}
-			}
-		}
-
-
-		glBindVertexArray(vao);
-		//Create a vertex buffer object
-		glBindBuffer(GL_ARRAY_BUFFER, gVertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, vVertex.size() * sizeof(Vertex), &vVertex[0], GL_STATIC_DRAW);
-
-
-		// vertex positions
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-		// vertex normals
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-		// vertex texture coords
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-
-
-		//Create an element buffer
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gElementBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, gIndex.size() * sizeof(unsigned int), &gIndex[0], GL_STATIC_DRAW);
-
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
-		glBufferData(GL_DRAW_INDIRECT_BUFFER, dICommands.size() * sizeof(DrawElementsIndirectCommand), &dICommands[0], GL_STATIC_DRAW);
-
-		meshChanged = false;
-	}
-	vector<DrawMeshAtributes> drawAtrib;
-	for each (Asset* as in assets)
-	{
-		for each (AssetComponent* c in as->components)
-		{
-			if (Model* d = dynamic_cast<Model*>(c)) {
-				for each(Mesh* m in d->meshes) {
-					DrawMeshAtributes a = DrawMeshAtributes();
-					mat4 model = mat4(1.0f);
-					model = translate(model, as->position + m->posOffset);
-					model = glm::scale(model, as->scale + m->scaleOffset);
-					a.Model = model;
-					a.Rot = glm::toMat4(as->q);
-					PBRMaterial* mat = dynamic_cast<PBRMaterial*>(m->material);
-					a.albedo = mat->albedo;
-					a.ao = mat->ao;
-					a.roughness = mat->roughness;
-					a.metallic = mat->metallic;
-					a.metallicTex = mat->metallicMap->layer;
-					a.roughnessTex = mat->roughnessMap->layer;
-					a.albedoTex = mat->albedoMap->layer;
-					drawAtrib.push_back(a);
-				}
-			}
-			else if (Mesh* m = dynamic_cast<Mesh*>(c)) {
-				DrawMeshAtributes a = DrawMeshAtributes();
-				mat4 model = mat4(1.0f);
-				model = translate(model, as->position + m->posOffset);
-				model = glm::scale(model, as->scale + m->scaleOffset);
-				a.Model = model;
-				a.Rot = glm::toMat4(as->q);
-				PBRMaterial* mat = dynamic_cast<PBRMaterial*>(m->material);
-				a.albedo = mat->albedo;
-				a.ao = mat->ao;
-				a.roughness = mat->roughness;
-				a.metallic = mat->metallic;
-				a.metallicTex = mat->metallicMap->layer;
-				a.roughnessTex = mat->roughnessMap->layer;
-				a.albedoTex = mat->albedoMap->layer;
-				drawAtrib.push_back(a);
-			}
-		}
-	}
-
-	////meshdata SSBO
-	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, eOpenGl->meshDataSSBO);
-	//GLuint block_index = 0;
-	////block_index = glGetProgramResourceIndex(Mesh::geometryShader->ID, GL_SHADER_STORAGE_BLOCK, "Atrib");
-	//GLuint ssbo_binding_point_index = 5;
-	////glShaderStorageBlockBinding(Mesh::geometryShader->ID, block_index, ssbo_binding_point_index);
-	//GLsizeiptr s = sizeof(DrawMeshAtributes) * drawAtrib.size();
-	////glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index_p, lightPositionSSBO);
-	//glBindBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, eOpenGl->meshDataSSBO, 0, s);
-
-	//glBufferData(GL_SHADER_STORAGE_BUFFER, s, drawAtrib.data(), GL_DYNAMIC_DRAW);
-
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, eOpenGl->meshDataSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawMeshAtributes) * drawAtrib.size(), drawAtrib.data(), GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, eOpenGl->meshDataSSBO);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-}
-
 void Game::RenderShadowMaps()
 {
 	Shader* shader = Mesh::lightmapShader;
@@ -547,41 +491,43 @@ void Game::RenderShadowMaps()
 	int count = 0;
 	for each (Lamp* l in lamps)
 	{
+		if (true) {
+			float aspect = (float)Lamp::SHADOW_WIDTH / (float)Lamp::SHADOW_WIDTH;
+			float Snear = 1.0f;
+			float Sfar = 25.0f;
+			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, Snear, Sfar);
+			vec3 lightPos = l->parents[0]->position;
+			std::vector<glm::mat4> shadowTransforms;
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
-		float aspect = (float)Lamp::SHADOW_WIDTH / (float)Lamp::SHADOW_WIDTH;
-		float Snear = 1.0f;
-		float Sfar = 25.0f;
-		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, Snear, Sfar);
-		vec3 lightPos = l->parents[0]->position;
-		std::vector<glm::mat4> shadowTransforms;
-		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+			shader->setInt("layer", count);
+			count++;
 
-		shader->setInt("layer", count);
+			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "shadowMatrices"), shadowTransforms.size(), GL_FALSE, glm::value_ptr(shadowTransforms[0]));
+			shader->setFloat("far_plane", 25);
+			shader->set3Float("lightPos", l->parents[0]->position);
 
-		count++;
-	
-		int i = 0;
-		vector<Asset*> relevantAssets(assets.size());
-		vec3 ppos = l->parents[0]->position;
-		auto it = std::copy_if(assets.begin(), assets.end(), relevantAssets.begin(), [&ppos](Asset* a) {return (length(a->position - ppos) < 25.0f) ; });
-		relevantAssets.resize(std::distance(relevantAssets.begin(), it));  // shrink container to new size
+			glBindVertexArray(vao);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gElementBuffer);
+			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, gIndirectBuffer);
 
-		for each (Asset* a in relevantAssets)
-		{
-				a->RenderLightmap(shadowTransforms, mat4(1), l);
+			glMultiDrawElementsIndirect(GL_TRIANGLES,
+				GL_UNSIGNED_INT,
+				(GLvoid*)0,
+				instance,
+				0);
 		}
-
 	}	
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

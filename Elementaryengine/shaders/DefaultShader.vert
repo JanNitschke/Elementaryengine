@@ -20,14 +20,19 @@ struct DrawAtributes{
 	int metallicTex;
 	int roughnessTex;
 };
+
 layout(std430, binding = 5) buffer Atrib 
 {
     DrawAtributes atrib[];
 };
+layout(std430, binding = 6) buffer didoff 
+{
+    int offsets[];
+};
 
 void main()
 {
-	int drawid = gl_DrawID;
+	int drawid = gl_DrawID + offsets[gl_DrawID] + gl_InstanceID;
     TexCoord = aTexCoord; 
 	FragPos = vec3(atrib[drawid].Model * atrib[drawid].Rot * vec4(aPos, 1.0));
     gl_Position = VP * atrib[drawid].Model * atrib[drawid].Rot * vec4(aPos, 1.0);

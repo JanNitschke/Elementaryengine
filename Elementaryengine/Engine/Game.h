@@ -47,7 +47,6 @@ public:
 	unsigned int gArrayTexutre;
 	unsigned int gElementBuffer;
 	unsigned int gIndirectBuffer;
-	unsigned int gDrawIdBuffer;
 	GLuint vao;
 
 	///<summary>
@@ -234,6 +233,7 @@ public:
 
 	//ENetPeer *peer;
 	bool meshChanged = true;
+	bool assetsChanged = true;
 
 private:
 	///<summary>
@@ -255,9 +255,12 @@ private:
 	/////</summary> 
 	//Authority authority;
 	
-	//Render Buffers etc.
+	//Render Buffers vertex and index Buffer
 	vector<Vertex> vVertex;
 	vector<unsigned int>gIndex;
+	
+	// offset for Multidraw inderect instancing
+	vector<int> drawInstanceOffset;
 	int currentIndexOffset = 0;
 	int currentVertexOffset = 0;
 	int instance = 0;

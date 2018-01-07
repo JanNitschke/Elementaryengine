@@ -72,6 +72,9 @@
     <ClCompile Include="ERenderCommand.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="OldRenderCode.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

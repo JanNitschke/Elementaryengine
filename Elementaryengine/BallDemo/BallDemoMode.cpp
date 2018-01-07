@@ -30,10 +30,13 @@ void BallDemoMode::Load()
 	game->SetActiveCam(new FPCam());
 	Model* m = new Model("Assets/Meshs/Cube.obj");
 	Model* lamp = new Model("Assets/Meshs/Sphere.obj");
+	Model* sp = new Model("Assets/Meshs/Sphere.obj");
+
 	Model* table = new Model("Assets/Meshs/tt.obj");
 
 	Mesh* cube = m->meshes[0];
-	Mesh* sphere = lamp->meshes[0];
+	Mesh* sphere = sp->meshes[0];
+	Mesh* lam = lamp->meshes[0];
 	Mesh* tab = table->meshes[0];
 
 	Asset* a = new Asset(vec3(0,-3,0),vec3(50,0.1f,50),0,assetShapes::cube);
@@ -102,21 +105,23 @@ void BallDemoMode::Load()
 
 	PBRMaterial* lampmat = new PBRMaterial();
 
+	lam->material = lampmat;
 
-	sphere->material = lampmat;
+	sphere->material = pbrwood;
 
 
 	Asset* t = new Asset(vec3(0, 0, 0), vec3(1.4, .75,.8), 1000, assetShapes::cube);
 	tab->attachTo(t);
 
 	Lamp* l = new Lamp();
+	//l->throwShadows = false;
 	Asset* b = new Asset();
 	l->attachTo(b);
 	l->color = vec3(6.0);
 	b->scale = vec3(.10f);
 	b->position = vec3(1.0f, 1.0f, 1.0f);
 	b->OnTick = LampTick;
-	sphere->attachTo(b);
+	lam->attachTo(b);
 
 	//Lamp* l2 = new Lamp();
 	//Asset* b2 = new Asset();
@@ -136,12 +141,12 @@ void BallDemoMode::Load()
 	//terrain->grassMap = new Texture("Assets/Textures/RockSpec.jpg"); 
 	//terrain->attachTo(t);
 
-	// 400 baseline defered : 30 fps
-	//for (int i = 0; i < 400; i++)
-	//{
-	//	Asset* a = new Asset(vec3(2, -0.5 + i* 0.1,-5), vec3(.040f), 10, assetShapes::ball);
-	//	mpbr->attachTo(a);
-	//}
+	//400 baseline defered : 30 fps
+	for (int i = 0; i < 4000; i++)
+	{
+		Asset* a = new Asset(vec3(2, -0.5 + i* 0.1,-5), vec3(.040f), 0, assetShapes::ball);
+		sphere->attachTo(a);
+	}
 }
 
 void BallDemoMode::Start()

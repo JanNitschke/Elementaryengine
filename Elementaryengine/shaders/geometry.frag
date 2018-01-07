@@ -28,6 +28,10 @@ layout(std430, binding = 5) buffer Atrib
 {
     DrawAtributes atrib[];
 };
+layout(std430, binding = 6) buffer didoff 
+{
+    int offsets[];
+};
 
 void main()
 {    

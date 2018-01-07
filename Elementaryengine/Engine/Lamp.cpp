@@ -4,6 +4,7 @@ unsigned int Lamp::depthMapFBO;
 const unsigned int Lamp::SHADOW_WIDTH = 1024, Lamp::SHADOW_HEIGHT = 1024;
 Lamp::Lamp()
 {
+	throwShadows = true;
 	if (!Game::isServer) {
 		color = vec3(1);
 

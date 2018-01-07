@@ -21,7 +21,6 @@ public:
 	vec3 posOffset;
 	vec3 rotOffset;
 	vec3 scaleOffset;
-	vector<Asset*> parents;
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 	Mesh();

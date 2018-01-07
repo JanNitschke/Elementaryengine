@@ -20,6 +20,6 @@ public:
 	static unsigned int depthMapFBO;
 	Texture* depthmap;
 	static const unsigned int SHADOW_WIDTH, SHADOW_HEIGHT;
-	
+	bool throwShadows;
 };
 

@@ -184,6 +184,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="OldRenderCode.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
