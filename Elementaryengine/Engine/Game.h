@@ -7,6 +7,9 @@
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h>
 #include <EOpenGl.h>
+#include <stdio.h>
+#include <conio.h>
+#include <windows.h>
 
 class GameMode;
 #include <GameMode.h>
@@ -35,6 +38,9 @@ public:
 	///DO NOT DESTROY THE GAME OBJECT WITHOUT CALLING Game::Stop() FIRST!
 	///</summary> 
 	~Game();
+	static bool shouldClose;
+	static bool physicsFinished;
+
 	unsigned int shadowMaps;
 	static unsigned int textureArray;
 	static const unsigned int TextureSize;
@@ -130,6 +136,7 @@ public:
 	///</summary> 
 	double smoothFps;
 
+	static double physicsFps;
 	///<summary>
 	///Time since last frame
 	///</summary> 
@@ -180,6 +187,7 @@ public:
 	///</param>
 	void processInput(GLFWwindow *window);
 
+	void processPhysics();
 
 	///<summary>
 	///Renders the HUD
@@ -246,6 +254,8 @@ private:
 	///</summary> 
 	Game() {}
 
+
+
 	///<summary>
 	///Time since start of the game in ms
 	///</summary> 
@@ -272,4 +282,6 @@ private:
 	vector<DrawElementsIndirectCommand> dICommands;
 
 };
+DWORD WINAPI PhysicsThread(LPVOID lpParam);
+
  

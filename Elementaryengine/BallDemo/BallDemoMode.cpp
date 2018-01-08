@@ -8,7 +8,7 @@
 #include <FPCam.h>
 #include <Terrain.h>
 
-# define M_PI           3.14159265358979323846  /* pi */
+#define M_PI           3.14159265358979323846  /* pi */
 
 
 using namespace glm;
@@ -157,13 +157,13 @@ void BallDemoMode::Load()
 
 	//400 baseline defered : 30 fps
 	float height = 0;
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 10000; i++)
 	{
 		float radius = 0.3f;
 		float lz = (float)sin(i * (2.0f * M_PI)/ 12.0f) * radius;
 		float lx = (float)cos(i *  (2.0f * M_PI)/ 12.0f) * radius;
 		vec3 pos = vec3(lx + 2.0f,height - 0.5f,lz - 5);
-		Asset* a = new Asset(pos, vec3(.040f), 10, assetShapes::ball);
+		Asset* a = new Asset(pos, vec3(.040f), 10, assetShapes::cube);
 		sphere->attachTo(a);
 		height += (((i + 1) % 12) == 0)?0.1f:0.0f;
 	}

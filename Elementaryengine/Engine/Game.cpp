@@ -18,7 +18,6 @@ using namespace std;
 
 
 //#include <enet\enet.h>
-using namespace FeatherEngine;
 
 Game::~Game()
 {
@@ -42,6 +41,8 @@ const unsigned int Game::TextureCount = 64;
 unsigned int Game::textureArray;
 bool Game::requireServer = false;
 bool Game::isServer = false;
+bool Game::physicsFinished = false;
+bool Game::shouldClose = false;
 vec3 Game::directionalLightColor;
 vec3 Game::directionalLightDirection;
 vector<Asset*> Game::assets;
@@ -51,6 +52,7 @@ vector<Lamp*> Game::lamps;
 Camera* Game::activeCam;
 btDiscreteDynamicsWorld* Game::dynamicsWorld;
 bool Game::simulatePhysics = true;
+double Game::physicsFps;
 vector<int> Game::freeLayers;
 
 // start the game and run the main loop
@@ -64,7 +66,13 @@ void Game::Start()
 
 	//setup Physics
 	if (usePhysx) {
+		/*static PxDefaultErrorCallback gDefaultErrorCallback;
+		static PxDefaultAllocator gDefaultAllocatorCallback;
 
+		PxFoundation* mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
+			gDefaultErrorCallback);
+		if (!mFoundation)
+			printf("PxCreateFoundation failed!");*/
 	}
 	else {
 		//Setup Bullet physics
@@ -153,6 +161,12 @@ void Game::loop()
 	}
 	currentTime = glfwGetTime();
 	smoothFps = 60;
+	shouldClose = false;
+	DWORD   threadId;
+	HANDLE  threadHandle;
+	threadHandle = CreateThread(NULL, 0, PhysicsThread, NULL, 0, &threadId);
+
+
 	do {
 		if (isServer || requireServer) {
 			updateNetwork();
@@ -166,7 +180,7 @@ void Game::loop()
 		currentTime = glfwGetTime();
 		deltaTime = currentTime - oldTime;
 		smoothFps = (9 * smoothFps / 10) + (.1 / deltaTime);
-		printf(" \r fps smooth: %i accurate: %f ", (int)(smoothFps + .5), 1 / deltaTime);
+		printf(" \r fps smooth: %i accurate: %f physics: %f", (int)(smoothFps + .5), 1 / deltaTime,Game::physicsFps);
 		if (!isServer) {
 			processInput(eOpenGl->window);
 		}
@@ -180,9 +194,7 @@ void Game::loop()
 		{
 			asset->Tick(eOpenGl->window, deltaTime);
 		}
-		if (simulatePhysics) {
-			dynamicsWorld->stepSimulation(deltaTime, 1);
-		}
+
 		if (!isServer) {
 			SetupRender();
 			RenderShadowMaps();
@@ -193,12 +205,16 @@ void Game::loop()
 			glfwSwapBuffers(eOpenGl->window);
 			glfwPollEvents();
 		}
-		
-
+		if (!(glfwGetKey(eOpenGl->window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(eOpenGl->window) == 0)){
+			shouldClose = true;
+		}
 
 	} // Check if the ESC key was pressed or the window was closed
-	while (glfwGetKey(eOpenGl->window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-		glfwWindowShouldClose(eOpenGl->window) == 0);
+	while (!shouldClose);
+	while (!physicsFinished)
+	{
+		Sleep(10);
+	}
 }
 bool Game::isKeyDown(int key)
 {
@@ -542,6 +558,10 @@ void Game::processInput(GLFWwindow * window)
 	
 }
 
+void Game::processPhysics()
+{
+}
+
 void Game::RenderHUD()
 {
 
@@ -653,4 +673,29 @@ void Game::netDisconnect()
 //	/* succeed yet.  Force the connection down.             */
 //	enet_peer_reset(peer);
 }
+DWORD WINAPI PhysicsThread(LPVOID lpParam)
+{
+	int i;
+	DWORD idThread;
 
+	idThread = GetCurrentThreadId();
+	double oTime = 0;
+	double cTime = 0;
+	double dTime = 0;
+
+	while (!Game::shouldClose)
+	{
+		oTime = cTime;
+		cTime = glfwGetTime();
+		dTime = cTime - oTime;
+		if (Game::simulatePhysics) {
+			Game::dynamicsWorld->stepSimulation(dTime, 1);
+		}
+		else {
+			Sleep(100);
+		}
+		Game::physicsFps = 1 / dTime;
+	}
+	Game::physicsFinished = true;
+	return 0;
+}

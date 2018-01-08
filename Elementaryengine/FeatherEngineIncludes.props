@@ -7,8 +7,9 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\lib\bullet3\src;$(SolutionDir)\lib\glfw\include;$(SolutionDir)\lib\glew\include;$(SolutionDir)\Engine;$(SolutionDir)\Debug;$(SolutionDir)\lib\physx\PhysX\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\lib\physx\nvToolsExt\1\include\stdint;$(SolutionDir)\lib\bullet3\src;$(SolutionDir)\lib\glfw\include;$(SolutionDir)\lib\glew\include;$(SolutionDir)\Engine;$(SolutionDir)\Debug;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\Engine\Debug;$(SolutionDir)\lib\glew\lib\Release\Win32;$(SolutionDir)\lib\glfw\lib-vc2015;$(SolutionDir)\Debug;$(SolutionDir)\lib\enet\Debug;$(SolutionDir)\lib\bullet3\src;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
