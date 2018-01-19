@@ -62,17 +62,17 @@ void Texture::loadLayer(const char * path)
 			return;
 		}
 		layer = 10000;
-		for each (int i in Game::freeLayers)
+		for each (int i in Game::eOpenGl->freeLayers)
 		{
 			if (i < layer) {
 				layer = i;
 			}
 		}
-		glBindTexture(GL_TEXTURE_2D_ARRAY, Game::textureArray);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, Game::eOpenGl->textureArray);
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, size, size,1, GL_RGB, GL_UNSIGNED_BYTE, data);
 		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
-		Game::freeLayers.erase(std::remove(Game::freeLayers.begin(), Game::freeLayers.end(), layer), Game::freeLayers.end());
+		Game::eOpenGl->freeLayers.erase(std::remove(Game::eOpenGl->freeLayers.begin(), Game::eOpenGl->freeLayers.end(), layer), Game::eOpenGl->freeLayers.end());
 
 		stbi_image_free(data);
 	}

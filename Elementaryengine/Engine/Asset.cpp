@@ -40,7 +40,8 @@ Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 	btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(mass, assetMotionState, btAssetShape, inertia);
 	assetRigidBody = new btRigidBody(groundRigidBodyCI);
 	Game::dynamicsWorld->addRigidBody(assetRigidBody);
-	assetRigidBody->setFriction(0.4);
+	assetRigidBody->setFriction(1);
+	assetRigidBody->setRestitution(0);
 }
 
 Asset::~Asset()
@@ -139,8 +140,6 @@ void Asset::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l
 	}
 }
 
-
-
 void Asset::Render(vec3 pos, vec3 rot, vec3 scale, mat4 view, mat4 projection, Shader* s)
 {
 	for each (AssetComponent* c in components)
@@ -151,7 +150,7 @@ void Asset::Render(vec3 pos, vec3 rot, vec3 scale, mat4 view, mat4 projection, S
 // called every frame for game logic
 void Asset::Tick(GLFWwindow * window, double deltaTime)
 {
-	if (assetRigidBody != nullptr) {
+	if (assetRigidBody != nullptr && Game::simulatePhysics) {
 		btTransform trans;
 		assetRigidBody->getMotionState()->getWorldTransform(trans);
 		position.x = trans.getOrigin().getX() - collisionPosOffset.x;
@@ -164,7 +163,7 @@ void Asset::Tick(GLFWwindow * window, double deltaTime)
 		q.z = trans.getRotation().getZ();
 
 	}
-	OnTick(window, deltaTime,this);
+	OnTick(window, deltaTime, this);
 }
 
 DllExport void Asset::setTickFunction(void(*tickFunction)(GLFWwindow *window, double deltaTime, Asset* asset))

@@ -74,7 +74,7 @@ void eSetLampsCommand(Shader * shader, GLuint lightColorSSBO, GLuint lightPositi
 	}
 
 	glActiveTexture(GL_TEXTURE8);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, Game::Instance().shadowMaps);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, Game::eOpenGl->shadowMaps);
 	shader->setInt("shadowMaps", 8);
 	//Color SSBO
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightColorSSBO);

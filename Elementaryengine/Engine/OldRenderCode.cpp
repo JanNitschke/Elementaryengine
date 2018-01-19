@@ -92,3 +92,23 @@ drawAtrib.push_back(a);
 }
 }
 }*/
+
+
+// voxel::
+
+//Shader* s = Mesh::voxelShader;
+//s->use();
+//glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->vBuffer);
+////glEnable(GL_BLEND);
+//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+//glClear(GL_COLOR_BUFFER_BIT);
+//glClear(GL_DEPTH_BUFFER_BIT);
+//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//glViewport(0, 0, eOpenGl->gridsize, eOpenGl->gridsize);
+//eSetLampsCommand(s, eOpenGl->lightColorSSBO, eOpenGl->lightPositionSSBO);
+/*
+for each (Asset* a in assets)
+{
+a->Render(View, Projection, s);
+}
+*/

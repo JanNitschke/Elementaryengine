@@ -32,33 +32,24 @@ class DllExport Game
 {
 
 public:
-	static Game& Instance() { static Game game; return game; }
+	static Game& Instance() { static Game game;
+	game.displaySettings = new EDisplaySettings();
+	return game; }
 
 	///<summary>
-	///DO NOT DESTROY THE GAME OBJECT WITHOUT CALLING Game::Stop() FIRST!
+	/// DO NOT DESTROY THE GAME OBJECT WITHOUT CALLING Game::Stop() FIRST!
 	///</summary> 
 	~Game();
 	static bool shouldClose;
 	static bool physicsFinished;
 
-	unsigned int shadowMaps;
-	static unsigned int textureArray;
 	static const unsigned int TextureSize;
 	static const unsigned int TextureCount;
-	unsigned int lBuffer, frameOut;
-	static vector<int> freeLayers;
-	GLuint64 texAHandle;
-	//multi draw indirect stuff
-	unsigned int gVertexBuffer;
-	unsigned int gArrayTexutre;
-	unsigned int gElementBuffer;
-	unsigned int gIndirectBuffer;
-	GLuint vao;
 
 	///<summary>
 	/// Opengl functions
 	///</summary> 
-	EOpenGl* eOpenGl = new EOpenGl();
+	static EOpenGl* eOpenGl;
 
 	EDisplaySettings* displaySettings;
 	///<summary>
@@ -180,7 +171,7 @@ public:
 	void RenderShadowMaps();
 
 	///<summary>
-	///Handles the input of the window and passes it to the active Gamemode. Not used atm
+	///Handles the input of the window and passes it to the active Gamemode.
 	///</summary> 
 	///<param name="window">
 	///The window to fetch the input from
@@ -270,16 +261,8 @@ private:
 	/////</summary> 
 	//Authority authority;
 	
-	//Render Buffers vertex and index Buffer
-	vector<Vertex> vVertex;
-	vector<unsigned int>gIndex;
+
 	
-	// offset for Multidraw inderect instancing
-	vector<int> drawInstanceOffset;
-	int currentIndexOffset = 0;
-	int currentVertexOffset = 0;
-	int instance = 0;
-	vector<DrawElementsIndirectCommand> dICommands;
 
 };
 DWORD WINAPI PhysicsThread(LPVOID lpParam);

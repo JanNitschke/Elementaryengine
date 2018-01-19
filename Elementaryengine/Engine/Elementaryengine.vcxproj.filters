@@ -75,6 +75,9 @@
     <ClCompile Include="OldRenderCode.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="ERender.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -157,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="stb_image_resize.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ERender.h">
+      <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

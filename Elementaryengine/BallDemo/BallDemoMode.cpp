@@ -44,7 +44,7 @@ void BallDemoMode::Load()
 	game->SetActiveCam(new FPCam());
 	Model* m = new Model("Assets/Meshs/Cube.obj");
 	Model* lamp = new Model("Assets/Meshs/Sphere.obj");
-	Model* sp = new Model("Assets/Meshs/Sphere.obj");
+	Model* sp = new Model("Assets/Meshs/Cube.obj");
 
 	Model* table = new Model("Assets/Meshs/tt.obj");
 
@@ -53,10 +53,9 @@ void BallDemoMode::Load()
 	Mesh* lam = lamp->meshes[0];
 	Mesh* tab = table->meshes[0];
 
-	Asset* a = new Asset(vec3(0,-3,0),vec3(50,0.1f,50),0,assetShapes::cube);
+	Asset* a = new Asset(vec3(0,-0.9,0),vec3(50,0.1f,50),0,assetShapes::cube);
 	a->setFriction(2);
 	cube->attachTo(a);
-	a->OnTick = FallingTick;
 	a->renderEnvironment = false;
 
 	PBRMaterial* pbrwood = new PBRMaterial();
@@ -156,16 +155,17 @@ void BallDemoMode::Load()
 	//terrain->attachTo(t);
 
 	//400 baseline defered : 30 fps
-	float height = 0;
-	for (int i = 0; i < 10000; i++)
+	float height = -0.2f;
+	for (int i = 0; i < 200; i++)
 	{
 		float radius = 0.3f;
 		float lz = (float)sin(i * (2.0f * M_PI)/ 12.0f) * radius;
 		float lx = (float)cos(i *  (2.0f * M_PI)/ 12.0f) * radius;
 		vec3 pos = vec3(lx + 2.0f,height - 0.5f,lz - 5);
-		Asset* a = new Asset(pos, vec3(.040f), 10, assetShapes::cube);
+		Asset* a = new Asset(pos, vec3(.040f), 1000, assetShapes::cube);
 		sphere->attachTo(a);
-		height += (((i + 1) % 12) == 0)?0.1f:0.0f;
+		a->setFriction(1.0f);
+		height += (((i + 1) % 12) == 0)?0.081f:0.0f;
 	}
 }
 
@@ -187,7 +187,3 @@ void LampTick(GLFWwindow * window, double deltaTime, Asset * asset)
 	asset->setPosition(vec3(lx, 1.50f, lz));
 }
 
-void FallingTick(GLFWwindow * window, double deltaTime, Asset * asset)
-{
-	asset->setPosition(asset->position + vec3(0, 1, 0));
-}
