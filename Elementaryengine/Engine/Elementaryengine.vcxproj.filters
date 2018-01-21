@@ -69,9 +69,6 @@
     <ClCompile Include="EOpenGl.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="ERenderCommand.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="OldRenderCode.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -153,9 +150,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="EOpenGl.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="ERenderCommand.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="stb_image_resize.h">

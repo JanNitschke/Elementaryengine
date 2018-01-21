@@ -20,9 +20,6 @@ public:
 	Model(char *path);
 	vector<Mesh*> meshes;
 
-	void Render(mat4 view, mat4 projection, Asset* parent, Shader* s);
-	void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a);
-
 private:
 	/*  Model Data  */
 	string directory;

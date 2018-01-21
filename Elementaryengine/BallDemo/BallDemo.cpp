@@ -20,7 +20,7 @@ int main()
 	game.name = "Ball demo";
 	BallDemoMode* mode = new BallDemoMode();
 	mode->game = &game;
-	game.displaySettings->fullscreen = false;
+	game.displaySettings->fullscreen = true;
 	game.setLight(vec3(0.02f), vec3(0.1, 0.2, 0.3));
 	game.gameMode = mode;
 	game.Start();

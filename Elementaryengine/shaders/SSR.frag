@@ -23,6 +23,7 @@ const float searchDist = 5;
 const int numBinarySearchSteps = 5;
 const float refSpecFallofExp = 3.0;
 
+/*
 float getDepth(vec2 pos){
     return length(texture(gPosition,TexCoord).rgb - viewPos);
 }
@@ -53,9 +54,10 @@ vec4 RayCast(in vec3 dir, inout vec3 hitCoord, out float dDepth){
     }
     return vec4(-1);
 }
-
+*/
 void main(){
-	float roughness = texture(gMaterial, TexCoord).r;
+	/*
+    float roughness = texture(gMaterial, TexCoord).r;
     float metallic = texture(gMaterial, TexCoord).g;
     vec3 viewNormal = vec3(texture(gNormal, TexCoord));
     vec3 globalPos =  vec3(texture(gPosition, TexCoord));
@@ -75,8 +77,8 @@ void main(){
         }
     }else{
         FragColor = vec4(texture(gColor,TexCoord).rgb,1);
-    }
-    //FragColor = vec4(texture(gColor,TexCoord).rgb,1);
+    }*/
+    FragColor = vec4(texture(gColor,TexCoord).rgb,1);
 
     //FragColor = vec4(reflected,1);
 }

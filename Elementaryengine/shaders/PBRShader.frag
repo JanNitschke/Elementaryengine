@@ -9,7 +9,7 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform sampler2D gMaterial;
-uniform samplerCubeArray shadowMaps;
+uniform samplerCubeArrayShadow shadowMaps;
 uniform	sampler2D colorCorrection;
 
 uniform vec3 directionalLightDirection; 
@@ -38,32 +38,19 @@ vec3 sampleOffsetDirections[20] = vec3[]
 	);  
 float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
 {
-	float bias   = 0.10;
-	int samples  = 20;
+	float bias = 0.10;
 	float viewDistance = length(viewPos - fragPos);
-    float diskRadius = (1.0 + (viewDistance / far_plane)) / 100.0;
 
 	// get vector between fragment position and light position
-	vec3 FPos = fragPos;
-	vec3 l = lightPos;
-	vec3 fragToLight = FPos - l;
-
+	vec3 fragToLight = fragPos - lightPos;
 
     // now get current linear depth as the length between the fragment and light position
     float currentDepth = length(fragToLight);
 	
-	float shadow = 0.0;
-	for(int i = 0; i < samples; ++i)
-	{
-		float cDepth = texture(shadowMaps, vec4(fragToLight + sampleOffsetDirections[i] * diskRadius,index)).r;
-		cDepth *= far_plane;   // Undo mapping [0;1]
-		if( currentDepth - bias > cDepth)
-		shadow += 1.0;
-	}
-	
-	shadow /= float(samples);  
 
-    return shadow;
+	float cDepth = texture(shadowMaps, vec4(fragToLight , index),(currentDepth - bias)	/ far_plane).r;
+
+    return cDepth;
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
@@ -175,6 +162,7 @@ void main(){
 
 	//for each light ... add to lo
 	for(int i=0;i<int(LightColors.length());i++){
+		
 	    vec3 L = normalize(LightPositions[i] - FragPos);
 		vec3 H = normalize(V + L);
 	
@@ -199,7 +187,7 @@ void main(){
 
 		float shadow = ShadowCalculation(FragPos,LightPositions[i],i);        
 		float NdotL = max(dot(N, L), 0.0);        
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL * (1 - shadow);
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;
 	}   
 	vec3 am = vec3(0.3) * albedo * ambient;
 	outcolor   = am + Lo;  

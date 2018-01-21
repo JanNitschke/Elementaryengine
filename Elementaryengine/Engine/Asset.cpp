@@ -35,6 +35,7 @@ Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 		btAssetShape = new btBoxShape(btVector3(scale.x * collisionSizeOffset.x,scale.y* collisionSizeOffset.y,scale.z* collisionSizeOffset.z));
 	}
 	btVector3 inertia(1, 1, 1);
+	q = glm::quat(vec3(0,0,0));
 	btAssetShape->calculateLocalInertia(mass, inertia);
 	assetMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(position.x + collisionPosOffset.x, position.y + collisionPosOffset.y, position.z + collisionPosOffset.z)));
 	btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(mass, assetMotionState, btAssetShape, inertia);
@@ -77,7 +78,12 @@ DllExport void Asset::setPosition(vec3 pos)
 	position = pos;
 	if (assetRigidBody != nullptr) {
 		btTransform trans;
-		trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
+		if (vec3(q.x, q.y, q.z).length == 0) {
+			trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
+		}
+		else {
+			trans.setRotation(btQuaternion(btVector3(q.x, q.y, q.z), q.w));
+		}
 		trans.setOrigin(btVector3(pos.x + collisionPosOffset.x, pos.y + collisionPosOffset.y, pos.z + collisionPosOffset.z));
 		assetRigidBody->setWorldTransform(trans);
 	}
@@ -91,6 +97,18 @@ DllExport void Asset::setFriction(float f)
 DllExport void Asset::setRotation(quat rot)
 {
 	q = rot;
+	if (assetRigidBody != nullptr) {
+		btTransform trans;
+		if (vec3(q.x, q.y, q.z).length == 0) {
+			rotation = vec3(0,0,0);
+			trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
+		}
+		else {
+			trans.setRotation(btQuaternion(btVector3(q.x, q.y, q.z), q.w));
+		}
+		trans.setOrigin(btVector3(position.x + collisionPosOffset.x, position.y + collisionPosOffset.y, position.z + collisionPosOffset.z));
+		assetRigidBody->setWorldTransform(trans);
+	}
 }
 
 DllExport void Asset::applyForce(vec3 force)

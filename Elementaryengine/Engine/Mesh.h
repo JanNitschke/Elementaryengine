@@ -26,11 +26,11 @@ public:
 	Mesh();
 	Mesh( vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture*> textures);
 	~Mesh();
-	virtual void Render(mat4 view, mat4 projection, Asset* parent, Shader* s);
-	virtual void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a);
+
 	Material* material;
 	GLuint VertexArrayID;
 	GLuint vertexbuffer;
+
 	static Texture* colorCorrection;
 	static Shader* defaultShader;
 	static Shader* lightmapShader;
@@ -44,7 +44,6 @@ public:
 	static Shader* ssrShader;
 
 	static void SetupMeshComp();
-	void SetupPbrUniforms(mat4 model, PBRMaterial* mat, Shader* shader);
 
 	unsigned int VAO, VBO, EBO;
 	GLuint VPMatrixID;

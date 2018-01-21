@@ -112,3 +112,17 @@ for each (Asset* a in assets)
 a->Render(View, Projection, s);
 }
 */
+
+// shadowmaps clear texture
+//clear the texture
+//glActiveTexture(GL_TEXTURE0);
+//glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, eOpenGl->shadowMaps);
+//glClear(GL_DEPTH_BUFFER_BIT);
+//glClear(GL_COLOR_BUFFER_BIT);
+//
+//if (vec3(q.x, q.y, q.z).length == 0) {
+//	trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
+//}
+//else {
+//	trans.setRotation(btQuaternion(btVector3(q.x, q.y, q.z), q.w));
+//}

@@ -86,37 +86,11 @@ void BallDemoMode::Load()
 	floor->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg", true);
 	floor->TextureScale = vec2(1.0f);
 
-	//PBRMaterial* beton = new PBRMaterial();
-	//beton->albedo = vec3(1);
-	//beton->albedoMap = new Texture("Assets/Textures/Plaster.jpg");
-	//beton->ao = vec3(0.01f);
-	//beton->metallic = 0;
-	//beton->roughness = 0.4f;
-	//beton->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg");
-
-	//PBRMaterial* grass = new PBRMaterial();
-	//grass->albedo = vec3(1);
-	//grass->albedoMap = new Texture("Assets/Textures/RockGrass.jpg");
-	//grass->ao = vec3(0.01f);
-	//grass->metallic = 0;
-	//grass->roughness = 10.0f;
-	//grass->TextureScale = vec2(50);
-	//grass->roughnessMap = new Texture("Assets/Textures/RockSpec.jpg");
-
-
-	//PBRMaterial* rust = new PBRMaterial();
-	//rust->albedo = vec3(0.4);
-	//rust->albedoMap = new Texture("Assets/Textures/r2albedo.jpg",true);
-	//rust->ao = vec3(0.5);
-	//rust->metallic = 1;
-	//rust->metallicMap = new Texture("Assets/Textures/r2metal.jpg",true);
-	//rust->roughness = 0.0f;
-	//rust->roughnessMap = new Texture("Assets/Textures/r2rough.jpg",true);
-	//rust->TextureScale = vec2(1.0f);
 	cube->material = floor;
 	tab->material = twood;
 
 	PBRMaterial* lampmat = new PBRMaterial();
+	lampmat->albedo = vec3(1000.0f);
 
 	lam->material = lampmat;
 
@@ -127,45 +101,48 @@ void BallDemoMode::Load()
 	tab->attachTo(t);
 
 	Lamp* l = new Lamp();
-	//l->throwShadows = false;
 	Asset* b = new Asset();
 	l->attachTo(b);
-	l->color = vec3(6.0);
+	l->color = vec3(3.0);
 	b->scale = vec3(.10f);
 	b->position = vec3(1.0f, 1.0f, 1.0f);
 	b->OnTick = LampTick;
 	lam->attachTo(b);
 
-	//Lamp* l2 = new Lamp();
-	//Asset* b2 = new Asset();
-	//l2->attachTo(b2);
-	//l2->color = vec3(0.8f);
-	//b2->scale = vec3(.10f);
-	//b2->position = vec3(0.5f, 6, 1.0f);
-	
-
-	//Asset* t = new Asset(vec3(0, -10, 0), vec3(50, 10, 50), 0, assetShapes::cube);
-	//Mesh* mesh = ter->meshes[0];
-	//mesh->material = beton;
-	//Texture* tt = new Texture("Assets/Textures/stoneHeight.jpg");
-	//t->setHeightmapCollision("Assets/Textures/stoneHeight.jpg");
-	//Terrain* terrain = new Terrain(mesh,tt);
-	//terrain->material = grass;
-	//terrain->grassMap = new Texture("Assets/Textures/RockSpec.jpg"); 
-	//terrain->attachTo(t);
 
 	//400 baseline defered : 30 fps
 	float height = -0.2f;
-	for (int i = 0; i < 200; i++)
+	float offset = 0.5f;
+	for (int i = 0; i < 5000; i++)
 	{
 		float radius = 0.3f;
-		float lz = (float)sin(i * (2.0f * M_PI)/ 12.0f) * radius;
-		float lx = (float)cos(i *  (2.0f * M_PI)/ 12.0f) * radius;
+		float lz = (float)sin((i + offset) * (2.0f * M_PI)/ 12.0f) * radius;
+		float lx = (float)cos((i + offset) *  (2.0f * M_PI)/ 12.0f) * radius;
 		vec3 pos = vec3(lx + 2.0f,height - 0.5f,lz - 5);
-		Asset* a = new Asset(pos, vec3(.040f), 1000, assetShapes::cube);
+		Asset* a = new Asset(pos, vec3(.040f), 1.1f, assetShapes::cube);
+		vec3 rot = vec3((360 * (i % 12) / 12),0.1,0);
+		a->setRotation(quat(rot));
 		sphere->attachTo(a);
 		a->setFriction(1.0f);
 		height += (((i + 1) % 12) == 0)?0.081f:0.0f;
+		
+		if ((i + 1) % 12 == 0) {
+			offset = (offset == 0.5f) ? 0.0f : 0.5f;
+		}
+	}
+	height = 1.5f;
+	for (int i = 0; i < 20; i++)
+	{
+		float radius = 1.5f;
+		float lz = (float)sin(i * (2.0f * M_PI) / 20) * radius;
+		float lx = (float)cos(i *  (2.0f * M_PI) / 20) * radius;
+		vec3 pos = vec3(lx + 2.0f, height - 0.5f, lz - 5);
+		Asset* a = new Asset(pos, vec3(.040f), 0, assetShapes::cube);
+		Lamp* la = new Lamp();
+		la->color = vec3(0.1f);
+		lam->attachTo(a);
+		la->attachTo(a);
+
 	}
 }
 

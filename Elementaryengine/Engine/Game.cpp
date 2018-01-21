@@ -159,7 +159,7 @@ void Game::loop()
 	DWORD   threadId;
 	HANDLE  threadHandle;
 	threadHandle = CreateThread(NULL, 0, PhysicsThread, NULL, 0, &threadId);
-
+	bool ff = true;
 
 	do {
 		if (isServer || requireServer) {

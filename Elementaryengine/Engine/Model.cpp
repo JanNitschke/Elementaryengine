@@ -16,22 +16,6 @@ Model::Model(char * path)
 	loadModel(path);
 }
 
-void Model::Render(mat4 view, mat4 projection, Asset* parent, Shader* s)
-{
-	for each (Mesh* m in meshes)
-	{
-		m->Render(view,projection,parent,s);
-	}
-}
-
-
-void Model::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a)
-{
-	for each (Mesh* m in meshes)
-	{
-		m->RenderLightmap(view, projection,l,a);
-	}
-}
 
 
 void Model::loadModel(string path)

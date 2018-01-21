@@ -1,8 +1,13 @@
 #pragma once
 #include <Feather.h>
 #include <string>
-#include <ERenderCommand.h>
 #include <algorithm>
+#include <glm\glm.hpp>
+#include <Material.h>
+#include <Shader.h>
+#include <Mesh.h>
+
+
 struct EDisplaySettings
 {
 	char* windowname;

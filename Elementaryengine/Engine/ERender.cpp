@@ -149,40 +149,50 @@ void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)
 	}
 
 	// copy the atribute vector to the GPU
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, eOpenGl->meshDataSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawMeshAtributes) * drawAtrib.size(), drawAtrib.data(), GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, eOpenGl->meshDataSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawMeshAtributes) * drawAtrib.size(), drawAtrib.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 void ERender::RenderShadowMaps(EOpenGl * eOpenGl)
 {
+	// use the lightmap shader
 	Shader* shader = Mesh::lightmapShader;
 	shader->use();
+	
+	// get the number of lights in a scene
 	int lightcount = Game::lamps.size();
+
+	// bind the cubemap array containing the shadowmap
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, eOpenGl->shadowMaps);
 
-	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_RGBA16F, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT, 6 * lightcount, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	// setup the texture array to resize to fit all the lights in the scene
+	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT32, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT, 6 * lightcount, 0, GL_DEPTH_COMPONENT	, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
 
+	// change the viewport to the resolution of the shadowmaps
 	glViewport(0, 0, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT);
+
+	// bind the Texture array to framebuffer and clear it
 	glBindFramebuffer(GL_FRAMEBUFFER, Lamp::depthMapFBO);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, eOpenGl->shadowMaps, 0);
-
-	glClearColor(1000, 1000, 1000, 1);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, eOpenGl->shadowMaps);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, eOpenGl->shadowMaps, 0);
+	glClearDepth(1);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glClear(GL_COLOR_BUFFER_BIT);
+
+	// render each lamp to a layer
 	int count = 0;
 	for each (Lamp* l in Game::lamps)
 	{
-		if (true) {
+
+		// only rerender the layer if a shadowmap is needed
+		if (l->throwShadows) {
+
+			// create the projection matrix
 			float aspect = (float)Lamp::SHADOW_WIDTH / (float)Lamp::SHADOW_WIDTH;
 			float Snear = 1.0f;
 			float Sfar = 25.0f;
@@ -202,16 +212,19 @@ void ERender::RenderShadowMaps(EOpenGl * eOpenGl)
 			shadowTransforms.push_back(shadowProj *
 				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
+			// set layer uniform wich tell the shader wich slice of the texture array to render to
 			if (eOpenGl->shadowUniformLayer < 0) {
 				eOpenGl->shadowUniformLayer = glGetUniformLocation(shader->ID, "layer");
 			}
 			shader->setInt(eOpenGl->shadowUniformLayer, count);
 
+			// copy the created shadow matrix to the GPU
 			if (eOpenGl->shadowUniformShadowMatrices < 0) {
 				eOpenGl->shadowUniformShadowMatrices = glGetUniformLocation(shader->ID, "shadowMatrices");
 			}
 			glUniformMatrix4fv(eOpenGl->shadowUniformShadowMatrices, shadowTransforms.size(), GL_FALSE, glm::value_ptr(shadowTransforms[0]));
 			count++;
+
 
 			if (eOpenGl->shadowUniformFar_plane < 0) {
 				eOpenGl->shadowUniformFar_plane = glGetUniformLocation(shader->ID, "far_plane");
@@ -234,7 +247,6 @@ void ERender::RenderShadowMaps(EOpenGl * eOpenGl)
 				0);
 		}
 	}
-
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -452,12 +464,10 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 
 
 	// copy content of geometry's depth buffer to default framebuffer's depth buffer
-
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, eOpenGl->gBuffer);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
-											   // blit to default framebuffer. Note that this may or may not work as the internal formats of both the FBO and default framebuffer have to match.
-											   // the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the 		
-											   // depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
+
+	// write to default framebuffer
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); 
 	glEnable(GL_DEPTH_TEST);
 }
 
