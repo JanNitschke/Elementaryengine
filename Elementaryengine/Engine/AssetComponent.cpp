@@ -26,12 +26,3 @@ void AssetComponent::detachFrom(Asset * a)
 {
 	parents.erase(std::remove(parents.begin(), parents.end(), a), parents.end());
 }
-
-void AssetComponent::Render(mat4 view, mat4 projection, Asset* parent, Shader* s)
-{
-}
-
-void AssetComponent::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l, Asset* a)
-{
-}
-

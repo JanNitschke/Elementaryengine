@@ -262,7 +262,7 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 	glDepthFunc(GL_LESS);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	
+
 	//set viewport
 	glViewport(0, 0, displaySettings->windowWidth, displaySettings->windowHeight);
 
@@ -358,6 +358,32 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 		eOpenGl->lightingUniformColorCorrection = glGetUniformLocation(Mesh::pbrShader->ID, "colorCorrection");
 	}
 	shader->setInt(eOpenGl->lightingUniformColorCorrection, 4);
+
+	// bind depth texture and set its uniform
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, eOpenGl->gDepth);
+	if (eOpenGl->lightingUniformDepth < 0) {
+		eOpenGl->lightingUniformDepth = glGetUniformLocation(shader->ID, "gDepth");
+	}
+	shader->setInt(eOpenGl->lightingUniformDepth, 6);
+
+	// set projection unform
+	if (eOpenGl->lightingUniformProj < 0) {
+		eOpenGl->lightingUniformProj = glGetUniformLocation(shader->ID, "invProj");
+	}
+	shader->setMat4f(eOpenGl->lightingUniformProj, inverse(Projection));
+
+	// set view unform
+	if (eOpenGl->lightingUniformView < 0) {
+		eOpenGl->lightingUniformView = glGetUniformLocation(shader->ID, "invView");
+	}
+	shader->setMat4f(eOpenGl->lightingUniformView, inverse(View));
+
+	// set view position uniform
+	if (eOpenGl->lightingUniformViewPos < 0) {
+		eOpenGl->lightingUniformViewPos = glGetUniformLocation(shader->ID, "viewPos");
+	}
+	shader->set3Float(eOpenGl->lightingUniformViewPos, Game::activeCam->position);
 
 	SetupLamps(eOpenGl,shader);
 

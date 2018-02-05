@@ -10,7 +10,7 @@
 #include <glm/glm.hpp>
 class Asset;
 
-namespace FeatherEngine {
+namespace ElementaryEngine {
 	//btVector3 toBullet(vec3 vec) {
 	//	return btVector3(vec.x, vec.y, vec.z);
 	//}

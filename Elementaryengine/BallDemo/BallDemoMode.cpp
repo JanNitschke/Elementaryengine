@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "BallDemoMode.h"
-#include <Feather.h>
+#include <EEngine.h>
 #include <glm\glm.hpp>
 #include <Model.h>
 #include <Mesh.h>
@@ -42,16 +42,20 @@ void BallDemoMode::Load()
 {
 	Game::simulatePhysics = false;
 	game->SetActiveCam(new FPCam());
+	game->activeCam->setPosition(vec3(0,0,0));
 	Model* m = new Model("Assets/Meshs/Cube.obj");
 	Model* lamp = new Model("Assets/Meshs/Sphere.obj");
 	Model* sp = new Model("Assets/Meshs/Cube.obj");
-
+	Model * room = new Model("Assets/Meshs/Room.obj");
 	Model* table = new Model("Assets/Meshs/tt.obj");
+	Model* candleMod = new Model("Assets/Meshs/Candle.obj");
 
 	Mesh* cube = m->meshes[0];
 	Mesh* sphere = sp->meshes[0];
 	Mesh* lam = lamp->meshes[0];
 	Mesh* tab = table->meshes[0];
+	Mesh* ro = room->meshes[0];
+	Mesh* cMesh = candleMod->meshes[0];
 
 	Asset* a = new Asset(vec3(0,-0.9,0),vec3(50,0.1f,50),0,assetShapes::cube);
 	a->setFriction(2);
@@ -88,6 +92,8 @@ void BallDemoMode::Load()
 
 	cube->material = floor;
 	tab->material = twood;
+	ro->material = floor;
+	cMesh->material = floor;
 
 	PBRMaterial* lampmat = new PBRMaterial();
 	lampmat->albedo = vec3(1000.0f);
@@ -97,23 +103,35 @@ void BallDemoMode::Load()
 	sphere->material = pbrwood;
 
 
-	Asset* t = new Asset(vec3(0, 0, 0), vec3(1.4, .75,.8), 1000, assetShapes::cube);
+	Asset* t = new Asset(vec3(-2.0f, -0.20, -4.0f), vec3(1.4, .75,.8), 1000, assetShapes::cube);
 	tab->attachTo(t);
+
+	Asset* r = new Asset(vec3(-2.5, -1.0f, -2.5), vec3(4, 2, 4), 0, assetShapes::cube);
+	ro->attachTo(r);
 
 	Lamp* l = new Lamp();
 	Asset* b = new Asset();
 	l->attachTo(b);
-	l->color = vec3(3.0);
+	l->color = vec3(3.0,2.0,1.0);
 	b->scale = vec3(.10f);
-	b->position = vec3(1.0f, 1.0f, 1.0f);
-	b->OnTick = LampTick;
+	b->position = vec3(-2.0f, 2.2f, -8.0f);
+	//b->OnTick = LampTick;
 	lam->attachTo(b);
 
+	Lamp* ca = new Lamp();
+	Asset* candle = new Asset();
+	ca->attachTo(candle);
+	ca->color = vec3(1.0, 0.6, 0.3);
+	candle->scale = vec3(0.7,1.2,0.7);
+	candle->position = vec3(-2.0, 0.9f, -4.0f);
+	candle->OnTick = CandleTick;
+	cMesh->attachTo(candle);
+	cMesh->posOffset = vec3(0, -0.04, 0);
 
 	//400 baseline defered : 30 fps
 	float height = -0.2f;
 	float offset = 0.5f;
-	for (int i = 0; i < 5000; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		float radius = 0.3f;
 		float lz = (float)sin((i + offset) * (2.0f * M_PI)/ 12.0f) * radius;
@@ -130,6 +148,7 @@ void BallDemoMode::Load()
 			offset = (offset == 0.5f) ? 0.0f : 0.5f;
 		}
 	}
+	/*
 	height = 1.5f;
 	for (int i = 0; i < 20; i++)
 	{
@@ -144,6 +163,7 @@ void BallDemoMode::Load()
 		la->attachTo(a);
 
 	}
+	*/
 }
 
 void BallDemoMode::Start()
@@ -164,3 +184,15 @@ void LampTick(GLFWwindow * window, double deltaTime, Asset * asset)
 	asset->setPosition(vec3(lx, 1.50f, lz));
 }
 
+void CandleTick(GLFWwindow * window, double deltaTime, Asset * asset) {
+	Lamp* l = Game::lamps[1];
+	timerunning += deltaTime;
+	vec3 color = vec3(1.0, 0.6, 0.3);
+	float baseint = 0.14f;
+	float intensety = 0.2f;
+	float i1 = ((float)sin(timerunning * 5) * intensety);
+	float i2 = ((float)cos(timerunning *  7) * intensety);
+	float i3 = ((float)cos(timerunning *  13) * intensety);
+
+	l->color = color * (baseint + (i1 * i2 * i3));
+}

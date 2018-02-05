@@ -27,7 +27,6 @@ mat4 FPCam::GetView()
 
 void FPCam::Tick(GLFWwindow * window, double deltaTime)
 {
-	float camSpeed = 2.0f;
 	float cameraSpeed = camSpeed * deltaTime;
 	float sensitivity = 0.05f;
 

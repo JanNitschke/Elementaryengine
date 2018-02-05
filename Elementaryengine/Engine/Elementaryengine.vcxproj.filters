@@ -104,9 +104,6 @@
     <ClInclude Include="Game.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Feather.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Import.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -157,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="ERender.h">
       <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="EEngine.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

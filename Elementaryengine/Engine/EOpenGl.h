@@ -1,5 +1,5 @@
 #pragma once
-#include <Feather.h>
+#include <EEngine.h>
 #include <string>
 #include <algorithm>
 #include <glm\glm.hpp>
@@ -37,6 +37,11 @@ struct DrawMeshAtributes {
 	int metallicTex;
 	int roughnessTex;
 	int i0;
+};
+struct Light {
+	vec3 pos;
+	int throwShadow; // 0 -> no shadows; 1-> flat lighting; 3 -> volumetric 
+	vec3 color;
 };
 
 class EOpenGl
@@ -106,6 +111,10 @@ public:
 	int lightingUniformFar_plane = -1;
 	int lightingUniformColorCorrection = -1;
 	int lightingUniformShadowMaps = -1;
+	int lightingUniformDepth = -1;
+	int lightingUniformProj = -1;
+	int lightingUniformView = -1;
+	int lightingUniformViewPos = -1;
 
 	// SSR shader
 	int ssrUniformPosition = -1;

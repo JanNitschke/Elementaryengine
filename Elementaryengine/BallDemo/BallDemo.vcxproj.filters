@@ -27,6 +27,12 @@
     <ClInclude Include="BallDemoMode.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="AstroidDemo.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Astroid.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -36,6 +42,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="BallDemoMode.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="AstroidDemo.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Astroid.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

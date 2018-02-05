@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <Feather.h>
+#include <EEngine.h>
 #include <AssetComponent.h>
 #include <Texture.h>
 #include <btBulletDynamicsCommon.h>
@@ -35,10 +35,7 @@ public:
 	DllExport btRigidBody* getRigidBody();
 
 	float mass = 1;
-	// Code to draw the asset, may get passed to the more specific class
-	virtual void Render(mat4 view, mat4 projection, Shader* s);
-	virtual void RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l);
-	virtual void Render(vec3 pos, vec3 rot, vec3 scale, mat4 view, mat4 projection, Shader* s);
+
 	// called ecery frame for game logic
 	DllExport virtual void Tick(GLFWwindow * window, double deltaTime);
 	DllExport void setTickFunction(void(*tickFunction)(GLFWwindow * window, double deltaTime, Asset* asset));

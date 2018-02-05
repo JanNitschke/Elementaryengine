@@ -12,7 +12,7 @@ using namespace std;
 
 #include <glm/glm.hpp>
 #include "shader.h"
-#include <Feather.h>
+#include <EEngine.h>
 
 
 Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)

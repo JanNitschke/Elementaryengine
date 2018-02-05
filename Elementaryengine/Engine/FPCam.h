@@ -10,8 +10,11 @@ public:
 	DllExport ~FPCam();
 	mat4 GetView();
 	void Tick(GLFWwindow * window, double deltaTime);
+	float camSpeed = 2.0f;
+
 private:
 	float lastX, lastY;
 	bool firstMouse = true;
+
 };
 

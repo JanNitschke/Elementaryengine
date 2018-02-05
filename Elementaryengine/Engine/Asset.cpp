@@ -144,27 +144,6 @@ DllExport btRigidBody * Asset::getRigidBody()
 	return assetRigidBody;
 }
 
-
-void Asset::Render(mat4 view, mat4 projection, Shader* s)
-{
-	Render(position,  rotation, scale,  view,  projection,s);
-}
-
-void Asset::RenderLightmap(vector<mat4> view, mat4 projection, AssetComponent* l)
-{
-	for each (AssetComponent* c in components)
-	{
-		c->RenderLightmap( view, projection, l,this);
-	}
-}
-
-void Asset::Render(vec3 pos, vec3 rot, vec3 scale, mat4 view, mat4 projection, Shader* s)
-{
-	for each (AssetComponent* c in components)
-	{
-		c->Render(view, projection, this,s);
-	}
-}
 // called every frame for game logic
 void Asset::Tick(GLFWwindow * window, double deltaTime)
 {

@@ -208,7 +208,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EOpenGl.h" />
     <ClInclude Include="ERender.h" />
-    <ClInclude Include="Feather.h" />
+    <ClInclude Include="EEngine.h" />
     <ClInclude Include="FPCam.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameMode.h" />

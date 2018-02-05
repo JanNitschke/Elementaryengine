@@ -1,18 +1,22 @@
 #pragma once
+
 #include "GameMode.h"
 #include <GL/glew.h>
 #include <GLFW\glfw3.h>
 #include <glm/glm.hpp>
 #include <Asset.h>
 #include <Game.h>
+#include "Astroid.h"
 
 using namespace std;
 using namespace glm;
-class BallDemoMode : public GameMode
+
+class AstroidDemo : public GameMode
 {
 public:
-	BallDemoMode();
-	~BallDemoMode();
+	AstroidDemo();
+	~AstroidDemo();
+
 	Game* game;
 	///<summary>
 	///Called once per frame.
@@ -36,14 +40,9 @@ public:
 	///Called when game stops.
 	///</summary> 
 	virtual void Stop();
-	
-private:
 
+	vector<Astroid*> Astroids;
+	vector<Mesh*> AstroidMeshs;
+	vector<Model*> AstroidModels;
 };
-///<summary>
-///Move the first lamp on tick. See Load() -  	b->OnTick = LampTick;
-///</summary> 
-void LampTick(GLFWwindow * window, double deltaTime, Asset* asset);
-void CandleTick(GLFWwindow * window, double deltaTime, Asset * asset);
-
 
