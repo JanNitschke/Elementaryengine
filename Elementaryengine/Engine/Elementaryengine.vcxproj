@@ -175,8 +175,10 @@
     <ClCompile Include="Asset.cpp" />
     <ClCompile Include="AssetComponent.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EJSFunctions.cpp" />
     <ClCompile Include="EOpenGl.cpp" />
     <ClCompile Include="ERender.cpp" />
+    <ClCompile Include="EScriptContext.cpp" />
     <ClCompile Include="FPCam.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Import.cpp" />
@@ -189,6 +191,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UIElement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ENetX64.dll" />
@@ -206,9 +209,11 @@
     <ClInclude Include="Asset.h" />
     <ClInclude Include="AssetComponent.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="EJSFunctions.h" />
     <ClInclude Include="EOpenGl.h" />
     <ClInclude Include="ERender.h" />
     <ClInclude Include="EEngine.h" />
+    <ClInclude Include="EScriptContext.h" />
     <ClInclude Include="FPCam.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameMode.h" />
@@ -222,6 +227,7 @@
     <ClInclude Include="stb_image_resize.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="UIElement.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="EnvShader.geom" />

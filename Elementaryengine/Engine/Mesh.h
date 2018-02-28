@@ -42,6 +42,7 @@ public:
 	static Shader* terrainEnvShader;
 	static Shader* grassShader;
 	static Shader* ssrShader;
+	static Shader* uiShader;
 
 	static void SetupMeshComp();
 

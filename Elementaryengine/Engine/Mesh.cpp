@@ -28,6 +28,8 @@ Shader* Mesh::terrainLightmapShader;
 Shader* Mesh::terrainShader;
 Shader* Mesh::grassShader;
 Shader* Mesh::ssrShader;
+Shader* Mesh::uiShader;
+
 Texture* Mesh::colorCorrection;
 
 Mesh::Mesh()
@@ -42,11 +44,13 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture
 		SetupMesh();
 	}
 	Game::meshs.push_back(this);
+	Game::meshChanged = true;
 }
 
 
 Mesh::~Mesh()
 {
+	Game::meshChanged = true;
 	// Cleanup VBO
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
@@ -59,6 +63,8 @@ void Mesh::SetupMeshComp()
 	pbrShader = new Shader("..\\shaders\\geometry.vert", "..\\shaders\\PBRShader.frag");
 	ssrShader = new Shader("..\\shaders\\geometry.vert", "..\\shaders\\SSR.frag");
 	geometryShader = new Shader("..\\shaders\\DefaultShader.vert", "..\\shaders\\geometry.frag");
+	//uiShader = new Shader("..\\shaders\\UI.vert", "..\\shaders\\UI.frag");
+
 	//voxelShader = new Shader("..\\shaders\\voxelise.vert", "..\\shaders\\voxelise.geom", "..\\shaders\\voxelise.frag");
 	//grassShader = new Shader("..\\shaders\\TerrainShader.vert","..\\shaders\\Grass.geom" , "..\\shaders\\Grass.frag");
 	//terrainShader = new Shader("..\\shaders\\TerrainShader.vert", "..\\shaders\\TerrainShader.geom", "..\\shaders\\PBRShader.frag");

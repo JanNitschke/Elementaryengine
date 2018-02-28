@@ -19,7 +19,6 @@ class Asset
 public:
 	DllExport Asset();
 	DllExport Asset(vec3 pos, vec3 scale, int mass, assetShapes shape);
-	DllExport ~Asset();
 	DllExport void setMass(float m);
 	DllExport void setScale(vec3 sca);
 	DllExport void setPosition(vec3 pos);
@@ -55,6 +54,7 @@ public:
 	static const unsigned int ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT;
 	static unsigned int envMapFBO;
 	static void SetupAsset();
+	void Destroy();
 	quat q;
 
 	DllExport void setHeightmapCollision(const char* path);

@@ -71,5 +71,25 @@ namespace ERender {
 	///</param>
 	void RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection);
 
+	///<summary>
+	///set the uniforms and ssbos for the lamps
+	///</summary> 
+	///<param name="eOpenGl">
+	///the EOpenGl object that holds the buffer and texture ids 
+	///</param>
+	///<param name="shader">
+	///the shader that needs the uniforms set
+	///</param>
 	void SetupLamps(EOpenGl* eOpenGl, Shader * shader);
+
+	///<summary>
+	///render the UI elements
+	///</summary> 
+	///<param name="eOpenGl">
+	///the EOpenGl object that holds the buffer and texture ids 
+	///</param>
+	///<param name="displaySettings">
+	///the display settings to use
+	///</param>
+	void RenderUI(EOpenGl* eOpenGl, EDisplaySettings* displaySettings);
 }

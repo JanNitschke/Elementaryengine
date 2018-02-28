@@ -46,6 +46,7 @@ vec3 Game::directionalLightColor;
 vec3 Game::directionalLightDirection;
 vector<Asset*> Game::assets;
 vector<Asset*> Game::nextAssets;
+vector<Asset*> Game::assetsToDelete;
 vector<Mesh*> Game::meshs;
 vector<Lamp*> Game::lamps;
 Camera* Game::activeCam;
@@ -53,6 +54,8 @@ btDiscreteDynamicsWorld* Game::dynamicsWorld;
 bool Game::simulatePhysics = true;
 double Game::physicsFps;
 EOpenGl* Game::eOpenGl = new EOpenGl();
+bool Game::meshChanged = true;
+bool Game::assetsChanged = true;
 
 // start the game and run the main loop
 void Game::Start()
@@ -61,6 +64,8 @@ void Game::Start()
 	
 	eOpenGl->Initialise(displaySettings);
 
+
+	eScriptContext = new EScriptContext();
 	//setup Physics
 	if (usePhysx) {
 		/*static PxDefaultErrorCallback gDefaultErrorCallback;
@@ -82,9 +87,10 @@ void Game::Start()
 		dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
 	}
 
-
+	system("cls");
 
 	// Setup components (shaders, textures etc.)
+	gameMode->window = eOpenGl->window;
 
 	Mesh::SetupMeshComp();
 	Lamp::SetupLampComp();
@@ -119,13 +125,14 @@ void Game::Start()
 	glGenBuffers(1, &eOpenGl->gVertexBuffer);
 
 	LoadScene();
+	eScriptContext->ReadScript(L"main.js");
 
 
 	float viewaspect = (float)displaySettings->windowWidth / (float)displaySettings->windowHeight;
 	Projection = glm::perspective(glm::radians(60.0f), viewaspect, 0.1f, 100.0f);
 
 	// for an ortho camera :
-	// projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
+	UIProjection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
 
 	// projection for voxelisation NOT USED ATM
 	VoxelProj = glm::ortho(-64.0f,64.0f,-64.0f,64.0f,-64.0f,64.0f); // In world coordinates
@@ -138,6 +145,8 @@ void Game::Start()
 
 	// Close OpenGL window and terminate GLFW
 	eOpenGl->CleanUp();
+
+	delete eScriptContext;
 }
 
 
@@ -162,6 +171,8 @@ void Game::loop()
 	bool ff = true;
 
 	do {
+		assets = vector<Asset*>(nextAssets);
+
 		if (isServer || requireServer) {
 			updateNetwork();
 		}
@@ -174,26 +185,37 @@ void Game::loop()
 		currentTime = glfwGetTime();
 		deltaTime = currentTime - oldTime;
 		smoothFps = (9 * smoothFps / 10) + (.1 / deltaTime);
-		printf(" \r fps smooth: %i accurate: %f physics: %f", (int)(smoothFps + .5), 1 / deltaTime,Game::physicsFps);
+		printf(" \r fps smooth: %i loaded Assets: %i accurate: %f physics: %f ", (int)(smoothFps + .5), (int)assets.size(), 1 / deltaTime, Game::physicsFps);
 		if (!isServer) {
 			processInput(eOpenGl->window);
 		}
-		assets = nextAssets;
 		View = activeCam->GetView();
 
 		if (gameMode != nullptr) {
 			gameMode->Tick(deltaTime);
 		}
+		eScriptContext->RunFunction("OnTick");
 		for each (Asset* asset in assets)
 		{
-			asset->Tick(eOpenGl->window, deltaTime);
+			if (asset) {
+				asset->Tick(eOpenGl->window, deltaTime);
+			}
 		}
+		// delete all Assets that were destroyed this frame
+		for each (Asset* a in assetsToDelete)
+		{
+			nextAssets.erase(std::remove(Game::nextAssets.begin(), Game::nextAssets.end(), a), Game::nextAssets.end());
+			delete a;
+		}
+		assetsToDelete.clear();
+		nextAssets.shrink_to_fit();
 
 		if (!isServer) {
 			SetupRender();
 			RenderShadowMaps();
 			Render();
 			RenderHUD();
+			RenderUI();
 
 			// Swap buffers
 			glfwSwapBuffers(eOpenGl->window);
@@ -212,7 +234,7 @@ void Game::loop()
 }
 bool Game::isKeyDown(int key)
 {
-	return (glfwGetKey(Instance().eOpenGl->window, key) == GLFW_PRESS);
+	return (glfwGetKey(Instance().eOpenGl->window, key) == GLFW_PRESS)||(glfwGetMouseButton(Instance().eOpenGl->window,key) == GLFW_PRESS);
 }
 void Game::setLight(vec3 color, vec3 direction)
 {
@@ -223,13 +245,15 @@ void Game::setLight(vec3 color, vec3 direction)
 void Game::SetupRender()
 {
 	// rebuild the render Mesh and / or renderCommandQueue if needed
+	//ERender::BuildMeshes(assetsChanged, meshChanged, eOpenGl);
 	ERender::BuildMeshes(assetsChanged, meshChanged, eOpenGl);
-	// reset the Variables used to notify about new changes
-	assetsChanged = false;
-	meshChanged = false;
 
 	// rebuild the List of draw atributes
 	ERender::BuildDrawAtrib(eOpenGl);
+
+	// reset the Variables used to notify about new changes
+	assetsChanged = false;
+	meshChanged = false;
 }
 
 void Game::Render()
@@ -239,6 +263,11 @@ void Game::Render()
 }
 
 void Game::RenderShadowMaps()
+{
+	ERender::RenderShadowMaps(eOpenGl);
+}
+
+void Game::RenderUI()
 {
 	ERender::RenderShadowMaps(eOpenGl);
 }
@@ -267,11 +296,21 @@ void Game::LoadScene()
 RaycastHit Game::Raycast(vec3 Start, vec3 End)
 {
 	RaycastHit r;
-	//btCollisionWorld::ClosestRayResultCallback RayCallback(toBullet(Start), toBullet(End));
-	//// Perform raycast
-	//dynamicsWorld->rayTest(toBullet(Start), toBullet(End), RayCallback);
-	//if (RayCallback.hasHit()) {
-	////	r.hitPos = RayCallback.;
+	btCollisionWorld::ClosestRayResultCallback RayCallback(toBullet(Start), toBullet(End));
+	//Perform raycast
+	RayCallback.m_hitNormalWorld;
+	dynamicsWorld->rayTest(toBullet(Start), toBullet(End), RayCallback);
+	if (RayCallback.hasHit()) {
+		r.hitPos = toGlm(RayCallback.m_hitPointWorld);
+		r.hitNormal = toGlm(RayCallback.m_hitNormalWorld);
+		for each (Asset* a in assets)
+		{
+			if (a->getRigidBody() == RayCallback.m_collisionObject) {
+				r.hitAsset = a;
+				break;
+			}
+		}
+	}
 	return r;
 }
 
@@ -288,6 +327,14 @@ void Game::netConnect(string ip)
 void Game::netDisconnect()
 {
 
+}
+btVector3 Game::toBullet(vec3 v)
+{
+	return btVector3(v.x, v.y,v.z);
+}
+vec3 Game::toGlm(btVector3 v)
+{
+	return vec3( v.getX(), v.getY(), v.getZ());
 }
 DWORD WINAPI PhysicsThread(LPVOID lpParam)
 {

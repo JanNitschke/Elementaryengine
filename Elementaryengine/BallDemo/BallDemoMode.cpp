@@ -7,6 +7,7 @@
 #include <Lamp.h>
 #include <FPCam.h>
 #include <Terrain.h>
+#include <algorithm>
 
 #define M_PI           3.14159265358979323846  /* pi */
 
@@ -36,6 +37,80 @@ void BallDemoMode::Tick(double deltaTime)
 	else {
 		p_pressedLastFrame = false;
 	}
+	vec3 dir = game->activeCam->cameraFront;
+	vec3 pos = game->activeCam->position;
+	RaycastHit r = game->Raycast(pos, pos + dir * 10.0f);
+	vec3 result = r.hitPos;
+	vec3 norm = r.hitNormal;
+
+	// correct the normal  to 1 and 0;
+	if (norm.x < 0.5f && norm.x > -0.5f) {
+		norm.x = 0;
+	} else {
+		if (norm.x > 0.5f)
+			norm.x = 1.0f;
+		if (norm.x < 0.5f)
+			norm.x = -1.0f;
+	}
+
+	if (norm.y < 0.5f && norm.y > -0.5f) {
+		norm.y = 0;
+	} else {
+		if (norm.y > 0.5f)
+			norm.y = 1.0f;
+		if (norm.y < 0.5f)
+			norm.y = -1.0f;
+	}
+
+	if (norm.z < 0.5f && norm.z > -0.5f) {
+		norm.z = 0;
+	} else {
+		if (norm.z > 0.5f)
+			norm.z = 1.0f;
+		if (norm.z < 0.5f)
+			norm.z = -1.0f;
+	}
+
+
+
+
+	if (Game::isKeyDown(GLFW_MOUSE_BUTTON_1)) {
+		if (placedLastFrame == false) {
+			if (r.hitAsset != nullptr) {
+				Asset* a;
+				int db = 0;
+				if (std::find(placedAssets.begin(), placedAssets.end(), r.hitAsset) != placedAssets.end()) {
+					a = new Asset(r.hitAsset->position + (norm * 0.5f), vec3(0.25f), 0, assetShapes::cube);
+					db = 1;
+				}
+				else {
+					a = new Asset(result + (norm * 0.25f), vec3(0.25f), 0, assetShapes::cube);
+					db = 2;
+				}
+				cube->attachTo(a);
+				placedAssets.push_back(a);
+			}
+		}
+		placedLastFrame = true;
+	}
+	else {
+		placedLastFrame = false;
+	}
+
+	if (Game::isKeyDown(GLFW_MOUSE_BUTTON_2)) {
+		if (destroyedLastFrame == false) {
+			if (r.hitAsset != nullptr) {
+				if (std::find(placedAssets.begin(), placedAssets.end(), r.hitAsset) != placedAssets.end()) {
+
+					r.hitAsset->Destroy();
+				}
+			}
+		}
+		destroyedLastFrame = true;
+	}
+	else {
+		destroyedLastFrame = false;
+	}
 }
 
 void BallDemoMode::Load()
@@ -50,7 +125,7 @@ void BallDemoMode::Load()
 	Model* table = new Model("Assets/Meshs/tt.obj");
 	Model* candleMod = new Model("Assets/Meshs/Candle.obj");
 
-	Mesh* cube = m->meshes[0];
+	cube = m->meshes[0];
 	Mesh* sphere = sp->meshes[0];
 	Mesh* lam = lamp->meshes[0];
 	Mesh* tab = table->meshes[0];
@@ -85,9 +160,11 @@ void BallDemoMode::Load()
 	floor->albedo = vec3(1);
 	floor->albedoMap = new Texture("Assets/Textures/Plaster.jpg", true);
 	floor->ao = vec3(0.01f);
+	//floor->metallic = 0;
+	//floor->roughness = 1.3f;
 	floor->metallic = 0;
-	floor->roughness = 1.3f;
-	floor->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg", true);
+	floor->roughness = 5.0f;
+	//floor->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg", true);
 	floor->TextureScale = vec2(1.0f);
 
 	cube->material = floor;
@@ -131,6 +208,7 @@ void BallDemoMode::Load()
 	//400 baseline defered : 30 fps
 	float height = -0.2f;
 	float offset = 0.5f;
+	/*
 	for (int i = 0; i < 10; i++)
 	{
 		float radius = 0.3f;
@@ -148,6 +226,7 @@ void BallDemoMode::Load()
 			offset = (offset == 0.5f) ? 0.0f : 0.5f;
 		}
 	}
+	*/
 	/*
 	height = 1.5f;
 	for (int i = 0; i < 20; i++)

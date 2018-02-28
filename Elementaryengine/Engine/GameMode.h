@@ -14,6 +14,7 @@ public:
 	///</param>
 	Game* game;
 
+	GLFWwindow* window;
 	///<summary>
 	///Called once per frame.
 	///</summary> 

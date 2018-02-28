@@ -76,8 +76,10 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glfwWindowHint(GLFW_SAMPLES, 4);
-	glEnable(GL_MULTISAMPLE);
+	
+	//MSAA is not working with defered rendering
+	//glfwWindowHint(GLFW_SAMPLES, 4);
+	//glEnable(GL_MULTISAMPLE);
 
 	//Setup framebuffer
 	glGenFramebuffers(1, &gBuffer);

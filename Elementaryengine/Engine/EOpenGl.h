@@ -135,4 +135,12 @@ public:
 	int shadowUniformShadowMatrices = -1;
 	int shadowUniformFar_plane = -1;
 	int shadoeUniformLightPos = -1;
+
+	// RenderUI
+	int uiUniformColor = -1;
+	int uiUniformOpacity= -1;
+	int uiUniformModel = -1;
+	int uiUniformView = -1;
+
+
 };

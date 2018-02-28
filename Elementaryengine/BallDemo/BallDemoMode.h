@@ -1,7 +1,7 @@
 #pragma once
 #include "GameMode.h"
 #include <GL/glew.h>
-#include <GLFW\glfw3.h>
+#include <EEngine.h>
 #include <glm/glm.hpp>
 #include <Asset.h>
 #include <Game.h>
@@ -39,6 +39,10 @@ public:
 	
 private:
 
+	bool placedLastFrame;
+	bool destroyedLastFrame;
+	Mesh* cube;
+	vector<Asset*> placedAssets;
 };
 ///<summary>
 ///Move the first lamp on tick. See Load() -  	b->OnTick = LampTick;

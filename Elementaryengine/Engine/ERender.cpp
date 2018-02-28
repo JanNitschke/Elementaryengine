@@ -21,9 +21,6 @@ void ERender::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl
 			eOpenGl->vVertex.resize(0);
 			eOpenGl->gIndex.clear();
 			eOpenGl->gIndex.resize(0);
-			eOpenGl->currentIndexOffset = 0;
-			eOpenGl->currentVertexOffset = 0;
-			eOpenGl->instance = 0;
 		}
 		// clear the draw command buffer if needed
 		if (assetsChanged || meshChanged) {
@@ -31,6 +28,9 @@ void ERender::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl
 			eOpenGl->dICommands.resize(0);
 			eOpenGl->drawInstanceOffset.clear();
 			eOpenGl->drawInstanceOffset.push_back(0);
+			eOpenGl->currentIndexOffset = 0;
+			eOpenGl->currentVertexOffset = 0;
+			eOpenGl->instance = 0;
 		}
 		// redo mesh array
 		for each (Mesh* m in Game::meshs) {
@@ -55,7 +55,7 @@ void ERender::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl
 
 			// calculate the offset of the render command due to multible renderings of the same mesh. Calculated in Shader: int drawid = gl_DrawID + offsets[gl_DrawID] + gl_InstanceID;
 			// example: If 3 Spheres are rendered and then 2 cubes, the Renderer needs to know the position offset in the draw atribute array for the cube since 1nd call + 0st instance would be 1, should be 3.
-			parentcount = (parentcount > 0) ? parentcount - 1 : 0;
+			parentcount = (parentcount > 0) ? parentcount - 1 : -1;
 			eOpenGl->drawInstanceOffset.push_back(lastoffset + parentcount);
 
 			// first index of the composed mesh that belongs to the current mesh
@@ -117,9 +117,13 @@ void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)
 {
 	// create a vector for the draw Atributes
 	vector<DrawMeshAtributes> drawAtrib;
+	
 
 	for each (Mesh* m in Game::meshs) {
-		
+		int lastoffset = eOpenGl->drawInstanceOffset.back();
+
+
+
 		for each(Asset* as in m->parents) {
 			// create a new atribute
 			DrawMeshAtributes a = DrawMeshAtributes();
@@ -152,6 +156,7 @@ void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, eOpenGl->meshDataSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawMeshAtributes) * drawAtrib.size(), drawAtrib.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 }
 
 void ERender::RenderShadowMaps(EOpenGl * eOpenGl)
@@ -522,7 +527,6 @@ void ERender::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 		shader->setInt(eOpenGl->lightingUniformShadowMaps, 8);
 	}
 
-	// copy vectors to GPU
 
 	// copy color SSBO
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, eOpenGl->lightColorSSBO);
@@ -535,4 +539,16 @@ void ERender::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 	GLsizeiptr lps = sizeof(glm::vec4) * lightPositions.size();
 	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 4, eOpenGl->lightPositionSSBO, 0, lps);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, lps, lightPositions.data(), GL_DYNAMIC_DRAW);
+}
+
+void ERender::RenderUI(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
+{
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+
+
+	eOpenGl->renderQuad();
+
+	glDisable(GL_BLEND);
+
 }

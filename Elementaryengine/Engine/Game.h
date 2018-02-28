@@ -10,12 +10,13 @@
 #include <stdio.h>
 #include <conio.h>
 #include <windows.h>
+#include <UIElement.h>
+#include <memory>
+#include "EScriptContext.h"
 
 class GameMode;
 #include <GameMode.h>
 using namespace glm;
-//
-//#include "enet\enet.h"
 
 #define DllImport   __declspec( dllimport )
 #define DllExport   __declspec( dllexport )
@@ -24,8 +25,9 @@ using namespace glm;
 ///You can not create more than one instance of this class;
 ///</summary> 
 struct DllExport RaycastHit {
-	Asset* hit;
+	Asset* hitAsset;
 	vec3 hitPos;
+	vec3 hitNormal;
 };
 
 class DllExport Game
@@ -56,6 +58,9 @@ public:
 	///The Gamemode to load
 	///</summary> 
 	GameMode* gameMode;
+
+	EScriptContext* eScriptContext;
+
 //Widow options. Permantent after Start() is called
 	///<summary>
 	///Name of the game and window title
@@ -94,10 +99,19 @@ public:
 	static vector<Asset*> assets;
 
 	static vector <Mesh*> meshs;
+
 	///<summary>
 	///Assets to loop trough next frame. You may delete items from this, but the destructor usualy does this by itself.
 	///</summary> 
 	static vector<Asset*> nextAssets;
+
+	///<summary>
+	///Assets to delete once the frame is completed
+	///</summary> 
+	static vector<Asset*> assetsToDelete;
+
+
+	static vector<UIElement*> uiElements;
 
 //TODO Fix ERROR if lamp has no parent
 	///<summary>
@@ -109,6 +123,11 @@ public:
 	///Projection matrix for 3D scene;
 	///</summary> 
 	glm::mat4 Projection;
+
+	///<summary>
+	///Projection matrix for UI;
+	///</summary> 
+	glm::mat4 UIProjection;
 
 	///<summary>
 	///Projection matrix for Voxelisation;
@@ -169,6 +188,8 @@ public:
 	///Renders the shadow maps of all lights
 	///</summary> 
 	void RenderShadowMaps();
+
+	void RenderUI();
 
 	///<summary>
 	///Handles the input of the window and passes it to the active Gamemode.
@@ -236,8 +257,8 @@ public:
 	void netDisconnect();
 
 	//ENetPeer *peer;
-	bool meshChanged = true;
-	bool assetsChanged = true;
+	static bool meshChanged;
+	static bool assetsChanged;
 
 private:
 	///<summary>
@@ -261,7 +282,9 @@ private:
 	/////</summary> 
 	//Authority authority;
 	
+	static btVector3 toBullet(vec3);
 
+	static vec3 toGlm(btVector3);
 	
 
 };

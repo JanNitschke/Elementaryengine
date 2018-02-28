@@ -4,7 +4,7 @@
 #define near 0.1
 #define far 100
 #define vlSampleCount 60
-
+#define vlMax 0.7
 layout (location = 0) out vec4 FragColor;
 
 in vec2 TexCoord;
@@ -54,8 +54,8 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
 float lightVolume(vec3 lightPos, int index,float depth){
 	int sampleCount = vlSampleCount;
 	float bias = 0.0050;
-	if(depth > 5){
-		depth = 5;
+	if(depth > 3){
+		depth = 3;
 	}
 	depth = (depth * (far - near)) - near;
 	float strength = 0;
@@ -81,7 +81,15 @@ float lightVolume(vec3 lightPos, int index,float depth){
 		}
 
 	}
-	return strength * depth / sampleCount;
+	if(depth / sampleCount > 0.97){
+		return 0.0;
+	}else{
+		if(depth / sampleCount > vlMax){
+			return strength * vlMax;
+		}else{
+			return strength * depth / sampleCount;
+		}
+	}
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
@@ -218,15 +226,7 @@ void main(){
 		rays += LightColors[i] * lr * 0.003;
 	}   
 	vec3 am = vec3(0.3) * albedo * ambient;
-	if(rays.x > 0.5){
-		rays.x = 0.5;
-	}
-	if(rays.y > 0.3){
-		rays.y = 0.3;
-	}
-	if(rays.z > 0.3){
-		rays.z = 0.3;
-	}
+
 	outcolor   = am + Lo + rays;  
 	float fragbrightness = (outcolor.x + outcolor.y + outcolor.z) / 3; 	
 	vec4 colCor = vec4(texture(colorCorrection,vec2(0,fragbrightness)));

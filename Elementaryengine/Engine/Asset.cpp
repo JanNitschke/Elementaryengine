@@ -15,12 +15,12 @@ Asset::Asset()
 
 	Game::nextAssets.push_back(this);
 	OnTick = &defaultOnTick;
+	Game::assetsChanged = true;
 
 }
 Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 {
-	
-	
+	Game::assetsChanged = true;
 
 	Game::nextAssets.push_back(this);
 	OnTick = &defaultOnTick;
@@ -43,12 +43,10 @@ Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 	Game::dynamicsWorld->addRigidBody(assetRigidBody);
 	assetRigidBody->setFriction(1);
 	assetRigidBody->setRestitution(0);
+
+
 }
 
-Asset::~Asset()
-{
-	Game::nextAssets.erase(std::remove(Game::nextAssets.begin(), Game::nextAssets.end(), this), Game::nextAssets.end());
-}
 
 DllExport void Asset::setMass(float m)
 {
@@ -171,6 +169,19 @@ DllExport void Asset::setTickFunction(void(*tickFunction)(GLFWwindow *window, do
 void Asset::SetupAsset()
 {
 
+}
+
+void Asset::Destroy()
+{
+	for each (AssetComponent* as in components)
+	{
+		as->parents.erase(std::remove(as->parents.begin(), as->parents.end(), this), as->parents.end());
+	}
+	Game::assetsToDelete.push_back(this);
+	Game::assetsChanged = true;
+	Game::dynamicsWorld->removeRigidBody(assetRigidBody);
+
+	delete assetRigidBody;
 }
 
 void Asset::setHeightmapCollision(const char * path)

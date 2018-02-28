@@ -75,6 +75,15 @@
     <ClCompile Include="ERender.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="UIElement.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EScriptContext.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EJSFunctions.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -156,6 +165,15 @@
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
     <ClInclude Include="EEngine.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UIElement.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EScriptContext.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EJSFunctions.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
