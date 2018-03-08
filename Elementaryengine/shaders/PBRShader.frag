@@ -1,38 +1,28 @@
 // shadertype=glsl
 #version 430 core
 
-out vec4 FragColor;
-  
+#define near 0.1
+#define far 100
+#define vlSampleCount 60
+#define vlMax 0.7
+layout (location = 0) out vec4 FragColor;
+
 in vec2 TexCoord;
-in vec3 Normal;  
-in vec3 FragPos;   
-in vec3 localPos;
+
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gAlbedoSpec;
+uniform sampler2D gMaterial;
+uniform sampler2D gDepth;
+uniform samplerCubeArrayShadow shadowMaps;
+uniform	sampler2D colorCorrection;
 
 uniform vec3 directionalLightDirection; 
 uniform vec3 directionalLightColor;
-uniform mat4 Model;
 uniform vec3 viewPos;
-uniform vec2 TextureCoordinateMultiply;
-uniform samplerCube depthMaps[20];
 uniform float far_plane;
-uniform samplerCube envMap;
-uniform int renderRef; 
-uniform mat4 Rot;
-uniform	sampler2D colorCorrection;
-
-struct Material {
-	sampler2D albedoMap;
-	sampler2D roughnessMap;
-	sampler2D metallicMap;
-	sampler2D normalMap;
-	sampler2D aoMap;
-	vec3 albedo;
-    float roughness;
-    vec3 ao;
-    float metallic;
-}; 
-  
-uniform Material material;
+uniform mat4 invProj;
+uniform mat4 invView;
 
 
 layout(std430, binding = 3) buffer lightColors 
@@ -45,46 +35,63 @@ layout(std430, binding = 4) buffer lightPositions
 };
 const float PI = 3.14159265359;
 
-vec3 sampleOffsetDirections[20] = vec3[]
-	(
-	   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
-	   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
-	   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
-	   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
-	   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
-	);  
-float ShadowCalculation(vec3 fragPos, vec3 lightPos, int light)
+float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
 {
-	float shadow = 0.0;
-	float bias   = 0.10;
-	int samples  = 20;
-	float viewDistance = length(viewPos - fragPos);
-    float diskRadius = (1.0 + (viewDistance / far_plane)) / 100.0;
+	float bias = 0.10;
 
 	// get vector between fragment position and light position
-	vec3 FPos = FragPos;
-	vec3 l = lightPos;
-	vec3 fragToLight = FPos - l;
-
-    // use the light to fragment vector to sample from the depth map    
-    float closestDepth = texture(depthMaps[light], fragToLight).r;
-
-    // it is currently in linear range between [0,1]. Re-transform back to original value
-    closestDepth *= far_plane;
+	vec3 fragToLight = fragPos - lightPos;
 
     // now get current linear depth as the length between the fragment and light position
     float currentDepth = length(fragToLight);
+	
 
-	for(int i = 0; i < samples; ++i)
-	{
-		float closestDepth = texture(depthMaps[light], fragToLight + sampleOffsetDirections[i] * diskRadius).r;
-		closestDepth *= far_plane;   // Undo mapping [0;1]
-		if(currentDepth - bias > closestDepth)
-			shadow += 1.0;
-	}
-	shadow /= float(samples);  
-    return shadow;
+	float cDepth = texture(shadowMaps, vec4(fragToLight , index),(currentDepth - bias)	/ far_plane).r;
+
+    return cDepth;
 }
+
+float lightVolume(vec3 lightPos, int index,float depth){
+	int sampleCount = vlSampleCount;
+	float bias = 0.0050;
+	if(depth > 3){
+		depth = 3;
+	}
+	depth = (depth * (far - near)) - near;
+	float strength = 0;
+	float dX = (2 * TexCoord.x ) - 1;
+	float dY = (2 * TexCoord.y ) - 1; 
+	vec4 dir = normalize(invView * vec4((invProj * vec4(dX,dY,0.1,1)).xyz,0));
+	float stepLength = depth / sampleCount;
+	stepLength /= 2;
+	vec4 currentPosition = vec4(viewPos,1);
+	float le = 0;
+	float dfp = 0;
+	for(int i = 0; i < sampleCount; i++){
+		currentPosition += (dir * stepLength);
+		vec3 posToLight = currentPosition.xyz - lightPos;
+		float currentDepth = length(currentPosition.xyz - viewPos);
+		float currentDepthToLight = length(posToLight);
+		dfp += stepLength;
+
+		float attenuation = 1.0 / (currentDepthToLight);
+		if(attenuation > 0.2){
+			float cDepth = texture(shadowMaps, vec4(posToLight, index),(currentDepthToLight - bias)	/ far_plane).r;
+			strength += ((cDepth / dfp) + cDepth) * attenuation;
+		}
+
+	}
+	if(depth / sampleCount > 0.97){
+		return 0.0;
+	}else{
+		if(depth / sampleCount > vlMax){
+			return strength * vlMax;
+		}else{
+			return strength * depth / sampleCount;
+		}
+	}
+}
+
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
@@ -122,19 +129,6 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 	
     return ggx1 * ggx2;
 }
-float RadicalInverse_VdC(uint bits) 
-{
-    bits = (bits << 16u) | (bits >> 16u);
-    bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
-    bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
-    bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
-    bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-    return float(bits) * 2.3283064365386963e-10; // / 0x100000000
-}
-vec2 Hammersley(uint i, uint N)
-{
-    return vec2(float(i)/float(N), RadicalInverse_VdC(i));
-}  
 vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
 {
     float a = roughness*roughness;
@@ -157,27 +151,22 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
     vec3 sampleVec = tangent * H.x + bitangent * H.y + N * H.z;
     return normalize(sampleVec);
 }  
-void main()
-{
-	vec2 TCoord = TexCoord * TextureCoordinateMultiply;
+
+
+void main(){
+	vec3 FragPos = texture(gPosition, TexCoord).rgb;
+	float FDepth = texture(gDepth, TexCoord).r;
+	vec3 Normal = texture(gNormal, TexCoord).rgb;
+	vec3 albedo = pow(texture(gAlbedoSpec, TexCoord).rgb, vec3(0.8));
+	float roughness = texture(gMaterial, TexCoord).r;
+	float metallic = texture(gMaterial, TexCoord).g;
+	float ambient = texture(gMaterial, TexCoord).b;
 	vec3 outcolor;
+
 	vec3 N = normalize(Normal); 
     vec3 V = normalize(viewPos - FragPos);
 	vec3 Lo = vec3(0.0);
-	// normal map
 
-	// obtain normal from normal map in range [0,1]
-    vec3 normal = texture(material.normalMap, TexCoord).rgb;
-    // transform normal vector to range [-1,1]
-    normal = normalize(normal * 2.0 - 1.0); 
-
-	//get the pbr values of the pixel
-	//vec3 albedo = material.albedo * vec3(texture(material.albedoMap, TCoord));
-	vec3 albedo = pow(texture(material.albedoMap, TCoord).rgb * material.albedo , vec3(0.8));
-	float metallic = material.metallic * vec3(texture(material.metallicMap, TCoord)).r;
-	float roughness = material.roughness * vec3(texture(material.roughnessMap, TCoord)).r;
-
-	//directional light
 	vec3 dL = normalize(directionalLightDirection);
 	vec3 dH = normalize(V + dL);
 
@@ -198,10 +187,14 @@ void main()
 	dkD *= 1.0 - metallic;	
 	float dNdotL = max(dot(N, dL), 0.0);        
 	Lo += (dkD * albedo / PI + dspecular) * dradiance * dNdotL;
+	vec3 rays = vec3(0);
+
+	float liniarDepth = (2.0 * near) / (near + far - FDepth * (far - near));
 
 
 	//for each light ... add to lo
 	for(int i=0;i<int(LightColors.length());i++){
+		
 	    vec3 L = normalize(LightPositions[i] - FragPos);
 		vec3 H = normalize(V + L);
 	
@@ -223,36 +216,19 @@ void main()
 		vec3 kS = F;
 		vec3 kD = vec3(1.0) - kS;
 		kD *= 1.0 - metallic;	
-		float shadow = ShadowCalculation(FragPos,LightPositions[i],i);                      
-		float NdotL = max(dot(N, L), 0.0);        
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL * (1- shadow);
-	}   
-	vec3 prefilteredColor = vec3(0.0);     
-	roughness += 0.2;
-	if(renderRef == 1){
-		if(roughness < 0.5){
-			const uint SAMPLE_COUNT = 512u;
-			float totalWeight = 0.0;   
-			for(uint i = 0u; i < SAMPLE_COUNT; ++i)
-			{
-				vec2 Xi = Hammersley(i, SAMPLE_COUNT);
-				vec3 H  = ImportanceSampleGGX(Xi, N, roughness);
-				vec3 L  = normalize(2.0 * dot(V, H) * H - V);
 
-				float NdotL = max(dot(N, L), 0.0);
-				if(NdotL > 0.0)
-				{
-					prefilteredColor += texture(envMap, (vec4(L , 0)).xyz ).rgb * NdotL;
-					totalWeight      += NdotL;
-				}
-			}
-			prefilteredColor = prefilteredColor / totalWeight;
-		} 
-	}
- 
-	vec3 ambient = vec3(0.03) * albedo * material.ao;
-	outcolor   = ambient + Lo;  
-	float fragbrightness = (outcolor.x + outcolor.y + outcolor.z) / 3; 
+		float shadow = ShadowCalculation(FragPos,LightPositions[i],i);        
+		float NdotL = max(dot(N, L), 0.0);  
+
+		float lr = lightVolume(LightPositions[i],i,liniarDepth);
+      
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;
+		rays += LightColors[i] * lr * 0.003;
+	}   
+	vec3 am = vec3(0.3) * albedo * ambient;
+
+	outcolor   = am + Lo + rays;  
+	float fragbrightness = (outcolor.x + outcolor.y + outcolor.z) / 3; 	
 	vec4 colCor = vec4(texture(colorCorrection,vec2(0,fragbrightness)));
-	FragColor = vec4(outcolor, 1.0) + (vec4(prefilteredColor,0) * 0.4 * (1 - roughness) *  (metallic + 0.2)) * colCor * colCor;
+	FragColor = vec4(outcolor, 1.0) * colCor * colCor * 5;
 }

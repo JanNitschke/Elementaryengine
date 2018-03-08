@@ -2,15 +2,18 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup>
+    <_PropertySheetDisplayName>EngineIncludes</_PropertySheetDisplayName>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\lib\bullet3\src;$(SolutionDir)\lib\glfw\include;$(SolutionDir)\lib\glew\include;$(SolutionDir)\Feather Engine;$(SolutionDir)\Debug;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\lib\physx\nvToolsExt\1\include\stdint;$(SolutionDir)\lib\bullet3\src;$(SolutionDir)\lib\glfw\include;$(SolutionDir)\lib\glew\include;$(SolutionDir)\Engine;$(SolutionDir)\Debug;$(SolutionDir)\lib\ChakraCore\header;$(SolutionDir)\lib\ChakraBridge\include\chakra_bridge;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Feather Engine\Debug;$(SolutionDir)\lib\glew\lib\Release\Win32;$(SolutionDir)\lib\glfw\lib-vc2015;$(SolutionDir)\Debug;$(SolutionDir)\lib\enet\Debug;$(SolutionDir)\lib\bullet3\src;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;Feather Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\Debug;$(SolutionDir)\lib\glew\lib\Release\Win32;$(SolutionDir)\lib\glfw\lib-vc2015;$(SolutionDir)\Debug;$(SolutionDir)\lib\enet\Debug;$(SolutionDir)\lib\bullet3\src;$(SolutionDir)\lib\ChakraCore\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;Feather Engine.lib;ChakraCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

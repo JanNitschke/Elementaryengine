@@ -11,18 +11,32 @@ using namespace std;
 #include "BallDemoMode.h"
 #include <GameMode.h>
 #include <iostream>
+#include "AstroidDemo.h"
 int main()
 {
-	//char* name = "Feather Engine";
-	Game game = Game::Instance();
-	game.windowHeight = 900;
-	game.windowWidth = 1600;
-	game.name = "Ball demo";
-	BallDemoMode* mode = new BallDemoMode();
-	mode->game = &game;
-	game.setLight(vec3(0.01f), vec3(0.1, 0.2, 0.3));
-	game.gameMode = mode;
-	game.Start();
+	int a; 
+	//cin >> a;
+	a = 1;
+	if (a == 1) {
+		Game game = Game::Instance();
+		game.name = "Ball demo";
+		BallDemoMode* mode = new BallDemoMode();
+		mode->game = &game;
+		game.displaySettings->fullscreen = false;
+		game.setLight(vec3(0.02f), vec3(0.1, 0.2, 0.3));
+		game.gameMode = mode;
+		game.Start();
+	}
+	else {
+		Game game = Game::Instance();
+		game.name = "Astroid demo";
+		AstroidDemo* mode = new AstroidDemo();
+		mode->game = &game;
+		game.displaySettings->fullscreen = false;
+		game.setLight(vec3(0.0f), vec3(0.1, 0.2, 0.3));
+		game.gameMode = mode;
+		game.Start();
+	}
 	return 0;
 }
 
