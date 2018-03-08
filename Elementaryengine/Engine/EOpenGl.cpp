@@ -1,6 +1,7 @@
 #include "EOpenGl.h"
 #include "iostream"
 #include "Lamp.h"
+#include "UIElement.h"
 
 EOpenGl::EOpenGl()
 {
@@ -38,12 +39,9 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 		window = glfwCreateWindow(mode->width, mode->height, settings->windowname, monitor, NULL);
 		settings->windowHeight = mode->height;
 		settings->windowWidth = mode->width;
-	}
-	else {
+	} else {
 		window = glfwCreateWindow(settings->windowWidth, settings->windowHeight, settings->windowname, NULL, NULL);
 	}
-
-
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -125,23 +123,20 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, gDepth, 0);
 
-
 	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
 	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 	glDrawBuffers(4, attachments);
-
-
 
 	// finally check if framebuffer is complete
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Framebuffer not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
 	// light buffers
 	glGenBuffers(1, &lightColorSSBO);
 	glGenBuffers(1, &lightPositionSSBO);
 	glGenBuffers(1, &meshDataSSBO);
+	glGenBuffers(1, &uiElementsSSBO);
 	glGenBuffers(1, &drawIdOffsetBuffer);
 	//// VXAO
 	//glGenFramebuffers(1, &vBuffer);

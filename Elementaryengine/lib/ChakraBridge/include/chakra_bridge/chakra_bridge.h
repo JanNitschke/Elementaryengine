@@ -22,7 +22,7 @@
 #include <memory>
 
 // ChakraCore
-#include <ChakraCore/inc/chakracommon.h>
+#include <ChakraCore.h>
 
 #pragma push_macro("max")
 #pragma push_macro("new")

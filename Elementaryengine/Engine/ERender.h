@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <windows.h>
+#include "UIElement.h"
 
 
 ///<summary>
@@ -31,6 +32,9 @@ namespace ERender {
 	///the EOpenGl object that holds the buffers ids that should be worked on
 	///</param>
 	void BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl);
+	 
+
+	void BuildUI(EOpenGl* eOpenG);
 
 	///<summary>
 	///builds the list of draw atributes and copies it to the GPU buffers

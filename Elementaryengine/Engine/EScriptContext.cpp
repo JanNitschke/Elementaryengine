@@ -29,6 +29,7 @@ EScriptContext::EScriptContext()
 	cout << string(resultW.begin(), resultW.end()) << endl;
 
 	AddBindings();
+
 }
 
 
@@ -117,52 +118,28 @@ void EScriptContext::ReadScript(wstring filename)
 }
 
 void EScriptContext::projectNativeClass(const wchar_t *className, JsNativeFunction constructor, JsValueRef &prototype, vector<const wchar_t *> memberNames, vector<JsNativeFunction> memberFuncs) {
-
-	// create class's prototype and project its member functions
-	JsCreateObject(&prototype);
-
 	// project constructor to global scope 
 	JsValueRef globalObject;
 	JsGetGlobalObject(&globalObject);
 	JsValueRef jsConstructor;
 	JsCreateFunction(constructor, nullptr, &jsConstructor);
 	setProperty(globalObject, className, jsConstructor);
-
+	// create class's prototype and project its member functions
+	JsCreateObject(&prototype);
+	assert(memberNames.size() == memberNames.size());
 	for (int i = 0; i < memberNames.size(); ++i) {
 		setCallback(prototype, memberNames[i], memberFuncs[i], nullptr);
 	}
-	
 	setProperty(jsConstructor, L"prototype", prototype);
-
 }
 
 void EScriptContext::setCallback(JsValueRef object, const wchar_t *propertyName, JsNativeFunction callback, void *callbackState)
 {
 	JsPropertyIdRef propertyId;
+	JsGetPropertyIdFromName(propertyName, &propertyId);
 	JsValueRef function;
-
-	_bstr_t temp(propertyName);
-
-	const char* pname = temp;
-	JsValueRef name;
-
-	JsCreateString("attachto", strlen("attachto"), &name);
-	JsErrorCode a = JsCreateNamedFunction(name, callback, callbackState, &function);
-
-	//JsErrorCode e = JsCreateFunction(callback, callbackState, &function);
-	JsErrorCode b = JsCreatePropertyId(pname, strlen(pname), &propertyId);
-
-	const wchar_t path = L't';
-	const wchar_t* p = &path;
-	const wchar_t** pa = &p;
-
-	bool hp;
-
-	JsErrorCode c = JsSetProperty(object, propertyId, function, true);
-
-	JsErrorCode d = JsGetPropertyNameFromId(propertyId, pa);
-	JsHasProperty(object, propertyId, &hp);
-
+	JsCreateFunction(callback, callbackState, &function);
+	JsSetProperty(object, propertyId, function, true);
 }
 
 void EScriptContext::setProperty(JsValueRef object, const wchar_t *propertyName, JsValueRef property)
@@ -171,6 +148,7 @@ void EScriptContext::setProperty(JsValueRef object, const wchar_t *propertyName,
 	JsGetPropertyIdFromName(propertyName, &propertyId);
 	JsSetProperty(object, propertyId, property, true);
 }
+
 
 void EScriptContext::AddBindings()
 {
@@ -202,6 +180,9 @@ void EScriptContext::AddBindings()
 	vector<JsNativeFunction> memberFuncsAsset;
 	projectNativeClass(L"Asset", EJSFunction::JSConstructorAsset, EJSFunction::JSAssetPrototype, memberNamesAsset, memberFuncsAsset);
 
+	vector<const wchar_t *> memberNamesUI;
+	vector<JsNativeFunction> memberFuncsUI;
+	projectNativeClass(L"UIElement", EJSFunction::JSConstructorUI, EJSFunction::JSUIPrototype, memberNamesUI, memberFuncsUI);
 
 	//vector<const wchar_t *> memberNamesConsole;
 	//vector<JsNativeFunction> memberFuncsConsole;
@@ -222,4 +203,8 @@ void EScriptContext::AddBindings()
 	JsGetGlobalObject(&global);
 	JsCreatePropertyId(consoleString, strlen(consoleString), &consolePropId);
 	JsSetProperty(global, consolePropId, console, true);
+
+
+
+
 }

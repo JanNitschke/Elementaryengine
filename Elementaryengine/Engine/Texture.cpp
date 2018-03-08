@@ -12,7 +12,12 @@ Texture::Texture(char path)
 
 Texture::Texture(const char* path, bool toArray)
 {
-	loadLayer(path);
+	if (toArray) {
+		loadLayer(path);
+	}
+	else {
+		loadLayer("");
+	}
 	
 }
 
@@ -83,8 +88,7 @@ void Texture::Load(const char * path)
 	if (!Game::isServer) {
 		if (path == "") {
 			layer = 0;
-		}
-		else {
+		} else {
 			try {
 				int width, height, nrChannels;
 				unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
@@ -107,6 +111,7 @@ void Texture::Load(const char * path)
 	
 		}
 	}
+	int t = 0;
 }
 
 Texture::~Texture()

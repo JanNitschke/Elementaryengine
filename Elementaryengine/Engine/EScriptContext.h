@@ -33,11 +33,11 @@ public:
 
 	void ReadScript(wstring filename);
 
-	void projectNativeClass(const wchar_t *className, JsNativeFunction constructor, JsValueRef &prototype, vector<const wchar_t *> memberNames, vector<JsNativeFunction> memberFuncs);
+	static void projectNativeClass(const wchar_t *className, JsNativeFunction constructor, JsValueRef &prototype, vector<const wchar_t *> memberNames, vector<JsNativeFunction> memberFuncs);
 
-	void setCallback(JsValueRef object, const wchar_t *propertyName, JsNativeFunction callback, void *callbackState);
+	static void setCallback(JsValueRef object, const wchar_t *propertyName, JsNativeFunction callback, void *callbackState);
 
-	void setProperty(JsValueRef object, const wchar_t *propertyName, JsValueRef property);
+	static void setProperty(JsValueRef object, const wchar_t *propertyName, JsValueRef property);
 
 	void AddBindings();
 

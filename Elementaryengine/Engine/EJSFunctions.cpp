@@ -7,6 +7,7 @@ JsValueRef EJSFunction::JSTexturePrototype;
 JsValueRef EJSFunction::JSMaterialPrototype;
 JsValueRef EJSFunction::JSMeshPrototype;
 JsValueRef EJSFunction::JSAssetPrototype;
+JsValueRef EJSFunction::JSUIPrototype;
 
 
 
@@ -44,6 +45,11 @@ Asset * EJSFunction::JSToNativeAsset(JsValueRef jsAsset)
 	void* p;
 	JsGetExternalData(jsAsset, &p);
 	return reinterpret_cast<Asset*>(p);
+}
+
+UIElement * EJSFunction::JSToNativeUI(JsValueRef jsAsset)
+{
+	return nullptr;
 }
 
 // new Vec3(number x, number y, number z)
@@ -87,7 +93,13 @@ JsValueRef EJSFunction::JSConstructorTexture(JsValueRef callee, bool isConstruct
 
 	wstring ws(p);
 	string str(ws.begin(), ws.end());
-	Texture* texture = new Texture(str.c_str(), toArray);
+	Texture* texture;
+	if (toArray) {
+		texture = new Texture(str.c_str(), toArray);
+	}
+	else {
+		texture = new Texture("");
+	}
 
 	JsCreateExternalObject(texture, nullptr, &output);
 	JsSetPrototype(output, JSTexturePrototype);
@@ -164,6 +176,65 @@ JsValueRef EJSFunction::JSConstructorAsset(JsValueRef callee, bool isConstructCa
 	Asset* asset = new Asset(*pos, *scale, mass, assetShapes::cube);
 
 	JsCreateExternalObject(asset, nullptr, &output);
+	JsSetPrototype(output, JSTexturePrototype);
+	return output;
+}
+
+JsValueRef EJSFunction::JSConstructorUI(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+
+	void* posV;
+	JsGetExternalData(arguments[1], &posV);
+	vec3* pos = static_cast<vec3*>(posV);
+	
+	void* posPxV;
+	JsGetExternalData(arguments[2], &posPxV);
+	vec3* posPx = static_cast<vec3*>(posPxV);
+
+	void* sizeV;
+	JsGetExternalData(arguments[3], &sizeV);
+	vec3* size = static_cast<vec3*>(sizeV);
+
+	void* sizePxV;
+	JsGetExternalData(arguments[4], &sizePxV);
+	vec3* sizePx = static_cast<vec3*>(sizePxV);
+
+	void* foregroundColorV;
+	JsGetExternalData(arguments[5], &foregroundColorV);
+	vec3* foregroundColor = static_cast<vec3*>(foregroundColorV);
+
+	void* backgroundColorV;
+	JsGetExternalData(arguments[6], &sizePxV);
+	vec3* backgroundColor = static_cast<vec3*>(sizePxV);
+
+	double opacity;
+	JsNumberToDouble(arguments[7], &opacity);
+
+	double bb;
+	JsNumberToDouble(arguments[8], &bb);
+
+	double zid;
+	JsNumberToDouble(arguments[9], &zid);
+
+
+	UIElement* ele2 = new UIElement();
+	ele2->opacity = opacity;
+
+	ele2->foregroundColor = *foregroundColor;
+	ele2->backgroundColor = *backgroundColor;
+
+	ele2->sizePixel = vec2(sizePx->x, sizePx->y );
+	ele2->sizePercent = vec2(size->x, size->y);
+	ele2->posisionPercent = vec2(pos->x, pos->y);
+	ele2->positionPixel = vec2(posPx->x, posPx->y);
+	ele2->backgoundBlurr = bb;
+	ele2->texture = JSToNativeTexture(arguments[10]);
+	ele2->alphamap = JSToNativeTexture(arguments[11]);
+	ele2->zindex = zid;
+
+
+	JsCreateExternalObject(ele2, nullptr, &output);
 	JsSetPrototype(output, JSTexturePrototype);
 	return output;
 }

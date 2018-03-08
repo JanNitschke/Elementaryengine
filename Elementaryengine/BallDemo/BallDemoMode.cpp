@@ -156,9 +156,11 @@ void BallDemoMode::Load()
 	twood->roughnessMap = new Texture("Assets/Textures/ttr.jpg", true);
 	twood->TextureScale = vec2(1.0f);
 
+	Texture* plaster = new Texture("Assets/Textures/Plaster.jpg", true);
+
 	PBRMaterial* floor = new PBRMaterial();
 	floor->albedo = vec3(1);
-	floor->albedoMap = new Texture("Assets/Textures/Plaster.jpg", true);
+	floor->albedoMap = plaster;
 	floor->ao = vec3(0.01f);
 	//floor->metallic = 0;
 	//floor->roughness = 1.3f;
@@ -171,6 +173,7 @@ void BallDemoMode::Load()
 	tab->material = twood;
 	ro->material = floor;
 	cMesh->material = floor;
+
 
 	PBRMaterial* lampmat = new PBRMaterial();
 	lampmat->albedo = vec3(1000.0f);
@@ -243,6 +246,7 @@ void BallDemoMode::Load()
 
 	}
 	*/
+
 }
 
 void BallDemoMode::Start()

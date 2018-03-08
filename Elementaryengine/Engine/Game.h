@@ -13,6 +13,7 @@
 #include <UIElement.h>
 #include <memory>
 #include "EScriptContext.h"
+#include <EScriptRuntime.h>
 
 class GameMode;
 #include <GameMode.h>
@@ -60,6 +61,7 @@ public:
 	GameMode* gameMode;
 
 	EScriptContext* eScriptContext;
+	EScriptRuntime* eScriptRuntime;
 
 //Widow options. Permantent after Start() is called
 	///<summary>

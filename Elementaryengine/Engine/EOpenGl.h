@@ -43,6 +43,25 @@ struct Light {
 	int throwShadow; // 0 -> no shadows; 1-> flat lighting; 3 -> volumetric 
 	vec3 color;
 };
+struct ERendererUIElement {
+	vec2 positionPixel;
+	vec2 posisionPercent;
+	vec2 sizePixel;
+	vec2 sizePercent;
+
+	vec3 foregroundColor;
+	int texture;
+	vec3 backgroundColor;
+	int alphamap;
+
+	float backgoundBlurr;
+	float foregroundBlurr;
+	float opacity;
+	float z;
+
+
+
+};
 
 class EOpenGl
 {
@@ -55,6 +74,7 @@ public:
 	GLuint lightColorSSBO = 0;
 	GLuint lightPositionSSBO = 0;
 	GLuint meshDataSSBO = 0;
+	GLuint uiElementsSSBO = 0;
 	GLuint drawIdOffsetBuffer = 0;
 
 	unsigned int lBuffer, frameOut;
@@ -75,6 +95,8 @@ public:
 	int currentVertexOffset = 0;
 	int instance = 0;
 	vector<DrawElementsIndirectCommand> dICommands;
+
+	vector<ERendererUIElement> ERUIElements;
 
 
 
@@ -129,6 +151,9 @@ public:
 	int ssrUniformInvProj = -1;
 	int ssrUniformView = -1;
 	int ssrUniformProj = -1;
+	int ssrUniformSW = -1;
+	int ssrUniformSH = -1;
+	int ssrUniformTex = -1;
 
 	// shadowmaps
 	int shadowUniformLayer = -1;

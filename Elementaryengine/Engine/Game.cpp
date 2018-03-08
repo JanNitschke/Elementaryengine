@@ -56,6 +56,7 @@ double Game::physicsFps;
 EOpenGl* Game::eOpenGl = new EOpenGl();
 bool Game::meshChanged = true;
 bool Game::assetsChanged = true;
+vector<UIElement*> Game::uiElements;
 
 // start the game and run the main loop
 void Game::Start()
@@ -66,6 +67,7 @@ void Game::Start()
 
 
 	eScriptContext = new EScriptContext();
+	//eScriptRuntime = new EScriptRuntime();
 	//setup Physics
 	if (usePhysx) {
 		/*static PxDefaultErrorCallback gDefaultErrorCallback;
@@ -126,7 +128,7 @@ void Game::Start()
 
 	LoadScene();
 	eScriptContext->ReadScript(L"main.js");
-
+	//eScriptRuntime->loadScript(L"main.js");
 
 	float viewaspect = (float)displaySettings->windowWidth / (float)displaySettings->windowHeight;
 	Projection = glm::perspective(glm::radians(60.0f), viewaspect, 0.1f, 100.0f);
@@ -147,6 +149,7 @@ void Game::Start()
 	eOpenGl->CleanUp();
 
 	delete eScriptContext;
+	//delete eScriptRuntime;
 }
 
 
@@ -194,7 +197,7 @@ void Game::loop()
 		if (gameMode != nullptr) {
 			gameMode->Tick(deltaTime);
 		}
-		eScriptContext->RunFunction("OnTick");
+		//eScriptContext->RunFunction("OnTick");
 		for each (Asset* asset in assets)
 		{
 			if (asset) {
@@ -214,8 +217,8 @@ void Game::loop()
 			SetupRender();
 			RenderShadowMaps();
 			Render();
-			RenderHUD();
-			RenderUI();
+			//RenderHUD();
+			//RenderUI();
 
 			// Swap buffers
 			glfwSwapBuffers(eOpenGl->window);

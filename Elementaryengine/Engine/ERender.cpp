@@ -113,7 +113,35 @@ void ERender::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl
 	}
 }
 
-void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)
+void ERender::BuildUI(EOpenGl * eOpenGl)
+{
+	eOpenGl->ERUIElements.clear();
+	eOpenGl->ERUIElements.resize(0);
+	for each(UIElement* uie in Game::uiElements) {
+		ERendererUIElement u = ERendererUIElement();
+		u.positionPixel = uie->positionPixel;
+		u.posisionPercent = uie->posisionPercent;
+		u.sizePixel = uie->sizePixel;
+		u.sizePercent = uie->sizePercent;
+
+		u.foregroundColor = uie->foregroundColor;
+		u.backgroundColor = uie->backgroundColor;
+		u.texture = uie->texture->layer;
+		u.alphamap = uie->alphamap->layer;
+		u.backgoundBlurr = uie->backgoundBlurr;
+		u.foregroundBlurr = uie->foregroundBlurr;
+		u.opacity = uie->opacity;
+		u.z = uie->zindex;
+		eOpenGl->ERUIElements.push_back(u);
+	}
+	// copy the atribute vector to the GPU
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 7, eOpenGl->uiElementsSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ERendererUIElement) * eOpenGl->ERUIElements.size(), eOpenGl->ERUIElements.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+}
+
+void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)	
 {
 	// create a vector for the draw Atributes
 	vector<DrawMeshAtributes> drawAtrib;
@@ -390,6 +418,9 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 	}
 	shader->set3Float(eOpenGl->lightingUniformViewPos, Game::activeCam->position);
 
+
+
+
 	SetupLamps(eOpenGl,shader);
 
 	eOpenGl->renderQuad();
@@ -458,8 +489,7 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 	}
 	shader->setInt(eOpenGl->ssrUniformDepth, 6);
 
-	SetupLamps(eOpenGl, shader);
-	
+	//SetupLamps(eOpenGl, shader);
 	// set view position uniform
 	if (eOpenGl->ssrUniformViewPos < 0) {
 		eOpenGl->ssrUniformViewPos = glGetUniformLocation(shader->ID, "viewPos");
@@ -488,7 +518,31 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 	if (eOpenGl->ssrUniformProj < 0) {
 		eOpenGl->ssrUniformProj = glGetUniformLocation(shader->ID, "proj");
 	}
+
+
+	if (eOpenGl->ssrUniformSW < 0) {
+		eOpenGl->ssrUniformSW = glGetUniformLocation(shader->ID, "screenX");
+	}
+	shader->setInt(eOpenGl->ssrUniformSW, Game::Instance().displaySettings->windowWidth);
+
+	if (eOpenGl->ssrUniformSH < 0) {
+		eOpenGl->ssrUniformSH = glGetUniformLocation(shader->ID, "screenY");
+	}
+	shader->setInt(eOpenGl->ssrUniformSH, Game::Instance().displaySettings->windowHeight);
+
+
 	shader->setMat4f(eOpenGl->ssrUniformProj, Projection);
+
+	BuildUI(eOpenGl);
+
+	// bind the array of textures
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, eOpenGl->textureArray);
+	if (eOpenGl->ssrUniformTex < 0) {
+		eOpenGl->ssrUniformTex = glGetUniformLocation(shader->ID, "textures");
+	}
+	shader->setInt(eOpenGl->ssrUniformTex, 0);
+
 
 	eOpenGl->renderQuad();
 
