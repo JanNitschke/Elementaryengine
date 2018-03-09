@@ -179,7 +179,6 @@
     <ClCompile Include="EOpenGl.cpp" />
     <ClCompile Include="ERender.cpp" />
     <ClCompile Include="EScriptContext.cpp" />
-    <ClCompile Include="EScriptRuntime.cpp" />
     <ClCompile Include="FPCam.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Import.cpp" />
@@ -215,7 +214,6 @@
     <ClInclude Include="ERender.h" />
     <ClInclude Include="EEngine.h" />
     <ClInclude Include="EScriptContext.h" />
-    <ClInclude Include="EScriptRuntime.h" />
     <ClInclude Include="FPCam.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameMode.h" />

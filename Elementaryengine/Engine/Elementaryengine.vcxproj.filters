@@ -84,9 +84,6 @@
     <ClCompile Include="EJSFunctions.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="EScriptRuntime.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -177,9 +174,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="EJSFunctions.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="EScriptRuntime.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

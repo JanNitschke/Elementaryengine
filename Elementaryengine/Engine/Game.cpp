@@ -68,27 +68,16 @@ void Game::Start()
 
 
 	eScriptContext = new EScriptContext();
-	//eScriptRuntime = new EScriptRuntime();
-	//setup Physics
-	if (usePhysx) {
-		/*static PxDefaultErrorCallback gDefaultErrorCallback;
-		static PxDefaultAllocator gDefaultAllocatorCallback;
 
-		PxFoundation* mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-			gDefaultErrorCallback);
-		if (!mFoundation)
-			printf("PxCreateFoundation failed!");*/
-	}
-	else {
-		//Setup Bullet physics
-		btBroadphaseInterface* broadphase = new btDbvtBroadphase();
-		btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
-		btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
-		btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
-		btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
-		dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
-	}
+	//Setup Bullet physics
+	btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+	btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+	btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
+	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+	dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
+	
 
 	system("cls");
 
@@ -129,7 +118,6 @@ void Game::Start()
 
 	LoadScene();
 	eScriptContext->ReadScript(L"main.js");
-	//eScriptRuntime->loadScript(L"main.js");
 
 	float viewaspect = (float)displaySettings->windowWidth / (float)displaySettings->windowHeight;
 	Projection = glm::perspective(glm::radians(60.0f), viewaspect, 0.1f, 100.0f);
@@ -150,7 +138,6 @@ void Game::Start()
 	eOpenGl->CleanUp();
 
 	delete eScriptContext;
-	//delete eScriptRuntime;
 }
 
 

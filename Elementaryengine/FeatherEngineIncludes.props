@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\lib\physx\nvToolsExt\1\include\stdint;$(SolutionDir)\lib\bullet3\src;$(SolutionDir)\lib\glfw\include;$(SolutionDir)\lib\glew\include;$(SolutionDir)\Engine;$(SolutionDir)\Debug;$(SolutionDir)\lib\ChakraCore\header;$(SolutionDir)\lib\ChakraBridge\include\chakra_bridge;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\lib\physx\nvToolsExt\1\include\stdint;$(SolutionDir)\lib\bullet3\src;$(SolutionDir)\lib\glfw\include;$(SolutionDir)\lib\glew\include;$(SolutionDir)\Engine;$(SolutionDir)\Debug;$(SolutionDir)\lib\ChakraCore\header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
