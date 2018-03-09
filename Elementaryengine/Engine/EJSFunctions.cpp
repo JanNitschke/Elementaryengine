@@ -259,6 +259,11 @@ JsValueRef EJSFunction::JSMaterialSetAlbedo(JsValueRef callee, bool isConstructC
 	return output;
 }
 
+JsValueRef EJSFunction::JSMaterialGetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	return JsValueRef();
+}
+
 // mesh.attachTo();
 JsValueRef EJSFunction::JSMeshAttachTo(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
@@ -456,6 +461,121 @@ JsValueRef EJSFunction::JSUIElementSetBackgroundColor(JsValueRef callee, bool is
 		noError = true;
 	}
 	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+// ----------------------------------------------------------------------------
+// ASSET MEMBER FUNCTIONS
+// ----------------------------------------------------------------------------
+
+JsValueRef EJSFunction::JSAssetSetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Asset* element = JSToNativeAsset(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		element->setPosition(val);
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetSetScale(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Asset* element = JSToNativeAsset(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		element->setScale(val);
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetSetRotation(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Asset* element = JSToNativeAsset(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		element->setRotation(quat(val));
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetSetMass(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Asset* element = JSToNativeAsset(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		element->setRotation(quat(val));
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		vec3 val = element->position;
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetGetScale(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		vec3 val = element->scale;
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetGetRotation(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		vec3 val = element->rotation;
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetGetMass(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		Asset* element = JSToNativeAsset(arguments[0]);
+		double val = element->mass;
+		JsDoubleToNumber(val, &output);
+	}
 	return output;
 }
 

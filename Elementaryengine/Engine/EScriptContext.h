@@ -50,7 +50,8 @@ private:
 	unsigned currentSourceContext = 0;
 
 	void Vec3Bindings();
+	void MaterialBindings();
 	void UIElementBindings();
-
+	void AssetBindings();
 };
 

@@ -114,6 +114,7 @@ void Texture::Load(const char * path)
 	int t = 0;
 }
 
+
 Texture::~Texture()
 {
 

@@ -161,29 +161,14 @@ void EScriptContext::AddBindings()
 	vector<JsNativeFunction> memberFuncsTexture;
 	projectNativeClass(L"Texture", EJSFunction::JSConstructorTexture, EJSFunction::JSTexturePrototype , memberNamesTexture, memberFuncsTexture);
 
-	vector<const wchar_t *> memberNamesMaterial;
-	vector<JsNativeFunction> memberFuncsMaterial;
-	//memberNamesMaterial.push_back(L"setAlbedo");
-	//memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetAlbedo);
-	projectNativeClass(L"Material", EJSFunction::JSConstructorMaterial, EJSFunction::JSMaterialPrototype, memberNamesMaterial, memberFuncsMaterial);
-
 	vector<const wchar_t *> memberNamesMesh;
 	vector<JsNativeFunction> memberFuncsMesh;
 	memberNamesMesh.push_back(L"attachto");
 	memberFuncsMesh.push_back(EJSFunction::JSMeshAttachTo);
 	projectNativeClass(L"Mesh", EJSFunction::JSConstructorMesh, EJSFunction::JSMeshPrototype, memberNamesMesh, memberFuncsMesh);
 
-	vector<const wchar_t *> memberNamesAsset;
-	vector<JsNativeFunction> memberFuncsAsset;
-	projectNativeClass(L"Asset", EJSFunction::JSConstructorAsset, EJSFunction::JSAssetPrototype, memberNamesAsset, memberFuncsAsset);
-
 	UIElementBindings();
-
-	//vector<const wchar_t *> memberNamesConsole;
-	//vector<JsNativeFunction> memberFuncsConsole;
-	//memberNamesConsole.push_back(L"log");
-	//memberFuncsConsole.push_back(EJSFunction::LogCB);
-	//projectNativeClass(L"console", EJSFunction::JSConstructorMesh, EJSFunction::JSMeshPrototype, memberNamesConsole, memberFuncsConsole);
+	AssetBindings();
 
 	JsValueRef console, logFunc, global;
 	JsPropertyIdRef consolePropId, logPropId;
@@ -244,6 +229,19 @@ void EScriptContext::Vec3Bindings()
 	projectNativeClass(L"Vec3", EJSFunction::JSConstructorVec3, EJSFunction::JSVec3Prototype, memberNamesVec3, memberFuncsVec3);
 }
 
+void EScriptContext::MaterialBindings()
+{
+
+	vector<const wchar_t *> memberNamesMaterial;
+	vector<JsNativeFunction> memberFuncsMaterial;
+
+	memberNamesMaterial.push_back(L"setAlbedo");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetAlbedo);
+
+	projectNativeClass(L"Material", EJSFunction::JSConstructorMaterial, EJSFunction::JSMaterialPrototype, memberNamesMaterial, memberFuncsMaterial);
+
+}
+
 void EScriptContext::UIElementBindings()
 {
 	vector<const wchar_t *> memberNamesUI;
@@ -253,14 +251,46 @@ void EScriptContext::UIElementBindings()
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetPositionPc);
 	memberNamesUI.push_back(L"setPositionPx");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetPositionPx);
+
 	memberNamesUI.push_back(L"setSizePc");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetSizePc);
 	memberNamesUI.push_back(L"setSizePx");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetSizePx);
+
 	memberNamesUI.push_back(L"setColorFg");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetForegroundColor);
 	memberNamesUI.push_back(L"setColorBg");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetBackgroundColor);
 
 	projectNativeClass(L"UIElement", EJSFunction::JSConstructorUI, EJSFunction::JSUIPrototype, memberNamesUI, memberFuncsUI);
+}
+
+void EScriptContext::AssetBindings()
+{
+	vector<const wchar_t *> memberNamesAsset;
+	vector<JsNativeFunction> memberFuncsAsset;
+
+	memberNamesAsset.push_back(L"setPosition");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetSetPosition);
+	memberNamesAsset.push_back(L"getPosition");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetGetPosition);
+
+	memberNamesAsset.push_back(L"setScale");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetSetScale);
+	memberNamesAsset.push_back(L"getScale");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetGetScale);
+
+
+	memberNamesAsset.push_back(L"setRotation");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetSetScale);
+	memberNamesAsset.push_back(L"getRotation");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetGetScale);
+
+	memberNamesAsset.push_back(L"setMass");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetSetMass);
+	memberNamesAsset.push_back(L"getMass");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetGetMass);
+
+	projectNativeClass(L"Asset", EJSFunction::JSConstructorAsset, EJSFunction::JSAssetPrototype, memberNamesAsset, memberFuncsAsset);
+
 }
