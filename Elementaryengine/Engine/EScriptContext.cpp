@@ -126,7 +126,7 @@ void EScriptContext::projectNativeClass(const wchar_t *className, JsNativeFuncti
 	setProperty(globalObject, className, jsConstructor);
 	// create class's prototype and project its member functions
 	JsCreateObject(&prototype);
-	assert(memberNames.size() == memberNames.size());
+	assert(memberNames.size() == memberFuncs.size());
 	for (int i = 0; i < memberNames.size(); ++i) {
 		setCallback(prototype, memberNames[i], memberFuncs[i], nullptr);
 	}
@@ -155,10 +155,7 @@ void EScriptContext::AddBindings()
 	JsValueRef globalObject;
 	JsGetGlobalObject(&globalObject);
 
-	vector<const wchar_t *> memberNamesVec3;
-	vector<JsNativeFunction> memberFuncsVec3;
-	projectNativeClass(L"Vec3", EJSFunction::JSConstructorVec3, EJSFunction::JSVec3Prototype, memberNamesVec3, memberFuncsVec3);
-
+	Vec3Bindings();
 
 	vector<const wchar_t *> memberNamesTexture;
 	vector<JsNativeFunction> memberFuncsTexture;
@@ -180,9 +177,7 @@ void EScriptContext::AddBindings()
 	vector<JsNativeFunction> memberFuncsAsset;
 	projectNativeClass(L"Asset", EJSFunction::JSConstructorAsset, EJSFunction::JSAssetPrototype, memberNamesAsset, memberFuncsAsset);
 
-	vector<const wchar_t *> memberNamesUI;
-	vector<JsNativeFunction> memberFuncsUI;
-	projectNativeClass(L"UIElement", EJSFunction::JSConstructorUI, EJSFunction::JSUIPrototype, memberNamesUI, memberFuncsUI);
+	UIElementBindings();
 
 	//vector<const wchar_t *> memberNamesConsole;
 	//vector<JsNativeFunction> memberFuncsConsole;
@@ -192,19 +187,80 @@ void EScriptContext::AddBindings()
 
 	JsValueRef console, logFunc, global;
 	JsPropertyIdRef consolePropId, logPropId;
+
+	JsValueRef inputObj, scrollFunc, KeyFunc;
+	JsPropertyIdRef inputPropId, scrollPropId, KeyPropID;
+
 	const char* logString = "log";
 	const char* consoleString = "console";
+
+	const char* keyString = "getKeyDown";
+	const char* scrollString = "getScroll";
+	const char* inputString = "input";
+
 	// create console object, log function, and set log function as property of console
 	JsCreateObject(&console);
 	JsCreateFunction(EJSFunction::LogCB, nullptr, &logFunc);
 	JsCreatePropertyId(logString, strlen(logString), &logPropId);
 	JsSetProperty(console, logPropId, logFunc, true);
-	// set console as property of global object
+
+	// create input object and scroll & keydown function
+	JsCreateObject(&inputObj);
+	JsCreateFunction(EJSFunction::Scroll, nullptr, &scrollFunc);
+	JsCreatePropertyId(scrollString, strlen(scrollString), &scrollPropId);
+	JsSetProperty(inputObj, scrollPropId, scrollFunc, true);
+
+	JsCreateFunction(EJSFunction::Key, nullptr, &KeyFunc);
+	JsCreatePropertyId(keyString, strlen(keyString), &KeyPropID);
+	JsSetProperty(inputObj, KeyPropID, KeyFunc, true);
+
+	// set console and input as property of global object
 	JsGetGlobalObject(&global);
 	JsCreatePropertyId(consoleString, strlen(consoleString), &consolePropId);
 	JsSetProperty(global, consolePropId, console, true);
+	JsCreatePropertyId(inputString, strlen(inputString), &inputPropId);
+	JsSetProperty(global, inputPropId, inputObj, true);
+}
 
+void EScriptContext::Vec3Bindings()
+{
 
+	vector<const wchar_t *> memberNamesVec3;
+	vector<JsNativeFunction> memberFuncsVec3;
+	memberNamesVec3.push_back(L"getX");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3GetX);
+	memberNamesVec3.push_back(L"getY");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3GetY);
+	memberNamesVec3.push_back(L"getZ");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3GetZ);
 
+	memberNamesVec3.push_back(L"setX");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3SetX);
+	memberNamesVec3.push_back(L"setY");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3SetY);
+	memberNamesVec3.push_back(L"setZ");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3SetZ);
 
+	projectNativeClass(L"Vec3", EJSFunction::JSConstructorVec3, EJSFunction::JSVec3Prototype, memberNamesVec3, memberFuncsVec3);
+}
+
+void EScriptContext::UIElementBindings()
+{
+	vector<const wchar_t *> memberNamesUI;
+	vector<JsNativeFunction> memberFuncsUI;
+
+	memberNamesUI.push_back(L"setPositionPc");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetPositionPc);
+	memberNamesUI.push_back(L"setPositionPx");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetPositionPx);
+	memberNamesUI.push_back(L"setSizePc");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetSizePc);
+	memberNamesUI.push_back(L"setSizePx");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetSizePx);
+	memberNamesUI.push_back(L"setColorFg");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetForegroundColor);
+	memberNamesUI.push_back(L"setColorBg");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetBackgroundColor);
+
+	projectNativeClass(L"UIElement", EJSFunction::JSConstructorUI, EJSFunction::JSUIPrototype, memberNamesUI, memberFuncsUI);
 }

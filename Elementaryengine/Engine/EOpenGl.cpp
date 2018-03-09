@@ -2,6 +2,7 @@
 #include "iostream"
 #include "Lamp.h"
 #include "UIElement.h"
+#include "Game.h"
 
 EOpenGl::EOpenGl()
 {
@@ -44,6 +45,7 @@ void EOpenGl::Initialise(EDisplaySettings * settings)
 	}
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetScrollCallback(window, Game::scroll_callback);
 
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 4.6 compatible. \n");

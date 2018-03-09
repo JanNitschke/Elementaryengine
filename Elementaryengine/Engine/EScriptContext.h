@@ -49,7 +49,8 @@ private:
 	JsValueRef result;
 	unsigned currentSourceContext = 0;
 
-
+	void Vec3Bindings();
+	void UIElementBindings();
 
 };
 

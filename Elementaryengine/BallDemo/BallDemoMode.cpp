@@ -71,9 +71,6 @@ void BallDemoMode::Tick(double deltaTime)
 			norm.z = -1.0f;
 	}
 
-
-
-
 	if (Game::isKeyDown(GLFW_MOUSE_BUTTON_1)) {
 		if (placedLastFrame == false) {
 			if (r.hitAsset != nullptr) {

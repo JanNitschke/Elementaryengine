@@ -171,6 +171,8 @@ public:
 
 	static bool isKeyDown(int key);
 
+	static vec2 getScroll();
+
 	///<summary>
 	///Set the directional light color and direction
 	///</summary> 
@@ -262,6 +264,8 @@ public:
 	static bool meshChanged;
 	static bool assetsChanged;
 
+	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
 private:
 	///<summary>
 	///Private constructor. Use shared_instance() to get the instance. Only one instance can exist simultaneously
@@ -269,6 +273,8 @@ private:
 	Game() {}
 
 
+	static vec2 scroll;
+	static bool scrolledThisFrame;
 
 	///<summary>
 	///Time since start of the game in ms

@@ -57,6 +57,8 @@ EOpenGl* Game::eOpenGl = new EOpenGl();
 bool Game::meshChanged = true;
 bool Game::assetsChanged = true;
 vector<UIElement*> Game::uiElements;
+vec2 Game::scroll;
+bool Game::scrolledThisFrame = false;
 
 // start the game and run the main loop
 void Game::Start()
@@ -197,13 +199,14 @@ void Game::loop()
 		if (gameMode != nullptr) {
 			gameMode->Tick(deltaTime);
 		}
-		//eScriptContext->RunFunction("OnTick");
+		eScriptContext->RunFunction("OnTick");
 		for each (Asset* asset in assets)
 		{
 			if (asset) {
 				asset->Tick(eOpenGl->window, deltaTime);
 			}
 		}
+		scrolledThisFrame = false;
 		// delete all Assets that were destroyed this frame
 		for each (Asset* a in assetsToDelete)
 		{
@@ -227,7 +230,6 @@ void Game::loop()
 		if (!(glfwGetKey(eOpenGl->window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(eOpenGl->window) == 0)){
 			shouldClose = true;
 		}
-
 	} // Check if the ESC key was pressed or the window was closed
 	while (!shouldClose);
 	while (!physicsFinished)
@@ -237,7 +239,11 @@ void Game::loop()
 }
 bool Game::isKeyDown(int key)
 {
-	return (glfwGetKey(Instance().eOpenGl->window, key) == GLFW_PRESS)||(glfwGetMouseButton(Instance().eOpenGl->window,key) == GLFW_PRESS);
+	return (glfwGetKey(Instance().eOpenGl->window, key) == GLFW_PRESS) || (glfwGetMouseButton(Instance().eOpenGl->window,key) == GLFW_PRESS);
+}
+vec2 Game::getScroll()
+{
+	return scrolledThisFrame?scroll:vec2(0);
 }
 void Game::setLight(vec3 color, vec3 direction)
 {
@@ -331,6 +337,7 @@ void Game::netDisconnect()
 {
 
 }
+
 btVector3 Game::toBullet(vec3 v)
 {
 	return btVector3(v.x, v.y,v.z);
@@ -364,4 +371,11 @@ DWORD WINAPI PhysicsThread(LPVOID lpParam)
 	}
 	Game::physicsFinished = true;
 	return 0;
+}
+
+void Game::scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
+{
+	vec2 pos = vec2(xoffset, yoffset);
+	scroll = pos;
+	scrolledThisFrame = true;
 }
