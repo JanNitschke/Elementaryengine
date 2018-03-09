@@ -12,7 +12,6 @@ using namespace std;
 #include <FPCam.h>
 #include <Lamp.h>
 #include <iostream>
-
 #include <glm\gtx\quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <ERender.h>
