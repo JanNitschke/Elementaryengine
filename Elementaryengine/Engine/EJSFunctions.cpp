@@ -81,10 +81,11 @@ JsValueRef EJSFunction::JSConstructorTexture(JsValueRef callee, bool isConstruct
 	JsValueRef output = JS_INVALID_REFERENCE;
 
 	assert(isConstructCall);
-	if (argumentCount > 1) {
+	JsValueType type;
+	JsGetValueType(arguments[1], &type);
+	if (type == JsBoolean) {
 		texture = new Texture("");
-	}
-	else {
+	}else if(type == JsString) {
 		const wchar_t path = L't';
 		const wchar_t* p = &path;
 		const wchar_t** pa = &p;
