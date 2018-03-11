@@ -17,8 +17,8 @@ public:
 	vec3 foregroundColor;
 	vec3 backgroundColor;
 
-	float backgoundBlurr;
-	float foregroundBlurr;
+	float backgoundBlur;
+	float foregroundBlur;
 	float opacity;
 	Texture* alphamap;
 	float zindex;

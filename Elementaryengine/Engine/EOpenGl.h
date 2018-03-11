@@ -54,8 +54,8 @@ struct ERendererUIElement {
 	vec3 backgroundColor;
 	int alphamap;
 
-	float backgoundBlurr;
-	float foregroundBlurr;
+	float backgoundBlur;
+	float foregroundBlur;
 	float opacity;
 	float z;
 

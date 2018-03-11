@@ -152,24 +152,15 @@ void EScriptContext::setProperty(JsValueRef object, const wchar_t *propertyName,
 
 void EScriptContext::AddBindings()
 {
-	JsValueRef globalObject;
-	JsGetGlobalObject(&globalObject);
-
+	// Setup the bindings for prototypes
 	Vec3Bindings();
-
-	vector<const wchar_t *> memberNamesTexture;
-	vector<JsNativeFunction> memberFuncsTexture;
-	projectNativeClass(L"Texture", EJSFunction::JSConstructorTexture, EJSFunction::JSTexturePrototype , memberNamesTexture, memberFuncsTexture);
-
-	vector<const wchar_t *> memberNamesMesh;
-	vector<JsNativeFunction> memberFuncsMesh;
-	memberNamesMesh.push_back(L"attachto");
-	memberFuncsMesh.push_back(EJSFunction::JSMeshAttachTo);
-	projectNativeClass(L"Mesh", EJSFunction::JSConstructorMesh, EJSFunction::JSMeshPrototype, memberNamesMesh, memberFuncsMesh);
-
+	TextureBindings();
+	MaterialBindings();
+	MeshBindings();
 	UIElementBindings();
 	AssetBindings();
 
+	// Setup the remaining bindings for static classes / members of the global object
 	JsValueRef console, logFunc, global;
 	JsPropertyIdRef consolePropId, logPropId;
 
@@ -185,12 +176,14 @@ void EScriptContext::AddBindings()
 
 	// create console object, log function, and set log function as property of console
 	JsCreateObject(&console);
+
 	JsCreateFunction(EJSFunction::LogCB, nullptr, &logFunc);
 	JsCreatePropertyId(logString, strlen(logString), &logPropId);
 	JsSetProperty(console, logPropId, logFunc, true);
 
 	// create input object and scroll & keydown function
 	JsCreateObject(&inputObj);
+
 	JsCreateFunction(EJSFunction::Scroll, nullptr, &scrollFunc);
 	JsCreatePropertyId(scrollString, strlen(scrollString), &scrollPropId);
 	JsSetProperty(inputObj, scrollPropId, scrollFunc, true);
@@ -229,6 +222,13 @@ void EScriptContext::Vec3Bindings()
 	projectNativeClass(L"Vec3", EJSFunction::JSConstructorVec3, EJSFunction::JSVec3Prototype, memberNamesVec3, memberFuncsVec3);
 }
 
+void EScriptContext::TextureBindings()
+{
+	vector<const wchar_t *> memberNamesTexture;
+	vector<JsNativeFunction> memberFuncsTexture;
+	projectNativeClass(L"Texture", EJSFunction::JSConstructorTexture, EJSFunction::JSTexturePrototype, memberNamesTexture, memberFuncsTexture);
+}
+
 void EScriptContext::MaterialBindings()
 {
 
@@ -242,6 +242,17 @@ void EScriptContext::MaterialBindings()
 
 }
 
+void EScriptContext::MeshBindings()
+{
+
+	vector<const wchar_t *> memberNamesMesh;
+	vector<JsNativeFunction> memberFuncsMesh;
+	memberNamesMesh.push_back(L"attachto");
+	memberFuncsMesh.push_back(EJSFunction::JSMeshAttachTo);
+	projectNativeClass(L"Mesh", EJSFunction::JSConstructorMesh, EJSFunction::JSMeshPrototype, memberNamesMesh, memberFuncsMesh);
+
+}
+
 void EScriptContext::UIElementBindings()
 {
 	vector<const wchar_t *> memberNamesUI;
@@ -252,15 +263,46 @@ void EScriptContext::UIElementBindings()
 	memberNamesUI.push_back(L"setPositionPx");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetPositionPx);
 
+	memberNamesUI.push_back(L"getPositionPc");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetPositionPc);
+	memberNamesUI.push_back(L"getPositionPx");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetPositionPx);
+
 	memberNamesUI.push_back(L"setSizePc");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetSizePc);
 	memberNamesUI.push_back(L"setSizePx");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetSizePx);
 
-	memberNamesUI.push_back(L"setColorFg");
+	memberNamesUI.push_back(L"getSizePc");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetSizePc);
+	memberNamesUI.push_back(L"getSizePx");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetSizePx);
+
+	memberNamesUI.push_back(L"setColorFG");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetForegroundColor);
-	memberNamesUI.push_back(L"setColorBg");
+	memberNamesUI.push_back(L"setColorBG");
 	memberFuncsUI.push_back(EJSFunction::JSUIElementSetBackgroundColor);
+
+	memberNamesUI.push_back(L"getColorFG");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetForegroundColor);
+	memberNamesUI.push_back(L"getColorBG");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetBackgroundColor);
+
+	memberNamesUI.push_back(L"setBackgroundBlur");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetBackgroundBlur);
+	memberNamesUI.push_back(L"getBackgroundBlur");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetBackgroundBlur);
+
+	memberNamesUI.push_back(L"setTexture");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetTexture);
+	memberNamesUI.push_back(L"setAlphaMap");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementSetAlphamap);
+
+
+	memberNamesUI.push_back(L"getTexture");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetTexture);
+	memberNamesUI.push_back(L"getAlphaMap");
+	memberFuncsUI.push_back(EJSFunction::JSUIElementGetAlphamap);
 
 	projectNativeClass(L"UIElement", EJSFunction::JSConstructorUI, EJSFunction::JSUIPrototype, memberNamesUI, memberFuncsUI);
 }
@@ -290,6 +332,12 @@ void EScriptContext::AssetBindings()
 	memberFuncsAsset.push_back(EJSFunction::JSAssetSetMass);
 	memberNamesAsset.push_back(L"getMass");
 	memberFuncsAsset.push_back(EJSFunction::JSAssetGetMass);
+
+	memberNamesAsset.push_back(L"applyForce");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetApplyForce);
+
+	memberNamesAsset.push_back(L"setColliderOffset");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetSetColliderOffset);
 
 	projectNativeClass(L"Asset", EJSFunction::JSConstructorAsset, EJSFunction::JSAssetPrototype, memberNamesAsset, memberFuncsAsset);
 

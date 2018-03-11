@@ -1,15 +1,13 @@
 #include "EJSFunctions.h"
 #include "Model.h"
 #include "Game.h"
-JsValueRef EJSFunction::JSVec3Prototype;
 
+JsValueRef EJSFunction::JSVec3Prototype;
 JsValueRef EJSFunction::JSTexturePrototype;
 JsValueRef EJSFunction::JSMaterialPrototype;
 JsValueRef EJSFunction::JSMeshPrototype;
 JsValueRef EJSFunction::JSAssetPrototype;
 JsValueRef EJSFunction::JSUIPrototype;
-
-
 
 
 vec3 EJSFunction::JSToNativeVec3(JsValueRef jsVec3)
@@ -185,59 +183,74 @@ JsValueRef EJSFunction::JSConstructorAsset(JsValueRef callee, bool isConstructCa
 JsValueRef EJSFunction::JSConstructorUI(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
 	JsValueRef output = JS_INVALID_REFERENCE;
+	UIElement* ele = new UIElement();
 
-	void* posV;
-	JsGetExternalData(arguments[1], &posV);
-	vec3* pos = static_cast<vec3*>(posV);
+	if (argumentCount > 1) {
+		void* posV;
+		JsGetExternalData(arguments[1], &posV);
+		vec3* pos = static_cast<vec3*>(posV);
+
+		void* posPxV;
+		JsGetExternalData(arguments[2], &posPxV);
+		vec3* posPx = static_cast<vec3*>(posPxV);
+
+		void* sizeV;
+		JsGetExternalData(arguments[3], &sizeV);
+		vec3* size = static_cast<vec3*>(sizeV);
+
+		void* sizePxV;
+		JsGetExternalData(arguments[4], &sizePxV);
+		vec3* sizePx = static_cast<vec3*>(sizePxV);
+
+		void* foregroundColorV;
+		JsGetExternalData(arguments[5], &foregroundColorV);
+		vec3* foregroundColor = static_cast<vec3*>(foregroundColorV);
+
+		void* backgroundColorV;
+		JsGetExternalData(arguments[6], &sizePxV);
+		vec3* backgroundColor = static_cast<vec3*>(sizePxV);
+
+		double opacity;
+		JsNumberToDouble(arguments[7], &opacity);
+
+		double bb;
+		JsNumberToDouble(arguments[8], &bb);
+
+		double zid;
+		JsNumberToDouble(arguments[9], &zid);
+
+
+		ele->opacity = opacity;
+		ele->foregroundColor = *foregroundColor;
+		ele->backgroundColor = *backgroundColor;
+		ele->sizePixel = vec2(sizePx->x, sizePx->y);
+		ele->sizePercent = vec2(size->x, size->y);
+		ele->posisionPercent = vec2(pos->x, pos->y);
+		ele->positionPixel = vec2(posPx->x, posPx->y);
+		ele->backgoundBlur = bb;
+		ele->texture = JSToNativeTexture(arguments[10]);
+		ele->alphamap = JSToNativeTexture(arguments[11]);
+		ele->zindex = zid;
+
+	}else {
+		ele->opacity = 1;
+		ele->foregroundColor = vec3(1);
+		ele->backgroundColor = vec3(0);
+		ele->sizePixel = vec2(0);
+		ele->sizePercent = vec2(0);
+		ele->posisionPercent = vec2(0);
+		ele->positionPixel = vec2(0);
+		ele->backgoundBlur = 0;
+		ele->texture = new Texture("");
+		ele->alphamap = new Texture("");;
+		ele->zindex = 0;
+	}
+
 	
-	void* posPxV;
-	JsGetExternalData(arguments[2], &posPxV);
-	vec3* posPx = static_cast<vec3*>(posPxV);
 
-	void* sizeV;
-	JsGetExternalData(arguments[3], &sizeV);
-	vec3* size = static_cast<vec3*>(sizeV);
-
-	void* sizePxV;
-	JsGetExternalData(arguments[4], &sizePxV);
-	vec3* sizePx = static_cast<vec3*>(sizePxV);
-
-	void* foregroundColorV;
-	JsGetExternalData(arguments[5], &foregroundColorV);
-	vec3* foregroundColor = static_cast<vec3*>(foregroundColorV);
-
-	void* backgroundColorV;
-	JsGetExternalData(arguments[6], &sizePxV);
-	vec3* backgroundColor = static_cast<vec3*>(sizePxV);
-
-	double opacity;
-	JsNumberToDouble(arguments[7], &opacity);
-
-	double bb;
-	JsNumberToDouble(arguments[8], &bb);
-
-	double zid;
-	JsNumberToDouble(arguments[9], &zid);
-
-
-	UIElement* ele2 = new UIElement();
-	ele2->opacity = opacity;
-
-	ele2->foregroundColor = *foregroundColor;
-	ele2->backgroundColor = *backgroundColor;
-
-	ele2->sizePixel = vec2(sizePx->x, sizePx->y );
-	ele2->sizePercent = vec2(size->x, size->y);
-	ele2->posisionPercent = vec2(pos->x, pos->y);
-	ele2->positionPixel = vec2(posPx->x, posPx->y);
-	ele2->backgoundBlurr = bb;
-	ele2->texture = JSToNativeTexture(arguments[10]);
-	ele2->alphamap = JSToNativeTexture(arguments[11]);
-	ele2->zindex = zid;
-
-
-	JsCreateExternalObject(ele2, nullptr, &output);
+	JsCreateExternalObject(ele, nullptr, &output);
 	JsSetPrototype(output, JSUIPrototype);
+
 	return output;
 }
 
@@ -261,6 +274,7 @@ JsValueRef EJSFunction::JSMaterialSetAlbedo(JsValueRef callee, bool isConstructC
 
 JsValueRef EJSFunction::JSMaterialGetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
+	// TODO: implement
 	return JsValueRef();
 }
 
@@ -464,6 +478,168 @@ JsValueRef EJSFunction::JSUIElementSetBackgroundColor(JsValueRef callee, bool is
 	return output;
 }
 
+JsValueRef EJSFunction::JSUIElementSetBackgroundBlur(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		UIElement* element = JSToNativeUI(arguments[0]);
+		double val;
+		JsNumberToDouble(arguments[1],&val);
+		element->backgoundBlur = val;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementSetTexture(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		UIElement* element = JSToNativeUI(arguments[0]);
+		Texture* val = JSToNativeTexture(arguments[1]);
+		element->texture = val;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementSetAlphamap(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		UIElement* element = JSToNativeUI(arguments[0]);
+		Texture* val = JSToNativeTexture(arguments[1]);
+		element->alphamap = val;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetPositionPc(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		vec3 val = vec3(element->posisionPercent,0);
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetPositionPx(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		vec3 val = vec3(element->positionPixel, 0);
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetSizePc(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		vec3 val = vec3(element->sizePercent, 0);
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetSizePx(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		vec3 val = vec3(element->sizePixel, 0);
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetForegroundColor(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		vec3 val = element->foregroundColor;
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetBackgroundColor(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		vec3 val = element->backgroundColor;
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetBackgroundBlur(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		double val = element->backgoundBlur;
+		JsDoubleToNumber(val, &output);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetTexture(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		Texture* val = element->texture;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSTexturePrototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSUIElementGetAlphamap(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		UIElement* element = static_cast<UIElement*>(v);
+		Texture* val = element->alphamap;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSTexturePrototype);
+	}
+	return output;
+}
+
 // ----------------------------------------------------------------------------
 // ASSET MEMBER FUNCTIONS
 // ----------------------------------------------------------------------------
@@ -522,6 +698,40 @@ JsValueRef EJSFunction::JSAssetSetMass(JsValueRef callee, bool isConstructCall, 
 		Asset* element = JSToNativeAsset(arguments[0]);
 		vec3 val = JSToNativeVec3(arguments[1]);
 		element->setRotation(quat(val));
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetApplyForce(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Asset* element = JSToNativeAsset(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		element->applyForce(val);
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetSetColliderOffset(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Asset* element = JSToNativeAsset(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		vec3 val2 = JSToNativeVec3(arguments[2]);
+
+		element->setCollisionPositionOffset(val);
+		element->setCollisionSizeOffset(val2);
+
 		noError = true;
 	}
 	JsBoolToBoolean(noError, &output);
@@ -611,6 +821,7 @@ JsValueRef EJSFunction::LogCB(JsValueRef callee, bool isConstructCall, JsValueRe
 	printf("\n");
 	return JS_INVALID_REFERENCE;
 }
+
 JsValueRef EJSFunction::Scroll(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState) {
 	JsValueRef output = JS_INVALID_REFERENCE;
 	vec2 v = Game::getScroll();
@@ -619,6 +830,7 @@ JsValueRef EJSFunction::Scroll(JsValueRef callee, bool isConstructCall, JsValueR
 	JsSetPrototype(output, JSVec3Prototype);
 	return output;
 }
+
 JsValueRef EJSFunction::Key(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState) {
 	JsValueRef output = JS_INVALID_REFERENCE;
 	int i;

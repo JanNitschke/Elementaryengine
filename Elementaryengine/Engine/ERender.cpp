@@ -128,8 +128,8 @@ void ERender::BuildUI(EOpenGl * eOpenGl)
 		u.backgroundColor = uie->backgroundColor;
 		u.texture = uie->texture->layer;
 		u.alphamap = uie->alphamap->layer;
-		u.backgoundBlurr = uie->backgoundBlurr;
-		u.foregroundBlurr = uie->foregroundBlurr;
+		u.backgoundBlur = uie->backgoundBlur;
+		u.foregroundBlur = uie->foregroundBlur;
 		u.opacity = uie->opacity;
 		u.z = uie->zindex;
 		eOpenGl->ERUIElements.push_back(u);

@@ -1,14 +1,17 @@
-console.log("UI Element test");
 
 // definition: new Texture("path",notEmpty)
 var cht = new Texture("Assets/Textures/ch.jpg",true);
 var empty = new Texture("",false);
 
+
 var v = new Vec3(0.5,0.5,0.5);
+console.log("UI Element test");
+
 var mat = new Material(v);
 var a = new Asset(new Vec3(2,2,2),new Vec3(0.5,0.5,0.5),0); 
 var m = new Mesh("Assets/Meshs/Cube.obj",mat);
 m.attachto(a);
+
 
 var selectedItem = 0;
 
