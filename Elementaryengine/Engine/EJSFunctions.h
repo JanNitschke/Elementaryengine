@@ -85,6 +85,8 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSAssetGetScale(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSAssetGetRotation(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSAssetGetMass(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSAssetGetColliderOffsetPos(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSAssetGetColliderOffsetSize(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 
 	JsValueRef CALLBACK LogCB(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);

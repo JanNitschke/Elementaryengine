@@ -338,6 +338,10 @@ void EScriptContext::AssetBindings()
 
 	memberNamesAsset.push_back(L"setColliderOffset");
 	memberFuncsAsset.push_back(EJSFunction::JSAssetSetColliderOffset);
+	memberNamesAsset.push_back(L"getColliderOffsetPos");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetGetColliderOffsetPos);
+	memberNamesAsset.push_back(L"getColliderOffsetSize");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetGetColliderOffsetSize);
 
 	projectNativeClass(L"Asset", EJSFunction::JSConstructorAsset, EJSFunction::JSAssetPrototype, memberNamesAsset, memberFuncsAsset);
 

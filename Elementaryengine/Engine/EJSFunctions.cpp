@@ -77,28 +77,27 @@ JsValueRef EJSFunction::JSConstructorVec3(JsValueRef callee, bool isConstructCal
 // new Texture(string path)
 JsValueRef EJSFunction::JSConstructorTexture(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
-	assert(isConstructCall && argumentCount == 3);
-	JsValueRef output = JS_INVALID_REFERENCE;
-	const wchar_t path = L't';
-	const wchar_t* p = &path;
-	const wchar_t** pa = &p;
-	size_t t;
-	size_t length;
-
-	bool toArray;
-	char* buffer;
-
-	JsStringToPointer(arguments[1], pa, &t);
-	JsBooleanToBool(arguments[2], &toArray);
-
-	wstring ws(p);
-	string str(ws.begin(), ws.end());
 	Texture* texture;
-	if (toArray) {
-		texture = new Texture(str.c_str(), toArray);
+	JsValueRef output = JS_INVALID_REFERENCE;
+
+	assert(isConstructCall);
+	if (argumentCount > 1) {
+		texture = new Texture("");
 	}
 	else {
-		texture = new Texture("");
+		const wchar_t path = L't';
+		const wchar_t* p = &path;
+		const wchar_t** pa = &p;
+		size_t t;
+		size_t length;
+
+		char* buffer;
+
+		JsStringToPointer(arguments[1], pa, &t);
+
+		wstring ws(p);
+		string str(ws.begin(), ws.end());
+		texture = new Texture(str.c_str(), true);
 	}
 
 	JsCreateExternalObject(texture, nullptr, &output);
@@ -785,6 +784,32 @@ JsValueRef EJSFunction::JSAssetGetMass(JsValueRef callee, bool isConstructCall, 
 		Asset* element = JSToNativeAsset(arguments[0]);
 		double val = element->mass;
 		JsDoubleToNumber(val, &output);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetGetColliderOffsetPos(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		vec3 val = element->collisionPosOffset;
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetGetColliderOffsetSize(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		vec3 val = element->collisionSizeOffset;
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
 	}
 	return output;
 }
