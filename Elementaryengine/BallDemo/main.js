@@ -1,7 +1,5 @@
-
-// definition: new Texture("path",notEmpty)
-var cht = new Texture("Assets/Textures/ch.jpg",true);
-var empty = new Texture("",false);
+var cht = new Texture("Assets/Textures/ch.jpg");
+var empty = new Texture("");
 
 
 var v = new Vec3(0.5,0.5,0.5);
