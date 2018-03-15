@@ -12,7 +12,7 @@ m.attachto(a);
 
 var selectedItem = 0;
 
-var fgCol = new Vec3(0.5,0.5,0.8);
+var fgCol = new Vec3(0.5,0.5,0.9);
 // definition: new UIElement(positionIn%, posistionInPX, sizein%, sizeInPx, foregroundColor, backgroundColor, opacity, backgroundBlurr, zindex, texture, alphamap)var b1 = new UIElement(new Vec3(50,0,0), new Vec3(-180,10,0),new Vec3(0,0,0), new Vec3(40,40,0), new Vec3(1,0.2,0.2),new Vec3(0,0,0), 0.5, 0,10,empty,empty);
 var b1 = new UIElement(new Vec3(50,0,0), new Vec3(-200,10,0),new Vec3(0,0,0), new Vec3(40,40,0), fgCol,new Vec3(0,0,0), 0.5, 0,10,empty,empty);
 var b2 = new UIElement(new Vec3(50,0,0), new Vec3(-140,10,0),new Vec3(0,0,0), new Vec3(40,40,0), fgCol,new Vec3(0,0,0), 0.5, 0,10,empty,empty);

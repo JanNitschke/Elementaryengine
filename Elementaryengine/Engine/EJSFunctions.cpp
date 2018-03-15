@@ -738,6 +738,20 @@ JsValueRef EJSFunction::JSAssetSetColliderOffset(JsValueRef callee, bool isConst
 	return output;
 }
 
+JsValueRef EJSFunction::JSAssetDelete(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	bool noError = false;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		element->Destroy();
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
 JsValueRef EJSFunction::JSAssetGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
 	JsValueRef output = JS_INVALID_REFERENCE;
