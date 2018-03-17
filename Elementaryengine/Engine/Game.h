@@ -12,23 +12,13 @@
 #include <windows.h>
 #include <UIElement.h>
 #include <memory>
-#include "EScriptContext.h"
+#include <EScriptContext.h>
+#include <RayCastHit.h>
 
 class GameMode;
 #include <GameMode.h>
 using namespace glm;
 
-#define DllImport   __declspec( dllimport )
-#define DllExport   __declspec( dllexport )
-///<summary>
-///Game class abstracts all things that belong to the game. Run Start() after creating an instance to run the game. Do not forget to set the window options and gamemode first.
-///You can not create more than one instance of this class;
-///</summary> 
-struct DllExport RaycastHit {
-	Asset* hitAsset;
-	vec3 hitPos;
-	vec3 hitNormal;
-};
 
 class DllExport Game
 {
@@ -231,7 +221,7 @@ public:
 	static btDiscreteDynamicsWorld* dynamicsWorld;
 	static bool simulatePhysics;
 
-	RaycastHit Raycast(vec3 Start, vec3 End);
+	RayCastHit Raycast(vec3 Start, vec3 End);
 
 
 

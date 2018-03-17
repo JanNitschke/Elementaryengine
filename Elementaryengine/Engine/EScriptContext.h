@@ -35,6 +35,8 @@ public:
 
 	static void projectNativeClass(const wchar_t *className, JsNativeFunction constructor, JsValueRef &prototype, vector<const wchar_t *> memberNames, vector<JsNativeFunction> memberFuncs);
 
+	static void projectNativeClassGlobal(const wchar_t *className, vector<const wchar_t *> memberNames, vector<JsNativeFunction> memberFuncs);
+
 	static void setCallback(JsValueRef object, const wchar_t *propertyName, JsNativeFunction callback, void *callbackState);
 
 	static void setProperty(JsValueRef object, const wchar_t *propertyName, JsValueRef property);
@@ -49,11 +51,18 @@ private:
 	JsValueRef result;
 	unsigned currentSourceContext = 0;
 
+	// setup prototypes
 	void Vec3Bindings();
 	void TextureBindings();
 	void MaterialBindings();
 	void MeshBindings();
 	void UIElementBindings();
 	void AssetBindings();
-};
+	void RayCastBindings();
+	void CameraBindings();
 
+	// setup global functions
+	void GlobalConsoleBindings();
+	void GlobalInputBindings();
+	void GloablGameBindings();
+};

@@ -1,6 +1,7 @@
 #include "EJSFunctions.h"
 #include "Model.h"
 #include "Game.h"
+#include <Camera.h>
 
 JsValueRef EJSFunction::JSVec3Prototype;
 JsValueRef EJSFunction::JSTexturePrototype;
@@ -8,6 +9,8 @@ JsValueRef EJSFunction::JSMaterialPrototype;
 JsValueRef EJSFunction::JSMeshPrototype;
 JsValueRef EJSFunction::JSAssetPrototype;
 JsValueRef EJSFunction::JSUIPrototype;
+JsValueRef EJSFunction::JSRaycastHitPrototype;
+JsValueRef EJSFunction::JSCameraPrototype;
 
 
 vec3 EJSFunction::JSToNativeVec3(JsValueRef jsVec3)
@@ -50,6 +53,20 @@ UIElement * EJSFunction::JSToNativeUI(JsValueRef jsUI)
 	void* p;
 	JsGetExternalData(jsUI, &p);
 	return reinterpret_cast<UIElement*>(p);
+}
+
+RayCastHit * EJSFunction::JsToNativeRaycast(JsValueRef jsRaycast)
+{
+	void* p;
+	JsGetExternalData(jsRaycast, &p);
+	return reinterpret_cast<RayCastHit*>(p);
+}
+
+Camera * EJSFunction::JSToNativeCamera(JsValueRef jsCamera)
+{
+	void* p;
+	JsGetExternalData(jsCamera, &p);
+	return reinterpret_cast<Camera*>(p);
 }
 
 // new Vec3(number x, number y, number z)
@@ -254,6 +271,28 @@ JsValueRef EJSFunction::JSConstructorUI(JsValueRef callee, bool isConstructCall,
 	return output;
 }
 
+JsValueRef EJSFunction::JSConstructorRaycastResult(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+
+	RayCastHit* rh = new RayCastHit();
+
+	JsCreateExternalObject(rh, nullptr, &output);
+	JsSetPrototype(output, JSRaycastHitPrototype);
+	return output;
+}
+
+JsValueRef EJSFunction::JSConstructorCamera(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+
+	Camera* cam = new Camera();
+
+	JsCreateExternalObject(cam, nullptr, &output);
+	JsSetPrototype(output, JSCameraPrototype);
+	return output;
+}
+
 // material.setAlbedo(vec3 color)
 JsValueRef EJSFunction::JSMaterialSetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
@@ -295,7 +334,7 @@ JsValueRef EJSFunction::JSMeshAttachTo(JsValueRef callee, bool isConstructCall, 
 	JsBoolToBoolean(noError, &output);
 	return output;
 }
-
+	
 // ----------------------------------------------------------------------------
 // VEC3 MEMBER FUNCTIONS
 // ----------------------------------------------------------------------------
@@ -378,6 +417,85 @@ JsValueRef EJSFunction::JSVec3SetZ(JsValueRef callee, bool isConstructCall, JsVa
 		double val;
 		JsNumberToDouble(arguments[1], &val);
 		element->z = val;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSVec3Scale(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	//JsValueRef output = JS_INVALID_REFERENCE;
+	//void* vec;
+	//if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+	//	vec3 element = JSToNativeVec3(arguments[0]);
+	//	double val;
+	//	JsNumberToDouble(arguments[1],&val);
+	//	vec3* out = new vec3();
+	//	*out = element * (float)val;
+	//	JsCreateExternalObject(&out, nullptr, &output);
+	//	JsSetPrototype(output, JSVec3Prototype);
+	//}
+	//return output;
+
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		vec3* element = static_cast<vec3*>(uie);
+		double val;
+		JsNumberToDouble(arguments[1], &val);
+		*element *= val;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+
+
+}
+
+JsValueRef EJSFunction::JSVec3Add(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	/*JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		vec3 element = JSToNativeVec3(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		vec3* out = new vec3();
+		*out = element + val;
+		JsCreateExternalObject(&out, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;*/
+
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		vec3* element = static_cast<vec3*>(uie);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		*element += val;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+
+}
+
+JsValueRef EJSFunction::JSVec3Normalize(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		vec3* element = static_cast<vec3*>(uie);
+		double val = 1;
+		if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+			JsNumberToDouble(arguments[1], &val);
+		}
+		glm::normalize(*element);
+		*element *= val;
 		noError = true;
 	}
 	JsBoolToBoolean(noError, &output);
@@ -758,8 +876,9 @@ JsValueRef EJSFunction::JSAssetGetPosition(JsValueRef callee, bool isConstructCa
 	void* vec;
 	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
 		Asset* element = static_cast<Asset*>(vec);
-		vec3 val = element->position;
-		JsCreateExternalObject(&val, nullptr, &output);
+		vec3* val = new vec3();
+		*val = element->position;
+		JsCreateExternalObject(val, nullptr, &output);
 		JsSetPrototype(output, JSVec3Prototype);
 	}
 	return output;
@@ -829,11 +948,58 @@ JsValueRef EJSFunction::JSAssetGetColliderOffsetSize(JsValueRef callee, bool isC
 	return output;
 }
 
+JsValueRef EJSFunction::JSCameraGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Camera* element = static_cast<Camera*>(vec);
+		vec3* val = new vec3();
+		*val = element->position;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSCameraSetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Camera* element = JSToNativeCamera(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+
+		element->position = val;
+
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSCameraGetForward(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Camera* element = static_cast<Camera*>(vec);
+		// recalculate the front vector by calling GetView()
+		element->GetView();
+		vec3* val = new vec3();
+		*val = element->cameraFront;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
 // ----------------------------------------------------------------------------
 // GLOBAL FUNCTIONS
 // ----------------------------------------------------------------------------
 
-JsValueRef EJSFunction::LogCB(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+JsValueRef EJSFunction::JSLog(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
 	for (unsigned int index = 1; index < argumentCount; index++)
 	{
@@ -862,7 +1028,7 @@ JsValueRef EJSFunction::LogCB(JsValueRef callee, bool isConstructCall, JsValueRe
 	return JS_INVALID_REFERENCE;
 }
 
-JsValueRef EJSFunction::Scroll(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState) {
+JsValueRef EJSFunction::JSScroll(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState) {
 	JsValueRef output = JS_INVALID_REFERENCE;
 	vec2 v = Game::getScroll();
 	vec3* s = new vec3(v, 0);
@@ -871,11 +1037,85 @@ JsValueRef EJSFunction::Scroll(JsValueRef callee, bool isConstructCall, JsValueR
 	return output;
 }
 
-JsValueRef EJSFunction::Key(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState) {
+JsValueRef EJSFunction::JSKeyDown(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState) {
 	JsValueRef output = JS_INVALID_REFERENCE;
 	int i;
 	JsNumberToInt(arguments[1], &i);
 	bool v = Game::isKeyDown(i);
 	JsBoolToBoolean(v, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSRaycast(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	vec3 start;
+	vec3 end;
+	start = JSToNativeVec3(arguments[1]);
+	end = JSToNativeVec3(arguments[2]);
+
+	RayCastHit r = Game::Instance().Raycast(start, end);
+	if (r.hitAsset != nullptr) {
+		RayCastHit* val = new RayCastHit();
+		val->hitPos = r.hitPos;
+		val->hitNormal = r.hitNormal;
+		val->hitAsset = r.hitAsset;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSRaycastHitPrototype);
+	}
+	else {
+		JsBoolToBoolean(false,&output);
+	}
+
+	return output;
+}
+
+JsValueRef EJSFunction::JSGetActiveCam(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	Camera* element = Game::activeCam;
+	JsCreateExternalObject(element, nullptr, &output);
+	JsSetPrototype(output, JSCameraPrototype);
+	return output;
+}
+
+JsValueRef EJSFunction::JSRaycastGetHitPos(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		RayCastHit* element = static_cast<RayCastHit*>(vec);
+		vec3* val = new vec3();
+		*val = element->hitPos;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSRaycastGetHitNormal(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		RayCastHit* element = static_cast<RayCastHit*>(vec);
+		vec3* val = new vec3();
+		*val = element->hitNormal;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSRaycastGetHitAsset(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		RayCastHit* element = static_cast<RayCastHit*>(vec);
+		JsCreateExternalObject(element->hitAsset, nullptr, &output);
+		JsSetPrototype(output, JSAssetPrototype);
+	}
 	return output;
 }

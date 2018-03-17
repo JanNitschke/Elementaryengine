@@ -15,7 +15,12 @@ Camera::~Camera()
 
 glm::mat4 Camera::GetView()
 {
-	return lookAt(glm::vec3(camX, 0.0, camZ), vec3(0,0,0), cameraUp);
+	vec3 front;
+	front.x = cos(glm::radians(rotation.x)) * cos(glm::radians(rotation.y));
+	front.y = sin(glm::radians(rotation.x));
+	front.z = cos(glm::radians(rotation.x)) * sin(glm::radians(rotation.y));
+	cameraFront = glm::normalize(front);
+	return lookAt(position, position + cameraFront, cameraUp);
 }
 
 void Camera::Tick(GLFWwindow * window, double deltaTime)

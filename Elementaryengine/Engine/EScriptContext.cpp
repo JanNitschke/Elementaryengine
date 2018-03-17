@@ -133,6 +133,23 @@ void EScriptContext::projectNativeClass(const wchar_t *className, JsNativeFuncti
 	setProperty(jsConstructor, L"prototype", prototype);
 }
 
+void EScriptContext::projectNativeClassGlobal(const wchar_t * className, vector<const wchar_t*> memberNames, vector<JsNativeFunction> memberFuncs)
+{
+	// project constructor to global scope 
+	JsValueRef globalObject;
+	JsValueRef prototype;
+	JsGetGlobalObject(&globalObject);
+	// create class's prototype and project its member functions
+	JsCreateObject(&prototype);
+	assert(memberNames.size() == memberFuncs.size());
+	for (int i = 0; i < memberNames.size(); ++i) {
+		setCallback(prototype, memberNames[i], memberFuncs[i], nullptr);
+	}
+	JsPropertyIdRef pid;
+	JsGetPropertyIdFromName(className, &pid);
+	JsSetProperty(globalObject, pid, prototype, true);
+}
+
 void EScriptContext::setCallback(JsValueRef object, const wchar_t *propertyName, JsNativeFunction callback, void *callbackState)
 {
 	JsPropertyIdRef propertyId;
@@ -159,45 +176,13 @@ void EScriptContext::AddBindings()
 	MeshBindings();
 	UIElementBindings();
 	AssetBindings();
+	RayCastBindings();
+	CameraBindings();
 
-	// Setup the remaining bindings for static classes / members of the global object
-	JsValueRef console, logFunc, global;
-	JsPropertyIdRef consolePropId, logPropId;
-
-	JsValueRef inputObj, scrollFunc, KeyFunc;
-	JsPropertyIdRef inputPropId, scrollPropId, KeyPropID;
-
-	const char* logString = "log";
-	const char* consoleString = "console";
-
-	const char* keyString = "getKeyDown";
-	const char* scrollString = "getScroll";
-	const char* inputString = "input";
-
-	// create console object, log function, and set log function as property of console
-	JsCreateObject(&console);
-
-	JsCreateFunction(EJSFunction::LogCB, nullptr, &logFunc);
-	JsCreatePropertyId(logString, strlen(logString), &logPropId);
-	JsSetProperty(console, logPropId, logFunc, true);
-
-	// create input object and scroll & keydown function
-	JsCreateObject(&inputObj);
-
-	JsCreateFunction(EJSFunction::Scroll, nullptr, &scrollFunc);
-	JsCreatePropertyId(scrollString, strlen(scrollString), &scrollPropId);
-	JsSetProperty(inputObj, scrollPropId, scrollFunc, true);
-
-	JsCreateFunction(EJSFunction::Key, nullptr, &KeyFunc);
-	JsCreatePropertyId(keyString, strlen(keyString), &KeyPropID);
-	JsSetProperty(inputObj, KeyPropID, KeyFunc, true);
-
-	// set console and input as property of global object
-	JsGetGlobalObject(&global);
-	JsCreatePropertyId(consoleString, strlen(consoleString), &consolePropId);
-	JsSetProperty(global, consolePropId, console, true);
-	JsCreatePropertyId(inputString, strlen(inputString), &inputPropId);
-	JsSetProperty(global, inputPropId, inputObj, true);
+	// Setup bindings for global functions 
+	GlobalConsoleBindings();
+	GlobalInputBindings();
+	GloablGameBindings();
 }
 
 void EScriptContext::Vec3Bindings()
@@ -218,6 +203,13 @@ void EScriptContext::Vec3Bindings()
 	memberFuncsVec3.push_back(EJSFunction::JSVec3SetY);
 	memberNamesVec3.push_back(L"setZ");
 	memberFuncsVec3.push_back(EJSFunction::JSVec3SetZ);
+
+	memberNamesVec3.push_back(L"add");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3Add);
+	memberNamesVec3.push_back(L"scale");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3Scale);
+	memberNamesVec3.push_back(L"normalize");
+	memberFuncsVec3.push_back(EJSFunction::JSVec3Scale);
 
 	projectNativeClass(L"Vec3", EJSFunction::JSConstructorVec3, EJSFunction::JSVec3Prototype, memberNamesVec3, memberFuncsVec3);
 }
@@ -347,4 +339,70 @@ void EScriptContext::AssetBindings()
 	memberFuncsAsset.push_back(EJSFunction::JSAssetDelete);
 
 	projectNativeClass(L"Asset", EJSFunction::JSConstructorAsset, EJSFunction::JSAssetPrototype, memberNamesAsset, memberFuncsAsset);
+}
+
+void EScriptContext::RayCastBindings()
+{
+	vector<const wchar_t *> memberNamesRC;
+	vector<JsNativeFunction> memberFuncsRC;
+
+	memberNamesRC.push_back(L"getHitPosition");
+	memberFuncsRC.push_back(EJSFunction::JSRaycastGetHitPos);
+
+	memberNamesRC.push_back(L"getHitNormal");
+	memberFuncsRC.push_back(EJSFunction::JSRaycastGetHitNormal);
+
+	memberNamesRC.push_back(L"getHitAsset");
+	memberFuncsRC.push_back(EJSFunction::JSRaycastGetHitAsset);
+
+	projectNativeClass(L"RaycastResult", EJSFunction::JSConstructorRaycastResult, EJSFunction::JSRaycastHitPrototype, memberNamesRC, memberFuncsRC);
+}
+
+void EScriptContext::CameraBindings()
+{
+	vector<const wchar_t *> memberNamesCamera;
+	vector<JsNativeFunction> memberFuncsCamera;
+
+	memberNamesCamera.push_back(L"getPosition");
+	memberFuncsCamera.push_back(EJSFunction::JSCameraGetPosition);
+
+	memberNamesCamera.push_back(L"setPosition");
+	memberFuncsCamera.push_back(EJSFunction::JSCameraSetPosition);
+
+	memberNamesCamera.push_back(L"getForeward");
+	memberFuncsCamera.push_back(EJSFunction::JSCameraGetForward);
+
+
+	projectNativeClass(L"Camera", EJSFunction::JSConstructorCamera, EJSFunction::JSCameraPrototype , memberNamesCamera, memberFuncsCamera);
+}
+
+void EScriptContext::GlobalConsoleBindings()
+{
+	vector<const wchar_t *> memberNames;
+	vector<JsNativeFunction> memberFuncs;
+	memberNames.push_back(L"log");
+	memberFuncs.push_back(EJSFunction::JSLog);
+	projectNativeClassGlobal(L"console", memberNames, memberFuncs);
+}
+
+void EScriptContext::GlobalInputBindings()
+{
+	vector<const wchar_t *> memberNames;
+	vector<JsNativeFunction> memberFuncs;
+	memberNames.push_back(L"getKey");
+	memberFuncs.push_back(EJSFunction::JSKeyDown);
+	memberNames.push_back(L"getScroll");
+	memberFuncs.push_back(EJSFunction::JSScroll);
+	projectNativeClassGlobal(L"input", memberNames, memberFuncs);
+}
+
+void EScriptContext::GloablGameBindings()
+{
+	vector<const wchar_t *> memberNames;
+	vector<JsNativeFunction> memberFuncs;
+	memberNames.push_back(L"RayCast");
+	memberFuncs.push_back(EJSFunction::JSRaycast);
+	memberNames.push_back(L"getActiveCamera");
+	memberFuncs.push_back(EJSFunction::JSGetActiveCam);
+	projectNativeClassGlobal(L"game", memberNames, memberFuncs);
 }

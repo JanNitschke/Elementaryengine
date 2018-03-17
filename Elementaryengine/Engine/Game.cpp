@@ -288,9 +288,9 @@ void Game::LoadScene()
 	}
 }
 
-RaycastHit Game::Raycast(vec3 Start, vec3 End)
+RayCastHit Game::Raycast(vec3 Start, vec3 End)
 {
-	RaycastHit r;
+	RayCastHit r;
 	btCollisionWorld::ClosestRayResultCallback RayCallback(toBullet(Start), toBullet(End));
 	//Perform raycast
 	RayCallback.m_hitNormalWorld;

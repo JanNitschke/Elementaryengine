@@ -8,6 +8,8 @@
 #include <Mesh.h>
 #include <Asset.h>
 #include <UIElement.h>
+#include <RayCastHit.h>
+#include <Camera.h>
 
 namespace EJSFunction {
 
@@ -18,6 +20,8 @@ namespace EJSFunction {
 	extern JsValueRef JSMeshPrototype;
 	extern JsValueRef JSAssetPrototype;
 	extern JsValueRef JSUIPrototype;
+	extern JsValueRef JSRaycastHitPrototype;
+	extern JsValueRef JSCameraPrototype;
 
 	// Javascript to Native object conversion
 	vec3 JSToNativeVec3(JsValueRef jsVec3);
@@ -26,6 +30,8 @@ namespace EJSFunction {
 	Mesh* JSToNativeMesh(JsValueRef jsMesh);
 	Asset* JSToNativeAsset(JsValueRef jsAsset);
 	UIElement* JSToNativeUI(JsValueRef jsUI);
+	RayCastHit* JsToNativeRaycast(JsValueRef jsRaycast);
+	Camera* JSToNativeCamera(JsValueRef jsCamera);
 
 	// Constructors
 	JsValueRef CALLBACK JSConstructorVec3(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
@@ -34,12 +40,30 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSConstructorMesh(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSConstructorAsset(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSConstructorUI(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSConstructorRaycastResult(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSConstructorCamera(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 // member functions
 
 	// Material
 	JsValueRef CALLBACK JSMaterialSetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSMaterialGetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
+	JsValueRef CALLBACK JSMaterialSetAlbedoMap(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSMaterialGetAlbedoMap(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
+	JsValueRef CALLBACK JSMaterialSetAO(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSMaterialGetAO(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
+	JsValueRef CALLBACK JSMaterialSetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSMaterialGetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
+	JsValueRef CALLBACK JSMaterialSetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSMaterialGetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
+	JsValueRef CALLBACK JSMaterialSetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSMaterialGetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
 
 	// Mesh
 	JsValueRef CALLBACK JSMeshAttachTo(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
@@ -51,6 +75,10 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSVec3SetX(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSVec3SetY(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSVec3SetZ(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSVec3Scale(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSVec3Add(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSVec3Normalize(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
 
 	// UIElement
 	JsValueRef CALLBACK JSUIElementSetPositionPc(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
@@ -88,11 +116,21 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSAssetGetMass(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSAssetGetColliderOffsetPos(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSAssetGetColliderOffsetSize(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	
+	// Camera 
+	JsValueRef CALLBACK JSCameraGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSCameraSetPosition(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSCameraGetForward(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
-	JsValueRef CALLBACK LogCB(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	// Global
+	JsValueRef CALLBACK JSLog(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSScroll(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
+	JsValueRef CALLBACK JSKeyDown(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
+	JsValueRef CALLBACK JSRaycast(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
+	JsValueRef CALLBACK JSGetActiveCam(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
 
-	JsValueRef Scroll(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
-	JsValueRef Key(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
-
-
+	// RaycastResult
+	JsValueRef CALLBACK JSRaycastGetHitPos(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
+	JsValueRef CALLBACK JSRaycastGetHitNormal(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
+	JsValueRef CALLBACK JSRaycastGetHitAsset(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
 }

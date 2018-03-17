@@ -39,7 +39,7 @@ void BallDemoMode::Tick(double deltaTime)
 	}
 	vec3 dir = game->activeCam->cameraFront;
 	vec3 pos = game->activeCam->position;
-	RaycastHit r = game->Raycast(pos, pos + dir * 10.0f);
+	RayCastHit r = game->Raycast(pos, pos + dir * 10.0f);
 	vec3 result = r.hitPos;
 	vec3 norm = r.hitNormal;
 
@@ -61,12 +61,12 @@ void BallDemoMode::Tick(double deltaTime)
 		if (norm.y < 0.5f)
 			norm.y = -1.0f;
 	}
-
+		
 	if (norm.z < 0.5f && norm.z > -0.5f) {
 		norm.z = 0;
 	} else {
 		if (norm.z > 0.5f)
-			norm.z = 1.0f;
+ 			norm.z = 1.0f;
 		if (norm.z < 0.5f)
 			norm.z = -1.0f;
 	}

@@ -80,7 +80,7 @@ DllExport void Asset::setPosition(vec3 pos)
 			trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
 		}
 		else {
-			trans.setRotation(btQuaternion(btVector3(q.x, q.y, q.z), q.w));
+			trans.setRotation(btQuaternion());
 		}
 		trans.setOrigin(btVector3(pos.x + collisionPosOffset.x, pos.y + collisionPosOffset.y, pos.z + collisionPosOffset.z));
 		assetRigidBody->setWorldTransform(trans);
@@ -102,7 +102,7 @@ DllExport void Asset::setRotation(quat rot)
 			trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
 		}
 		else {
-			trans.setRotation(btQuaternion(btVector3(q.x, q.y, q.z), q.w));
+			trans.setRotation(btQuaternion());
 		}
 		trans.setOrigin(btVector3(position.x + collisionPosOffset.x, position.y + collisionPosOffset.y, position.z + collisionPosOffset.z));
 		assetRigidBody->setWorldTransform(trans);

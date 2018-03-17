@@ -22,6 +22,12 @@
     <Filter Include="Headerdateien\Interfaces">
       <UniqueIdentifier>{5e833530-0cb9-443b-8ae9-fe37a4651f10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\JavaScript">
+      <UniqueIdentifier>{8697a9cb-b003-4c10-8349-39a190f1b7b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\JavaScript">
+      <UniqueIdentifier>{4caeb8d7-4659-4f10-83ba-16bda2cbdb13}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -78,11 +84,14 @@
     <ClCompile Include="UIElement.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="EScriptContext.cpp">
+    <ClCompile Include="RayCastHit.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="EScriptContext.cpp">
+      <Filter>Quelldateien\JavaScript</Filter>
+    </ClCompile>
     <ClCompile Include="EJSFunctions.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Quelldateien\JavaScript</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,11 +179,14 @@
     <ClInclude Include="UIElement.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="EScriptContext.h">
+    <ClInclude Include="RayCastHit.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="EScriptContext.h">
+      <Filter>Headerdateien\JavaScript</Filter>
+    </ClInclude>
     <ClInclude Include="EJSFunctions.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\JavaScript</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
