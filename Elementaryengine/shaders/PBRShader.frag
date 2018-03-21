@@ -228,7 +228,5 @@ void main(){
 	vec3 am = vec3(0.3) * albedo * ambient;
 
 	outcolor   = am + Lo + rays;  
-	float fragbrightness = (outcolor.x + outcolor.y + outcolor.z) / 3; 	
-	vec4 colCor = vec4(texture(colorCorrection,vec2(0,fragbrightness)));
-	FragColor = vec4(outcolor, 1.0) * colCor * colCor * 5;
+	FragColor = vec4(outcolor * 5, 1.0);
 }

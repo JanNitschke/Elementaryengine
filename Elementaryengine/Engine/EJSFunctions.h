@@ -79,7 +79,6 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSVec3Add(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSVec3Normalize(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
-
 	// UIElement
 	JsValueRef CALLBACK JSUIElementSetPositionPc(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSUIElementSetPositionPx(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);

@@ -2,7 +2,7 @@
 #include "Model.h"
 #include "Game.h"
 #include <Camera.h>
-
+#include <ERender.h>
 JsValueRef EJSFunction::JSVec3Prototype;
 JsValueRef EJSFunction::JSTexturePrototype;
 JsValueRef EJSFunction::JSMaterialPrototype;
@@ -101,7 +101,7 @@ JsValueRef EJSFunction::JSConstructorTexture(JsValueRef callee, bool isConstruct
 	JsValueType type;
 	JsGetValueType(arguments[1], &type);
 	if (type == JsBoolean) {
-		texture = new Texture("");
+		texture = new Texture();
 	}else if(type == JsString) {
 		const wchar_t path = L't';
 		const wchar_t* p = &path;
@@ -115,7 +115,7 @@ JsValueRef EJSFunction::JSConstructorTexture(JsValueRef callee, bool isConstruct
 
 		wstring ws(p);
 		string str(ws.begin(), ws.end());
-		texture = new Texture(str.c_str(), true);
+		texture = Game::Instance().loadTexture(str.c_str());
 	}
 
 	JsCreateExternalObject(texture, nullptr, &output);
@@ -258,8 +258,8 @@ JsValueRef EJSFunction::JSConstructorUI(JsValueRef callee, bool isConstructCall,
 		ele->posisionPercent = vec2(0);
 		ele->positionPixel = vec2(0);
 		ele->backgoundBlur = 0;
-		ele->texture = new Texture("");
-		ele->alphamap = new Texture("");;
+		ele->texture = new Texture();
+		ele->alphamap = new Texture();;
 		ele->zindex = 0;
 	}
 

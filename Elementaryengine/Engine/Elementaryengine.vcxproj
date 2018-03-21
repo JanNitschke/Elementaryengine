@@ -177,7 +177,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EJSFunctions.cpp" />
     <ClCompile Include="EOpenGl.cpp" />
-    <ClCompile Include="ERender.cpp" />
+    <ClCompile Include="ERasterizer.cpp" />
     <ClCompile Include="EScriptContext.cpp" />
     <ClCompile Include="FPCam.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -212,6 +212,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EJSFunctions.h" />
     <ClInclude Include="EOpenGl.h" />
+    <ClInclude Include="ERasterizer.h" />
     <ClInclude Include="ERender.h" />
     <ClInclude Include="EEngine.h" />
     <ClInclude Include="EScriptContext.h" />

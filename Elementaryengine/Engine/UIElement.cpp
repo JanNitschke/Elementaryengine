@@ -4,7 +4,7 @@
 
 UIElement::UIElement()
 {
-	texture = new Texture("");
+	texture = new Texture();
 	Game::uiElements.push_back(this);
 }
 

@@ -1,4 +1,4 @@
-#include "ERender.h"
+#include "ERasterizer.h"
 #include "Game.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -6,12 +6,83 @@
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
 
-void ERender::SetupRender()
+#include <stb_image.h>
+#include <stb_image_resize.h>
+
+ERasterizer::ERasterizer()
 {
 
 }
 
-void ERender::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl)
+
+ERasterizer::~ERasterizer()
+{
+
+}
+
+void ERasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
+{
+	glGenTextures(1, &eOpenGl->shadowMaps);
+	glGenFramebuffers(1, &eOpenGl->lBuffer);
+	glGenTextures(1, &eOpenGl->frameOut);
+
+	glGenTextures(1, &Game::eOpenGl->textureArray);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, Game::eOpenGl->textureArray);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGB8, TextureSize, TextureSize, TextureCount);
+	//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB, Game::TextureSize, Game::TextureSize, TextureCount,0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	for (int i = 0; i < TextureCount; i++)
+	{
+		eOpenGl->freeLayers.push_back(i);
+	}
+	loadTexture("Assets/Textures/empty.jpg");
+	// Setup Render buffers for mdei
+	glGenVertexArrays(1, &eOpenGl->vao);
+	glGenBuffers(1, &eOpenGl->gElementBuffer);
+	glGenBuffers(1, &eOpenGl->gIndirectBuffer);
+	glGenBuffers(1, &eOpenGl->gVertexBuffer);
+
+
+}
+
+Texture* ERasterizer::loadTexture(const char * path)
+{
+	Texture* tex = new Texture();
+	if (!Game::isServer) {
+		int width, height, nrChannels;
+		int size = 1024;
+		unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
+		//unsigned char *fdata;
+		//stbir_resize_uint8(data, width, height, 0, fdata, size, size, 0, nrChannels);
+		if (width != size || height != size) {
+			cout << "Invalid Texture size\n";
+			return nullptr;
+		}
+		tex->layer = 10000;
+		for each (int i in Game::eOpenGl->freeLayers)
+		{
+			if (i < tex->layer) {
+				tex->layer = i;
+			}
+		}
+		glBindTexture(GL_TEXTURE_2D_ARRAY, Game::eOpenGl->textureArray);
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, tex->layer, size, size, 1, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+		Game::eOpenGl->freeLayers.erase(std::remove(Game::eOpenGl->freeLayers.begin(), Game::eOpenGl->freeLayers.end(), tex->layer), Game::eOpenGl->freeLayers.end());
+
+		stbi_image_free(data);
+	}
+	return tex;
+}
+
+
+void ERasterizer::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl)
 {
 	// see if new mesh is loaded or new asset is created
 	if (meshChanged || assetsChanged) {
@@ -113,7 +184,7 @@ void ERender::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl
 	}
 }
 
-void ERender::BuildUI(EOpenGl * eOpenGl)
+void ERasterizer::BuildUI(EOpenGl * eOpenGl)
 {
 	eOpenGl->ERUIElements.clear();
 	eOpenGl->ERUIElements.resize(0);
@@ -141,11 +212,11 @@ void ERender::BuildUI(EOpenGl * eOpenGl)
 
 }
 
-void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)	
+void ERasterizer::BuildDrawAtrib(EOpenGl * eOpenGl)
 {
 	// create a vector for the draw Atributes
 	vector<DrawMeshAtributes> drawAtrib;
-	
+
 
 	for each (Mesh* m in Game::meshs) {
 		int lastoffset = eOpenGl->drawInstanceOffset.back();
@@ -161,7 +232,7 @@ void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)
 			model = translate(model, as->position + m->posOffset);
 			model = glm::scale(model, as->scale + m->scaleOffset);
 			a.Model = model;
-			
+
 			// set rotation atribute
 			a.Rot = glm::toMat4(as->q);
 
@@ -174,7 +245,7 @@ void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)
 			a.metallicTex = mat->metallicMap->layer;
 			a.roughnessTex = mat->roughnessMap->layer;
 			a.albedoTex = mat->albedoMap->layer;
-			
+
 			// add the atribute to the atrubute vector
 			drawAtrib.push_back(a);
 		}
@@ -187,12 +258,12 @@ void ERender::BuildDrawAtrib(EOpenGl * eOpenGl)
 
 }
 
-void ERender::RenderShadowMaps(EOpenGl * eOpenGl)
+void ERasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
 {
 	// use the lightmap shader
 	Shader* shader = Mesh::lightmapShader;
 	shader->use();
-	
+
 	// get the number of lights in a scene
 	int lightcount = Game::lamps.size();
 
@@ -200,7 +271,7 @@ void ERender::RenderShadowMaps(EOpenGl * eOpenGl)
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, eOpenGl->shadowMaps);
 
 	// setup the texture array to resize to fit all the lights in the scene
-	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT32, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT, 6 * lightcount, 0, GL_DEPTH_COMPONENT	, GL_FLOAT, NULL);
+	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT32, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT, 6 * lightcount, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -283,9 +354,26 @@ void ERender::RenderShadowMaps(EOpenGl * eOpenGl)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection)
+void ERasterizer::SetupFrame(bool assetsChanged, bool meshChanged, EOpenGl * eOpenGl)
 {
-// geometry pass
+	BuildMeshes(assetsChanged, meshChanged, eOpenGl);
+	BuildDrawAtrib(eOpenGl);
+
+}
+
+void ERasterizer::RenderFrame(EOpenGl * eOpenGl, EDisplaySettings * displaySettings, mat4 View, mat4 Projection)
+{
+	RenderShadowMaps(eOpenGl);
+	RenderFrameMain(eOpenGl, displaySettings,View,Projection);
+}
+
+void ERasterizer::RenderFX(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
+{
+}
+
+void ERasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection)
+{
+	// geometry pass
 
 	// bind and setup framebuffer for geometry pass
 	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->gBuffer);
@@ -303,7 +391,7 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 	Mesh::geometryShader->use();
 
 	// copy View Projection Matrix to GPU
-	if (eOpenGl->geometryUniformVP < 0){
+	if (eOpenGl->geometryUniformVP < 0) {
 		eOpenGl->geometryUniformVP = glGetUniformLocation(Mesh::geometryShader->ID, "VP");
 	}
 	Mesh::geometryShader->setMat4f(eOpenGl->geometryUniformVP, Projection * View);
@@ -329,7 +417,7 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 		0);
 
 
-// lighting pass	
+	// lighting pass	
 	// bind and setup framebuffer for lighting pass
 	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->lBuffer);
 	glBindTexture(GL_TEXTURE_2D, eOpenGl->frameOut);
@@ -384,14 +472,6 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 	}
 	shader->setFloat(eOpenGl->lightingUniformFar_plane, 25);
 
-	// bind ColorCorrection texture and set its uniform
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, Mesh::colorCorrection->id);
-	if (eOpenGl->lightingUniformColorCorrection < 0) {
-		eOpenGl->lightingUniformColorCorrection = glGetUniformLocation(Mesh::pbrShader->ID, "colorCorrection");
-	}
-	shader->setInt(eOpenGl->lightingUniformColorCorrection, 4);
-
 	// bind depth texture and set its uniform
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, eOpenGl->gDepth);
@@ -418,14 +498,11 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 	}
 	shader->set3Float(eOpenGl->lightingUniformViewPos, Game::activeCam->position);
 
-
-
-
-	SetupLamps(eOpenGl,shader);
+	SetupLamps(eOpenGl, shader);
 
 	eOpenGl->renderQuad();
 
-//post fx (ssr) 
+	//post fx (ssr) 
 	glBlitFramebuffer(0, 0, displaySettings->windowWidth, displaySettings->windowHeight, 0, 0, displaySettings->windowWidth, displaySettings->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -495,7 +572,7 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 		eOpenGl->ssrUniformViewPos = glGetUniformLocation(shader->ID, "viewPos");
 	}
 	shader->set3Float(eOpenGl->ssrUniformViewPos, Game::activeCam->position);
-	
+
 	// set view inverse unform
 	if (eOpenGl->ssrUniformInvView < 0) {
 		eOpenGl->ssrUniformInvView = glGetUniformLocation(shader->ID, "invView");
@@ -552,11 +629,11 @@ void ERender::RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, m
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, eOpenGl->gBuffer);
 
 	// write to default framebuffer
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); 
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 }
 
-void ERender::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
+void ERasterizer::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 {
 	// create vectors for light colors and positions
 	vector<vec4> lightColors;
@@ -595,7 +672,7 @@ void ERender::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 	glBufferData(GL_SHADER_STORAGE_BUFFER, lps, lightPositions.data(), GL_DYNAMIC_DRAW);
 }
 
-void ERender::RenderUI(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
+void ERasterizer::RenderUI(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -606,3 +683,4 @@ void ERender::RenderUI(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 	glDisable(GL_BLEND);
 
 }
+

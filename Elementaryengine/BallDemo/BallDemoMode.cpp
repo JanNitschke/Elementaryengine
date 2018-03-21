@@ -136,24 +136,24 @@ void BallDemoMode::Load()
 
 	PBRMaterial* pbrwood = new PBRMaterial();
 	pbrwood->albedo = vec3(1);
-	pbrwood->albedoMap = new Texture("Assets/Textures/Wood.jpg",true);
+	pbrwood->albedoMap = game->loadTexture("Assets/Textures/Wood.jpg");
 	pbrwood->ao = vec3(0.01f);
 	pbrwood->metallic = 0;
 	pbrwood->roughness = 0.4f;
-	pbrwood->roughnessMap = new Texture("Assets/Textures/WoodSpec.jpg",true);
+	pbrwood->roughnessMap = game->loadTexture("Assets/Textures/WoodSpec.jpg");
 	pbrwood->TextureScale = vec2(1.0f);
 
 
 	PBRMaterial* twood = new PBRMaterial();
 	twood->albedo = vec3(1);
-	twood->albedoMap = new Texture("Assets/Textures/tt.jpg", true);
+	twood->albedoMap = game->loadTexture("Assets/Textures/tt.jpg");
 	twood->ao = vec3(0.01f);
 	twood->metallic = 0;
 	twood->roughness = 3.0f;
-	twood->roughnessMap = new Texture("Assets/Textures/ttr.jpg", true);
+	twood->roughnessMap = game->loadTexture("Assets/Textures/ttr.jpg");
 	twood->TextureScale = vec2(1.0f);
 
-	Texture* plaster = new Texture("Assets/Textures/Plaster.jpg", true);
+	Texture* plaster = game->loadTexture("Assets/Textures/Plaster.jpg");
 
 	PBRMaterial* floor = new PBRMaterial();
 	floor->albedo = vec3(1);

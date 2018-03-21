@@ -186,11 +186,12 @@ void Asset::Destroy()
 
 void Asset::setHeightmapCollision(const char * path)
 {
-	int width, height, nrChannels;
+	// TODO: redo for new Renderer
+	/*int width, height, nrChannels;
 	unsigned char* data = Texture::LoadPicture(path);
 	btAssetShape = new btHeightfieldTerrainShape(512, 512, data, scale.y, 2, false, false);
 	btAssetShape = new btHeightfieldTerrainShape(512, 512, data,1,0,1,1,PHY_ScalarType::PHY_FLOAT,false);
 
-	assetRigidBody->setCollisionShape(btAssetShape);
+	assetRigidBody->setCollisionShape(btAssetShape);*/
 }
 

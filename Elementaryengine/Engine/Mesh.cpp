@@ -30,8 +30,6 @@ Shader* Mesh::grassShader;
 Shader* Mesh::ssrShader;
 Shader* Mesh::uiShader;
 
-Texture* Mesh::colorCorrection;
-
 Mesh::Mesh()
 {
 }
@@ -70,7 +68,6 @@ void Mesh::SetupMeshComp()
 	//terrainShader = new Shader("..\\shaders\\TerrainShader.vert", "..\\shaders\\TerrainShader.geom", "..\\shaders\\PBRShader.frag");
 	//terrainLightmapShader = new Shader("..\\shaders\\TerrainLightmapShader.vert", "..\\shaders\\LightmapShader.geom", "..\\shaders\\LightmapShader.frag");
 	//terrainEnvShader = new Shader("..\\shaders\\TerrainEnvShader.vert", "..\\shaders\\TerrainEnvShader.geom", "..\\shaders\\PBRShader.frag");
-	colorCorrection = new Texture("Assets/Textures/colorCorrection.jpg");
 }
 
 void Mesh::SetupMesh()

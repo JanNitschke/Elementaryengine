@@ -50,11 +50,11 @@ void AstroidDemo::Load()
 
 	PBRMaterial* astroidMat = new PBRMaterial();
 	astroidMat->albedo = vec3(1);
-	astroidMat->albedoMap = new Texture("Assets/Textures/Plaster.jpg", true);
+	astroidMat->albedoMap = game->loadTexture("Assets/Textures/Plaster.jpg");
 	astroidMat->ao = vec3(0.01f);
 	astroidMat->metallic = 0;
 	astroidMat->roughness = 1.0f;
-	astroidMat->roughnessMap = new Texture("Assets/Textures/PlasterR.jpg", true);
+	astroidMat->roughnessMap = game->loadTexture("Assets/Textures/PlasterR.jpg");
 	astroidMat->TextureScale = vec2(1.0f);
 
 	AstroidModels.push_back(new Model("Assets/Meshs/Astroid1.obj"));

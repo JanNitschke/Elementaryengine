@@ -16,11 +16,11 @@ void Material::SetMat()
 
 PBRMaterial::PBRMaterial()
 {
-	albedoMap = new Texture("");
-	roughnessMap = new Texture("");
-	metallicMap = new Texture("");
-	normalMap = new Texture("");
-	aoMap = new Texture("");
+	albedoMap = new Texture();
+	roughnessMap = new Texture();
+	metallicMap = new Texture();
+	normalMap = new Texture();
+	aoMap = new Texture();
 	albedo = vec3(1);
 	roughness = 0.5;
 	metallic = 0;
@@ -37,10 +37,10 @@ void PBRMaterial::SetMat()
 
 DefaultMaterial::DefaultMaterial()
 {
-	ambientMap = new Texture("empty.jpg");
-	diffuseMap = new Texture("empty.jpg");
-	specularMap = new Texture("empty.jpg");
-	normalMap = new Texture("empty.jpg");
+	ambientMap = new Texture();
+	diffuseMap = new Texture();
+	specularMap = new Texture();
+	normalMap = new Texture();
 	ambient = vec3(0);
 	specular = vec3(1);
 	diffuse = vec3(1);

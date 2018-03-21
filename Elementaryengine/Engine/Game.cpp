@@ -15,6 +15,7 @@ using namespace std;
 #include <glm\gtx\quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <ERender.h>
+#include <ERasterizer.h>
 
 //#include <enet\enet.h>
 
@@ -30,13 +31,17 @@ void Game::setIsServer(bool set)
 	isServer = set;
 }
 
+Texture * Game::loadTexture(const char * path)
+{
+	return renderer->loadTexture(path);
+}
+
 void Game::SetActiveCam(Camera * camera)
 {
 	Game::activeCam = camera;
 }
 
-const unsigned int Game::TextureSize = 1024;
-const unsigned int Game::TextureCount = 64;
+
 bool Game::requireServer = false;
 bool Game::isServer = false;
 bool Game::physicsFinished = false;
@@ -58,6 +63,7 @@ bool Game::assetsChanged = true;
 vector<UIElement*> Game::uiElements;
 vec2 Game::scroll;
 bool Game::scrolledThisFrame = false;
+ERenderer* Game::renderer;
 
 // start the game and run the main loop
 void Game::Start()
@@ -65,7 +71,7 @@ void Game::Start()
 	displaySettings->windowname = name;
 	
 	eOpenGl->Initialise(displaySettings);
-
+	renderer = new ERasterizer();
 
 	eScriptContext = new EScriptContext();
 
@@ -82,39 +88,14 @@ void Game::Start()
 	system("cls");
 
 	// Setup components (shaders, textures etc.)
-	gameMode->window = eOpenGl->window;
 
 	Mesh::SetupMeshComp();
 	Lamp::SetupLampComp();
 	Asset::SetupAsset();
 
-	glGenTextures(1, &eOpenGl->shadowMaps);
-	glGenFramebuffers(1, &eOpenGl->lBuffer);
-	glGenTextures(1, &eOpenGl->frameOut);
+	renderer->Setup(eOpenGl,displaySettings);
 
-	glGenTextures(1, &Game::eOpenGl->textureArray);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, Game::eOpenGl->textureArray);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGB8, TextureSize, TextureSize, TextureCount);
-	//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB, Game::TextureSize, Game::TextureSize, TextureCount,0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-
-
-	for (int i = 0; i < TextureCount; i++)
-	{
-		eOpenGl->freeLayers.push_back(i);
-	}
-	new Texture("Assets/Textures/empty.jpg", true);
-	// Setup Render buffers for mdei
-	glGenVertexArrays(1, &eOpenGl->vao);
-	glGenBuffers(1, &eOpenGl->gElementBuffer);
-	glGenBuffers(1, &eOpenGl->gIndirectBuffer);
-	glGenBuffers(1, &eOpenGl->gVertexBuffer);
+	gameMode->window = eOpenGl->window;
 
 	LoadScene();
 	eScriptContext->ReadScript(L"main.js");
@@ -127,7 +108,6 @@ void Game::Start()
 
 	// projection for voxelisation NOT USED ATM
 	VoxelProj = glm::ortho(-64.0f,64.0f,-64.0f,64.0f,-64.0f,64.0f); // In world coordinates
-
 
 	loop();
 
@@ -203,11 +183,7 @@ void Game::loop()
 		nextAssets.shrink_to_fit();
 
 		if (!isServer) {
-			SetupRender();
-			RenderShadowMaps();
 			Render();
-			//RenderHUD();
-			//RenderUI();
 
 			// Swap buffers
 			glfwSwapBuffers(eOpenGl->window);
@@ -241,10 +217,9 @@ void Game::SetupRender()
 {
 	// rebuild the render Mesh and / or renderCommandQueue if needed
 	//ERender::BuildMeshes(assetsChanged, meshChanged, eOpenGl);
-	ERender::BuildMeshes(assetsChanged, meshChanged, eOpenGl);
 
 	// rebuild the List of draw atributes
-	ERender::BuildDrawAtrib(eOpenGl);
+	//ERender::BuildDrawAtrib(eOpenGl);
 
 	// reset the Variables used to notify about new changes
 	assetsChanged = false;
@@ -253,18 +228,12 @@ void Game::SetupRender()
 
 void Game::Render()
 {
+
+	renderer->SetupFrame(assetsChanged, meshChanged, eOpenGl);
+	renderer->RenderFrame(eOpenGl, displaySettings, View, Projection);
+	renderer->RenderFX(eOpenGl,displaySettings);
 	// render the frame using ElementaryRenderer
-	ERender::RenderFrame(eOpenGl, displaySettings, View, Projection);
-}
-
-void Game::RenderShadowMaps()
-{
-	ERender::RenderShadowMaps(eOpenGl);
-}
-
-void Game::RenderUI()
-{
-	ERender::RenderShadowMaps(eOpenGl);
+	//ERender::RenderFrame(eOpenGl, displaySettings, View, Projection);
 }
 
 void Game::processInput(GLFWwindow * window)

@@ -78,9 +78,6 @@
     <ClCompile Include="OldRenderCode.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="ERender.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="UIElement.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -92,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="EJSFunctions.cpp">
       <Filter>Quelldateien\JavaScript</Filter>
+    </ClCompile>
+    <ClCompile Include="ERasterizer.cpp">
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -187,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="EJSFunctions.h">
       <Filter>Headerdateien\JavaScript</Filter>
+    </ClInclude>
+    <ClInclude Include="ERasterizer.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

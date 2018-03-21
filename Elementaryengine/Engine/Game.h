@@ -18,7 +18,7 @@
 class GameMode;
 #include <GameMode.h>
 using namespace glm;
-
+class ERenderer;
 
 class DllExport Game
 {
@@ -34,9 +34,6 @@ public:
 	~Game();
 	static bool shouldClose;
 	static bool physicsFinished;
-
-	static const unsigned int TextureSize;
-	static const unsigned int TextureCount;
 
 	///<summary>
 	/// Opengl functions
@@ -72,6 +69,9 @@ public:
 	///</summary> 
 	static bool requireServer;
 
+	static ERenderer* renderer;
+
+	Texture* loadTexture(const char* path);
 
 	///<summary>
 	///The active camera
@@ -176,12 +176,6 @@ public:
 	///</summary> 
 	void SetupRender();
 
-	///<summary>
-	///Renders the shadow maps of all lights
-	///</summary> 
-	void RenderShadowMaps();
-
-	void RenderUI();
 
 	///<summary>
 	///Handles the input of the window and passes it to the active Gamemode.
@@ -258,8 +252,6 @@ private:
 	///<summary>
 	///Private constructor. Use shared_instance() to get the instance. Only one instance can exist simultaneously
 	///</summary> 
-	Game() {}
-
 
 	static vec2 scroll;
 	static bool scrolledThisFrame;
