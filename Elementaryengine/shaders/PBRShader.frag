@@ -3,7 +3,7 @@
 
 #define near 0.1
 #define far 100
-#define vlSampleCount 60
+#define vlSampleCount 120
 #define vlMax 0.7
 layout (location = 0) out vec4 FragColor;
 
@@ -74,7 +74,7 @@ float lightVolume(vec3 lightPos, int index,float depth){
 		float currentDepthToLight = length(posToLight);
 		dfp += stepLength;
 
-		float attenuation = 1.0 / (currentDepthToLight);
+		float attenuation = 1.0 / (currentDepthToLight) * (currentDepthToLight);
 		if(attenuation > 0.2){
 			float cDepth = texture(shadowMaps, vec4(posToLight, index),(currentDepthToLight - bias)	/ far_plane).r;
 			strength += ((cDepth / dfp) + cDepth) * attenuation;
@@ -223,7 +223,7 @@ void main(){
 		float lr = lightVolume(LightPositions[i],i,liniarDepth);
       
 		Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;
-		rays += LightColors[i] * lr * 0.003;
+		rays += LightColors[i] * lr * 0.001;
 	}   
 	vec3 am = vec3(0.3) * albedo * ambient;
 

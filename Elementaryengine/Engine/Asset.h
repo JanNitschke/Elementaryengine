@@ -54,8 +54,17 @@ public:
 	static const unsigned int ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT;
 	static unsigned int envMapFBO;
 	static void SetupAsset();
+	
+	typedef void(*AssetCallback)(Asset* asset);
+
+	static AssetCallback rendererAssetCreatedCallback;
+	static AssetCallback rendererAssetChangedCallback;
+	static AssetCallback rendererAssetDestroyedCallback;
+
 	void Destroy();
 	quat q;
+
+	int renderPos;
 
 	DllExport void setHeightmapCollision(const char* path);
 private:

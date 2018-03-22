@@ -10,11 +10,11 @@
 #include <windows.h>
 #include "UIElement.h"
 
-
 class ERenderer
 {
 public:
-	virtual void SetupFrame(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl) = 0;
+
+	virtual void SetupFrame(bool meshChanged, EOpenGl* eOpenGl) = 0;
 	virtual void RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection) = 0;
 	virtual void RenderFX(EOpenGl* eOpenGl, EDisplaySettings* displaySettings) = 0;
 	virtual void Setup(EOpenGl* eOpenGl, EDisplaySettings* displaySettings) = 0;

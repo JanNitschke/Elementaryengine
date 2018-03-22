@@ -59,7 +59,6 @@ bool Game::simulatePhysics = true;
 double Game::physicsFps;
 EOpenGl* Game::eOpenGl = new EOpenGl();
 bool Game::meshChanged = true;
-bool Game::assetsChanged = true;
 vector<UIElement*> Game::uiElements;
 vec2 Game::scroll;
 bool Game::scrolledThisFrame = false;
@@ -71,7 +70,6 @@ void Game::Start()
 	displaySettings->windowname = name;
 	
 	eOpenGl->Initialise(displaySettings);
-	renderer = new ERasterizer();
 
 	eScriptContext = new EScriptContext();
 
@@ -156,7 +154,7 @@ void Game::loop()
 		currentTime = glfwGetTime();
 		deltaTime = currentTime - oldTime;
 		smoothFps = (9 * smoothFps / 10) + (.1 / deltaTime);
-		printf(" \r fps smooth: %i loaded Assets: %i accurate: %f physics: %f ", (int)(smoothFps + .5), (int)assets.size(), 1 / deltaTime, Game::physicsFps);
+		printf(" \r fps smooth: %i loaded Assets: %i accurate: %f physics: %f", (int)(smoothFps + .5), (int)assets.size(), 1 / deltaTime, Game::physicsFps);
 		if (!isServer) {
 			processInput(eOpenGl->window);
 		}
@@ -177,6 +175,7 @@ void Game::loop()
 		for each (Asset* a in assetsToDelete)
 		{
 			nextAssets.erase(std::remove(Game::nextAssets.begin(), Game::nextAssets.end(), a), Game::nextAssets.end());
+			Asset::rendererAssetChangedCallback(a);
 			delete a;
 		}
 		assetsToDelete.clear();
@@ -212,28 +211,14 @@ void Game::setLight(vec3 color, vec3 direction)
 	directionalLightColor = color;
 	directionalLightDirection = direction;
 }
-
-void Game::SetupRender()
-{
-	// rebuild the render Mesh and / or renderCommandQueue if needed
-	//ERender::BuildMeshes(assetsChanged, meshChanged, eOpenGl);
-
-	// rebuild the List of draw atributes
-	//ERender::BuildDrawAtrib(eOpenGl);
-
-	// reset the Variables used to notify about new changes
-	assetsChanged = false;
-	meshChanged = false;
-}
-
 void Game::Render()
 {
 
-	renderer->SetupFrame(assetsChanged, meshChanged, eOpenGl);
+	renderer->SetupFrame(meshChanged, eOpenGl);
 	renderer->RenderFrame(eOpenGl, displaySettings, View, Projection);
 	renderer->RenderFX(eOpenGl,displaySettings);
-	// render the frame using ElementaryRenderer
-	//ERender::RenderFrame(eOpenGl, displaySettings, View, Projection);
+
+	meshChanged = false;
 }
 
 void Game::processInput(GLFWwindow * window)

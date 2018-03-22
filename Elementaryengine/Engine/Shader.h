@@ -18,6 +18,7 @@ public:
 	// constructor reads and builds the shader
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
 	Shader(const GLchar* vertexPath, const GLchar* geompath, const GLchar* fragmentPath);
+	Shader(const GLchar* computePath);
 
 	// use/activate the shader
 	void use();

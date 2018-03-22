@@ -150,6 +150,47 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * geompath, const GLchar 
 
 }
 
+Shader::Shader(const GLchar * computePath)
+{
+	// 1. retrieve the vertex/fragment source code from filePath
+	std::string code;
+	std::ifstream shaderFile;
+	// ensure ifstream objects can throw exceptions:
+	shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	try
+	{
+		// open files
+		shaderFile.open(computePath);
+		std::stringstream shaderStream;
+		// read file's buffer contents into streams
+		shaderStream << shaderFile.rdbuf();
+		// close file handlers
+		shaderFile.close();
+		// convert stream into string
+		code = shaderStream.str();
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+	}
+	const char * shaderCode = code.c_str();
+	// 2. compile shaders
+	unsigned int compute;
+	// vertex shader
+	compute = glCreateShader(GL_COMPUTE_SHADER);
+	glShaderSource(compute, 1, &shaderCode, NULL);
+	glCompileShader(compute);
+	checkCompileErrors(compute, "COMPUTE");
+
+	// shader Program
+	ID = glCreateProgram();
+	glAttachShader(ID, compute);
+	glLinkProgram(ID);
+	checkCompileErrors(ID, "PROGRAM");
+	// delete the shaders as they're linked into our program now and no longer necessary
+	glDeleteShader(compute);
+}
+
 
 void Shader::checkCompileErrors(unsigned int shader, std::string type)
 {

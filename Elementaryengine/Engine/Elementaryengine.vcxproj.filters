@@ -28,60 +28,27 @@
     <Filter Include="Quelldateien\JavaScript">
       <UniqueIdentifier>{4caeb8d7-4659-4f10-83ba-16bda2cbdb13}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\Renderers">
+      <UniqueIdentifier>{92edc6be-4d2e-42fd-9b26-67f5e02c869a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Renderers">
+      <UniqueIdentifier>{6dced54d-063b-482e-98c4-16ae176db60a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Engine">
+      <UniqueIdentifier>{62ba65b3-ee4e-4808-bafd-323149053ae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Asset">
+      <UniqueIdentifier>{d3df4d35-dff8-4330-bcba-905347cfbe6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Asset">
+      <UniqueIdentifier>{b0c2efff-566e-4b09-b61d-411498b3f85d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Asset.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetComponent.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Import.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="FPCam.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Lamp.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Terrain.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="EOpenGl.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="OldRenderCode.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="UIElement.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="RayCastHit.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="EScriptContext.cpp">
@@ -91,7 +58,52 @@
       <Filter>Quelldateien\JavaScript</Filter>
     </ClCompile>
     <ClCompile Include="ERasterizer.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Quelldateien\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="EOpenGl.cpp">
+      <Filter>Quelldateien\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="Asset.cpp">
+      <Filter>Quelldateien\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetComponent.cpp">
+      <Filter>Quelldateien\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Quelldateien\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="FPCam.cpp">
+      <Filter>Quelldateien\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Quelldateien\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Lamp.cpp">
+      <Filter>Quelldateien\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Quelldateien\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Quelldateien\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Quelldateien\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Quelldateien\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="UIElement.cpp">
+      <Filter>Quelldateien\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Quelldateien\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Quelldateien\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="ERaytracer.cpp">
+      <Filter>Quelldateien\Renderers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,67 +131,16 @@
     <None Include="ENetX64.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Import.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Asset.h">
-      <Filter>Headerdateien\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="AssetComponent.h">
-      <Filter>Headerdateien\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Headerdateien\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Headerdateien\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="FPCam.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Lamp.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="GameMode.h">
       <Filter>Headerdateien\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="Terrain.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="EOpenGl.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="stb_image_resize.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="ERender.h">
-      <Filter>Headerdateien\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="EEngine.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="UIElement.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="RayCastHit.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="EScriptContext.h">
@@ -188,8 +149,59 @@
     <ClInclude Include="EJSFunctions.h">
       <Filter>Headerdateien\JavaScript</Filter>
     </ClInclude>
+    <ClInclude Include="EOpenGl.h">
+      <Filter>Headerdateien\Renderers</Filter>
+    </ClInclude>
     <ClInclude Include="ERasterizer.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="ERender.h">
+      <Filter>Headerdateien\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="EEngine.h">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset.h">
+      <Filter>Headerdateien\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetComponent.h">
+      <Filter>Headerdateien\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="FPCam.h">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Lamp.h">
+      <Filter>Headerdateien\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Headerdateien\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Headerdateien\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Headerdateien\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Headerdateien\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Headerdateien\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="RayCastHit.h">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="UIElement.h">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ERaytracer.h">
+      <Filter>Headerdateien\Renderers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

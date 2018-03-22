@@ -9,6 +9,10 @@
 #include <stb_image.h>
 #include <stb_image_resize.h>
 
+
+bool ERasterizer::assetCreated = true;
+bool ERasterizer::assetChanged = true;
+
 ERasterizer::ERasterizer()
 {
 
@@ -48,6 +52,9 @@ void ERasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 	glGenBuffers(1, &eOpenGl->gIndirectBuffer);
 	glGenBuffers(1, &eOpenGl->gVertexBuffer);
 
+	Asset::rendererAssetCreatedCallback = &AssetCreatedCallback;
+	Asset::rendererAssetChangedCallback = &AssetChangedCallback;
+	Asset::rendererAssetDestroyedCallback = &AssetDestroyedCallback;
 
 }
 
@@ -79,6 +86,28 @@ Texture* ERasterizer::loadTexture(const char * path)
 		stbi_image_free(data);
 	}
 	return tex;
+}
+
+void ERasterizer::AssetCreatedCallback(Asset * asset)
+{
+	assetCreated = true;
+}
+
+void ERasterizer::AssetChangedCallback(Asset * asset)
+{
+	bool c = false;
+	for each (AssetComponent* com in asset->components)
+	{
+		if (Mesh* m = static_cast<Mesh*>(com)){
+			c = true;
+		}
+	}
+	if(c)assetChanged = true;
+}
+
+void ERasterizer::AssetDestroyedCallback(Asset * asset)
+{
+	assetCreated = true;
 }
 
 
@@ -214,48 +243,48 @@ void ERasterizer::BuildUI(EOpenGl * eOpenGl)
 
 void ERasterizer::BuildDrawAtrib(EOpenGl * eOpenGl)
 {
-	// create a vector for the draw Atributes
-	vector<DrawMeshAtributes> drawAtrib;
+	if (assetChanged || assetCreated) {
+		// create a vector for the draw Atributes
+		int i = 0;
+		vector<DrawMeshAtributes> drawAtrib;
+		for each (Mesh* m in Game::meshs) {
+			int lastoffset = eOpenGl->drawInstanceOffset.back();
+		
+			for each(Asset* as in m->parents) {
+				// create a new atribute
+				DrawMeshAtributes a = DrawMeshAtributes();
 
+				// calculate model matrix and add it to the draw atribute
+				mat4 model = mat4(1.0f);
+				model = translate(model, as->position + m->posOffset);
+				model = glm::scale(model, as->scale + m->scaleOffset);
+				a.Model = model;
 
-	for each (Mesh* m in Game::meshs) {
-		int lastoffset = eOpenGl->drawInstanceOffset.back();
+				// set rotation atribute
+				a.Rot = glm::toMat4(as->q);
 
+				// set all material parameters
+				PBRMaterial* mat = dynamic_cast<PBRMaterial*>(m->material);
+				a.albedo = mat->albedo;
+				a.ao = mat->ao;
+				a.roughness = mat->roughness;
+				a.metallic = mat->metallic;
+				a.metallicTex = mat->metallicMap->layer;
+				a.roughnessTex = mat->roughnessMap->layer;
+				a.albedoTex = mat->albedoMap->layer;
 
-
-		for each(Asset* as in m->parents) {
-			// create a new atribute
-			DrawMeshAtributes a = DrawMeshAtributes();
-
-			// calculate model matrix and add it to the draw atribute
-			mat4 model = mat4(1.0f);
-			model = translate(model, as->position + m->posOffset);
-			model = glm::scale(model, as->scale + m->scaleOffset);
-			a.Model = model;
-
-			// set rotation atribute
-			a.Rot = glm::toMat4(as->q);
-
-			// set all material parameters
-			PBRMaterial* mat = dynamic_cast<PBRMaterial*>(m->material);
-			a.albedo = mat->albedo;
-			a.ao = mat->ao;
-			a.roughness = mat->roughness;
-			a.metallic = mat->metallic;
-			a.metallicTex = mat->metallicMap->layer;
-			a.roughnessTex = mat->roughnessMap->layer;
-			a.albedoTex = mat->albedoMap->layer;
-
-			// add the atribute to the atrubute vector
-			drawAtrib.push_back(a);
+				// add the atribute to the atrubute vector
+				drawAtrib.push_back(a);
+				as->renderPos = i;
+				i++;
+			}
 		}
+
+		// copy the atribute vector to the GPU
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, eOpenGl->meshDataSSBO);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawMeshAtributes) * drawAtrib.size(), drawAtrib.data(), GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
-
-	// copy the atribute vector to the GPU
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, eOpenGl->meshDataSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawMeshAtributes) * drawAtrib.size(), drawAtrib.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
 }
 
 void ERasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
@@ -354,17 +383,18 @@ void ERasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ERasterizer::SetupFrame(bool assetsChanged, bool meshChanged, EOpenGl * eOpenGl)
+void ERasterizer::SetupFrame(bool meshChanged, EOpenGl * eOpenGl)
 {
-	BuildMeshes(assetsChanged, meshChanged, eOpenGl);
+	BuildMeshes(assetChanged || assetCreated, meshChanged, eOpenGl);
 	BuildDrawAtrib(eOpenGl);
-
 }
 
 void ERasterizer::RenderFrame(EOpenGl * eOpenGl, EDisplaySettings * displaySettings, mat4 View, mat4 Projection)
 {
 	RenderShadowMaps(eOpenGl);
-	RenderFrameMain(eOpenGl, displaySettings,View,Projection);
+	RenderFrameMain(eOpenGl, displaySettings,View,Projection); 
+	assetCreated = false;
+	assetChanged = false;
 }
 
 void ERasterizer::RenderFX(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
@@ -622,7 +652,6 @@ void ERasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySet
 
 
 	eOpenGl->renderQuad();
-
 
 
 	// copy content of geometry's depth buffer to default framebuffer's depth buffer

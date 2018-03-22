@@ -12,6 +12,9 @@ using namespace std;
 #include <GameMode.h>
 #include <iostream>
 #include "AstroidDemo.h"
+#include <ERasterizer.h>
+#include <ERaytracer.h>
+
 int main()
 {
 	int a; 
@@ -19,6 +22,7 @@ int main()
 	a = 1;
 	if (a == 1) {
 		Game game = Game::Instance();
+		game.renderer = new ERasterizer();
 		game.name = "Ball demo";
 		BallDemoMode* mode = new BallDemoMode();
 		mode->game = &game;
@@ -29,6 +33,7 @@ int main()
 	}
 	else {
 		Game game = Game::Instance();
+		game.renderer = new ERasterizer();
 		game.name = "Astroid demo";
 		AstroidDemo* mode = new AstroidDemo();
 		mode->game = &game;

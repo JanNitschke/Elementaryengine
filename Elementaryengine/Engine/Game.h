@@ -172,12 +172,6 @@ public:
 	void Render();
 	
 	///<summary>
-	///Draws all elements of the assets vector
-	///</summary> 
-	void SetupRender();
-
-
-	///<summary>
 	///Handles the input of the window and passes it to the active Gamemode.
 	///</summary> 
 	///<param name="window">
@@ -244,9 +238,12 @@ public:
 
 	//ENetPeer *peer;
 	static bool meshChanged;
-	static bool assetsChanged;
 
 	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
+	static btVector3 toBullet(vec3);
+
+	static vec3 toGlm(btVector3);
 
 private:
 	///<summary>
@@ -270,9 +267,7 @@ private:
 	/////</summary> 
 	//Authority authority;
 	
-	static btVector3 toBullet(vec3);
 
-	static vec3 toGlm(btVector3);
 	
 
 };

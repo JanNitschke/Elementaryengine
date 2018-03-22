@@ -8,11 +8,18 @@ public:
 	ERasterizer();
 	~ERasterizer();
 
-	void SetupFrame(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl);
+	void SetupFrame(bool meshChanged, EOpenGl* eOpenGl);
 	void RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection);
 	void RenderFX(EOpenGl* eOpenGl, EDisplaySettings* displaySettings);
 	void Setup(EOpenGl* eOpenGl, EDisplaySettings* displaySettings);
 	Texture* loadTexture(const char* path);
+
+	static void AssetCreatedCallback(Asset* asset);
+	static void AssetChangedCallback(Asset* asset);
+	static void AssetDestroyedCallback(Asset* asset);
+	
+	static bool assetCreated;
+	static bool assetChanged;
 
 	const unsigned int TextureSize = 1024;
 	const unsigned int TextureCount = 64;

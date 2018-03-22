@@ -6,7 +6,6 @@ var m = new Mesh("Assets/Meshs/Cube.obj",mat);
 // Array to hold our placed blocks
 var placedBlocks = [];
 
-
 // Create an empty Texture. This will be used as alphamap and texture for all plain ui elements
 var empty = new Texture(false);
 
@@ -43,6 +42,10 @@ var ch = new UIElement(new Vec3(50,50,0), new Vec3(-10,-10,0),new Vec3(0,0,0), n
 // Move the selection marker to its starting position
 updateHud();
 
+var j = 0;
+var z = 0;
+var k = 0;
+
 // called once per frame. Only used for input in this example
 function OnTick(){
 
@@ -56,6 +59,21 @@ function OnTick(){
     if(scY != 0){
         updateSelection(scY > 0);
     } 
+
+    if(input.getKey(70)){
+        if(j > 15){
+            j = 0;
+            z += 0.5;
+        }
+        if(z > 15){
+            z = 0;
+            k += 0.5;
+        }
+        var as = new Asset(new Vec3(z,k,j),new Vec3(0.2,0.2,0.2 ),0); 
+        j += 0.5;
+        m.attachto(as);
+    }
+
 
     // place a block if Q key is pressed and has not been pressed last frame. This is done to ensure that holding the button down won't place more than one block.
     if(input.getKey(81)){

@@ -5,23 +5,22 @@
 
 const unsigned int Asset::ENVIRONMENT_WIDTH = 1024, Asset::ENVIRONMENT_HEIGHT = 1024;
 unsigned int Asset::envMapFBO;
+Asset::AssetCallback Asset::rendererAssetCreatedCallback = nullptr;
+Asset::AssetCallback Asset::rendererAssetChangedCallback = nullptr;
+Asset::AssetCallback Asset::rendererAssetDestroyedCallback = nullptr;
 
 Asset::Asset()
 {
-
-
-
 	scale = vec3(1.0f);
 
 	Game::nextAssets.push_back(this);
 	OnTick = &defaultOnTick;
-	Game::assetsChanged = true;
+
+	rendererAssetCreatedCallback(this);
 
 }
 Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 {
-	Game::assetsChanged = true;
-
 	Game::nextAssets.push_back(this);
 	OnTick = &defaultOnTick;
 
@@ -44,7 +43,7 @@ Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 	assetRigidBody->setFriction(1);
 	assetRigidBody->setRestitution(0);
 
-
+	rendererAssetCreatedCallback(this);
 }
 
 
@@ -69,6 +68,8 @@ DllExport void Asset::setScale(vec3 sca)
 		}
 		assetRigidBody->setCollisionShape(btAssetShape);
 	}
+
+	rendererAssetChangedCallback(this);
 }
 
 DllExport void Asset::setPosition(vec3 pos)
@@ -85,6 +86,7 @@ DllExport void Asset::setPosition(vec3 pos)
 		trans.setOrigin(btVector3(pos.x + collisionPosOffset.x, pos.y + collisionPosOffset.y, pos.z + collisionPosOffset.z));
 		assetRigidBody->setWorldTransform(trans);
 	}
+	rendererAssetChangedCallback(this);
 }
 
 DllExport void Asset::setFriction(float f)
@@ -107,6 +109,7 @@ DllExport void Asset::setRotation(quat rot)
 		trans.setOrigin(btVector3(position.x + collisionPosOffset.x, position.y + collisionPosOffset.y, position.z + collisionPosOffset.z));
 		assetRigidBody->setWorldTransform(trans);
 	}
+	rendererAssetChangedCallback(this);
 }
 
 DllExport void Asset::applyForce(vec3 force)
@@ -148,6 +151,10 @@ void Asset::Tick(GLFWwindow * window, double deltaTime)
 	if (assetRigidBody != nullptr && Game::simulatePhysics) {
 		btTransform trans;
 		assetRigidBody->getMotionState()->getWorldTransform(trans);
+		if (Game::toGlm(trans.getOrigin()) != position ||
+			q.w != trans.getRotation().getW() || q.x != trans.getRotation().getX() || q.y != trans.getRotation().getY() || q.z != trans.getRotation().getZ())
+			rendererAssetChangedCallback(this);
+
 		position.x = trans.getOrigin().getX() - collisionPosOffset.x;
 		position.y = trans.getOrigin().getY() - collisionPosOffset.y;
 		position.z = trans.getOrigin().getZ() - collisionPosOffset.z;
@@ -178,7 +185,6 @@ void Asset::Destroy()
 		as->parents.erase(std::remove(as->parents.begin(), as->parents.end(), this), as->parents.end());
 	}
 	Game::assetsToDelete.push_back(this);
-	Game::assetsChanged = true;
 	Game::dynamicsWorld->removeRigidBody(assetRigidBody);
 
 	delete assetRigidBody;

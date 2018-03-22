@@ -3,6 +3,8 @@
 #include "Game.h"
 #include <Camera.h>
 #include <ERender.h>
+
+
 JsValueRef EJSFunction::JSVec3Prototype;
 JsValueRef EJSFunction::JSTexturePrototype;
 JsValueRef EJSFunction::JSMaterialPrototype;
@@ -313,8 +315,192 @@ JsValueRef EJSFunction::JSMaterialSetAlbedo(JsValueRef callee, bool isConstructC
 
 JsValueRef EJSFunction::JSMaterialGetAlbedo(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
-	// TODO: implement
-	return JsValueRef();
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		PBRMaterial* element = static_cast<PBRMaterial*>(vec);
+		vec3* val = new vec3();
+		*val = element->albedo;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialSetAlbedoMap(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* material;
+	if (JsGetExternalData(arguments[0], &material) == JsNoError) {
+		PBRMaterial* mat = static_cast<PBRMaterial*>(material);
+		void* v;
+		Texture* tex = JSToNativeTexture(arguments[1]);
+		mat->albedoMap = tex;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialGetAlbedoMap(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		PBRMaterial* element = static_cast<PBRMaterial*>(v);
+		Texture* val = element->albedoMap;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSTexturePrototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialSetAO(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* material;
+	if (JsGetExternalData(arguments[0], &material) == JsNoError) {
+		PBRMaterial* mat = static_cast<PBRMaterial*>(material);
+		void* v;
+		JsGetExternalData(arguments[1], &v);
+		vec3* color = static_cast<vec3*>(v);
+		mat->ao = *color;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialGetAO(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		PBRMaterial* element = static_cast<PBRMaterial*>(vec);
+		vec3* val = new vec3();
+		*val = element->ao;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialSetMetallic(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* material;
+	if (JsGetExternalData(arguments[0], &material) == JsNoError) {
+		PBRMaterial* mat = static_cast<PBRMaterial*>(material);
+		double val;
+		JsNumberToDouble(arguments[1],&val);
+		mat->metallic = val;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialGetMetallic(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		PBRMaterial* element = static_cast<PBRMaterial*>(vec);
+		double val;
+		val = element->metallic;
+		JsDoubleToNumber(val, &output);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialSetMetallicMap(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* material;
+	if (JsGetExternalData(arguments[0], &material) == JsNoError) {
+		PBRMaterial* mat = static_cast<PBRMaterial*>(material);
+		void* v;
+		Texture* tex = JSToNativeTexture(arguments[1]);
+		mat->metallicMap = tex;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialGetMetallicMap(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		PBRMaterial* element = static_cast<PBRMaterial*>(v);
+		Texture* val = element->metallicMap;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSTexturePrototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialSetRoughness(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* material;
+	if (JsGetExternalData(arguments[0], &material) == JsNoError) {
+		PBRMaterial* mat = static_cast<PBRMaterial*>(material);
+		double val;
+		JsNumberToDouble(arguments[1], &val);
+		mat->roughness = val;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialGetRoughness(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		PBRMaterial* element = static_cast<PBRMaterial*>(vec);
+		double val;
+		val = element->roughness;
+		JsDoubleToNumber(val, &output);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialSetRoughnessMap(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* material;
+	if (JsGetExternalData(arguments[0], &material) == JsNoError) {
+		PBRMaterial* mat = static_cast<PBRMaterial*>(material);
+		void* v;
+		Texture* tex = JSToNativeTexture(arguments[1]);
+		mat->roughnessMap = tex;
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSMaterialGetRoughnessMap(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* v;
+	if (JsGetExternalData(arguments[0], &v) == JsNoError) {
+		PBRMaterial* element = static_cast<PBRMaterial*>(v);
+		Texture* val = element->roughnessMap;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSTexturePrototype);
+	}
+	return output;
 }
 
 // mesh.attachTo();
