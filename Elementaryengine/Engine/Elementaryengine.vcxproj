@@ -176,9 +176,11 @@
     <ClCompile Include="AssetComponent.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EJSFunctions.cpp" />
+    <ClCompile Include="EOGLUniform.cpp" />
     <ClCompile Include="EOpenGl.cpp" />
     <ClCompile Include="ERasterizer.cpp" />
     <ClCompile Include="ERaytracer.cpp" />
+    <ClCompile Include="ERender.cpp" />
     <ClCompile Include="EScriptContext.cpp" />
     <ClCompile Include="FPCam.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -187,6 +189,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="EModularRasterizer.cpp" />
     <ClCompile Include="OldRenderCode.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Terrain.cpp" />
@@ -210,6 +213,7 @@
     <ClInclude Include="AssetComponent.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EJSFunctions.h" />
+    <ClInclude Include="EOGLUniform.h" />
     <ClInclude Include="EOpenGl.h" />
     <ClInclude Include="ERasterizer.h" />
     <ClInclude Include="ERaytracer.h" />
@@ -223,6 +227,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="EModularRasterizer.h" />
     <ClInclude Include="RayCastHit.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />

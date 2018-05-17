@@ -19,5 +19,9 @@ public:
 	virtual void RenderFX(EOpenGl* eOpenGl, EDisplaySettings* displaySettings) = 0;
 	virtual void Setup(EOpenGl* eOpenGl, EDisplaySettings* displaySettings) = 0;
 	virtual Texture* loadTexture(const char* path) = 0;
+
+	static void AssetCreatedCallback(Asset* asset);
+	static void AssetChangedCallback(Asset* asset);
+	static void AssetDestroyedCallback(Asset* asset);
 };
 

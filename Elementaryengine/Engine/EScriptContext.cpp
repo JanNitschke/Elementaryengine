@@ -229,6 +229,38 @@ void EScriptContext::MaterialBindings()
 
 	memberNamesMaterial.push_back(L"setAlbedo");
 	memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetAlbedo);
+	memberNamesMaterial.push_back(L"getAlbedo");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialGetAlbedo);
+
+	memberNamesMaterial.push_back(L"setAlbedoMap");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetAlbedoMap);
+	memberNamesMaterial.push_back(L"getAlbedoMap");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialGetAlbedoMap);
+
+	memberNamesMaterial.push_back(L"setAO");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetAO);
+	memberNamesMaterial.push_back(L"getAO");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialGetAO);
+
+	memberNamesMaterial.push_back(L"setMetallic");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetMetallic);
+	memberNamesMaterial.push_back(L"getMetallic");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialGetMetallic);
+
+	memberNamesMaterial.push_back(L"setMetallicMap");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetMetallicMap);
+	memberNamesMaterial.push_back(L"getMetallicMap");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialGetMetallicMap);
+
+	memberNamesMaterial.push_back(L"setRoughness");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetRoughness);
+	memberNamesMaterial.push_back(L"getRoughness");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialGetRoughness);
+
+	memberNamesMaterial.push_back(L"setRoughnessMap");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialSetRoughnessMap);
+	memberNamesMaterial.push_back(L"getRoughnessMap");
+	memberFuncsMaterial.push_back(EJSFunction::JSMaterialGetRoughnessMap);
 
 	projectNativeClass(L"Material", EJSFunction::JSConstructorMaterial, EJSFunction::JSMaterialPrototype, memberNamesMaterial, memberFuncsMaterial);
 
@@ -337,6 +369,9 @@ void EScriptContext::AssetBindings()
 
 	memberNamesAsset.push_back(L"destroy");
 	memberFuncsAsset.push_back(EJSFunction::JSAssetDelete);
+
+	memberNamesAsset.push_back(L"equals");
+	memberFuncsAsset.push_back(EJSFunction::JSAssetEqual);
 
 	projectNativeClass(L"Asset", EJSFunction::JSConstructorAsset, EJSFunction::JSAssetPrototype, memberNamesAsset, memberFuncsAsset);
 }

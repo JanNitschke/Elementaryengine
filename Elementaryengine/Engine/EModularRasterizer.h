@@ -1,12 +1,12 @@
 #pragma once
 #include <ERender.h>
 #include <Game.h>
-
-class ERasterizer: public ERenderer
+#include <EOGLUniform.h>
+class EModularRasterizer : public ERenderer
 {
 public:
-	ERasterizer();
-	~ERasterizer();
+	EModularRasterizer();
+	~EModularRasterizer();
 
 	void SetupFrame(bool meshChanged, EOpenGl* eOpenGl);
 	void RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection);
@@ -17,7 +17,7 @@ public:
 	static void AssetCreatedCallback(Asset* asset);
 	static void AssetChangedCallback(Asset* asset);
 	static void AssetDestroyedCallback(Asset* asset);
-	
+
 	static bool assetCreated;
 	static bool assetChanged;
 
@@ -102,4 +102,29 @@ private:
 	///the display settings to use
 	///</param>
 	void RenderUI(EOpenGl* eOpenGl, EDisplaySettings* displaySettings);
+
+
+	EOGLUniform<vec3> uniformViewPos;
+
+	// Shadow uniforms
+	EOGLUniform<int> shadowUniformLayer;
+	EOGLUniform<float> shadowUniformFar_plane;
+	EOGLUniform<vec3> shadowUniformLightPos;
+
+
+	// Geometry pass Uniforms
+	EOGLUniform<mat4> geometryUniformVP;
+	EOGLUniform<int> geometryUniformTextures;
+
+	// lighting pass Uniforms
+
+	EOGLUniform<int> lightingUniformPosition;
+	EOGLUniform<int> lightingUniformNormal;
+	EOGLUniform<int> lightingUniformAlbedoSpec;
+	EOGLUniform<int> lightingUniformMaterial;
+	EOGLUniform<float> lightingUniformFar_plane;
+
+	//EOGLUniform<vec3>* shadowUniformLightPos;
+
+
 };

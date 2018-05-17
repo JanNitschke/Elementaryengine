@@ -5,8 +5,8 @@
 
 FPCam::FPCam()
 {
-	position = glm::vec3(-3.0f, 0.0f, 0.0f);
-	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	position = glm::vec3(3.0, 2.0, 7.0);
+	cameraFront = glm::vec3(-0.3f, -0.2f, -0.7f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
@@ -22,7 +22,9 @@ mat4 FPCam::GetView()
 	front.y = sin(glm::radians(rotation.x));
 	front.z = cos(glm::radians(rotation.x)) * sin(glm::radians(rotation.y));
 	cameraFront = glm::normalize(front);
+
 	return lookAt(position, position + cameraFront, cameraUp);
+
 }
 
 void FPCam::Tick(GLFWwindow * window, double deltaTime)

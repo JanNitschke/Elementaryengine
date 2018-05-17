@@ -1,0 +1,200 @@
+#version 430
+
+#define MAX_SCENE_BOUNDS 1000.0
+#define NUM_BOXES 2
+
+layout (local_size_x = 8, local_size_y = 8) in;
+
+uniform vec3 viewPos;
+uniform mat4 invProj;
+uniform mat4 invView;
+
+layout(rgba32f, binding = 0) uniform image2D framebuffer;
+
+vec3 lightPos = vec3(2,2,2);
+vec3 lightCol = vec3(1);
+
+const float PI = 3.14159265359;
+
+struct Material {
+  vec3 albedo;
+  float roughness;
+};
+
+struct Box {
+  vec3 min;
+  vec3 max;
+  int mat;
+};
+
+struct Triangle {
+  vec3 p0;
+  vec3 p1;
+  vec3 p2;
+  int mat;
+};
+
+const Material materials[] = {
+  {vec3(0.9,0.1,0.1),0.1},
+  {vec3(0.1,0.1,0.9),0.1}
+};
+
+const Box boxes[] = {
+  /* The ground */
+  {vec3(-5.0, -0.1, -5.0), vec3(5.0, 0.0, 5.0),0},
+  /* Box in the middle */
+  {vec3(-0.5, 0.0, -0.5), vec3(0.5, 1.0, 0.5),1}
+};
+
+const Triangle triangles[] = {
+  /* The ground */
+  {vec3(-0.5, 0.0, -0.5), vec3(-0.5, 0.0, -0.5), vec3(0.5, 1.0, 0.5),1}
+  /* Box in the middle */
+  {vec3(-0.5, 0.0, -0.5), vec3(0.5, 0.0, 0.5), vec3(0.5, 1.0, 0.5),1}
+};
+struct hitinfo {
+  vec2 lambda;
+  vec3 pos;
+  Box hitObject;
+};
+
+//raytrace
+vec2 intersectBox(vec3 origin, vec3 dir, const Box b) {
+  vec3 tMin = (b.min - origin) / dir;
+  vec3 tMax = (b.max - origin) / dir;
+  vec3 t1 = min(tMin, tMax);
+  vec3 t2 = max(tMin, tMax);
+  float tNear = max(max(t1.x, t1.y), t1.z);
+  float tFar = min(min(t2.x, t2.y), t2.z);
+  return vec2(tNear, tFar);
+}
+
+bool intersectBoxes(vec3 origin, vec3 dir, out hitinfo info) {
+  float smallest = MAX_SCENE_BOUNDS;
+  bool found = false;
+  for (int i = 0; i < NUM_BOXES; i++) {
+    vec2 lambda = intersectBox(origin, dir, boxes[i]);
+    if (lambda.x > 0.0 && lambda.x < lambda.y && lambda.x < smallest) {
+      info.lambda = lambda;
+      info.hitObject = boxes[i];
+      info.pos = origin + dir * lambda.x;
+      smallest = lambda.x;
+      found = true;
+    }
+  }
+  return found;
+}
+// see https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+bool intersectTriane(vec3 origin, vec3 dir, Triangle triangle, out float dist, out vec3 hitPos){
+  vec3 norm = cross(triangle.p0 - triangle.p1, triangle.p0 - triangle.p2);
+  float NdotRayDirection = dot(norm, dir); 
+  if (abs(NdotRayDirection) < 0.001){ // almost 0 
+      return false; // they are parallel so they don't intersect ! 
+  }
+  float d = dot(norm, triangle.p0);
+  dist = (dot(norm,origin) + d) / NdotRayDirection; 
+  if (dist < 0){
+    return false;
+  }
+  hitPos = origin + dist * dir; 
+
+  vec3 edge = triangle.p1 - triangle.p0; 
+  vec3 vp = hitPos - triangle.p0; 
+  vec3 C = cross(edge,vp); 
+  bool right = dot(norm, C) < 0;
+
+  edge = triangle.p2 - triangle.p1; 
+  vp = hitPos - triangle.p1; 
+  vec3 C = cross(edge,vp); 
+  if((dot(norm, C) < 0) != right){
+    return false;
+  }
+
+  edge = triangle.p0 - triangle.p2; 
+  vp = hitPos - triangle.p2; 
+  vec3 C = cross(edge,vp); 
+  if((dot(norm, C) < 0) != right){
+    return false;
+  }
+  return true;
+}
+
+bool intersectTriangles(vec3 origin, vec3 dir, out hitinfo info) {
+  float smallest = MAX_SCENE_BOUNDS;
+  bool found = false;
+
+  for (int i = 0; i < triangles.length(); i++) {
+    float dist;
+    vec3 hitPos;
+    if(intersectTriane(origin,dir,triangles[i],dist,hitPos) && dist < smallest){
+      smallest = dist;
+      info.lambda = vec2(dist);
+      found = true;
+    }
+  }
+  return found;
+}
+
+
+
+
+vec3 lightcol(vec3 pos,vec3 vPos, int mat){
+  hitinfo i;
+  vec3 lightdir = lightPos - pos;
+  bool hit = intersectTriangles(pos - (0.0001 * lightdir),lightdir,i);
+  if(hit){
+    return vec3(0);
+  }else{
+    return materials[mat].albedo * lightCol;    
+  }
+}
+
+vec4 trace(vec3 origin, vec3 dir) {
+  hitinfo i;
+  if (intersectTriangles(origin, dir, i)) {
+    vec3 col = lightcol(i.pos,viewPos,i.hitTriangle.mat);
+    return vec4(col.rgb, 1.0);
+  }
+  return vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+
+vec3 lightcol(vec3 pos,vec3 vPos, int mat){
+  hitinfo i;
+  vec3 lightdir = lightPos - pos;
+  bool hit = intersectBoxes(pos - (0.0001 * lightdir),lightdir,i);
+  if(hit){
+    return vec3(0);
+  }else{
+    return materials[mat].albedo * lightCol;    
+  }
+}
+
+vec4 trace(vec3 origin, vec3 dir) {
+  hitinfo i;
+  if (intersectBoxes(origin, dir, i)) {
+    vec3 col = lightcol(i.pos,viewPos,i.hitObject.mat);
+    return vec4(col.rgb, 1.0);
+  }
+  return vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+
+void main() {
+
+  // get index in global work group i.e x,y position
+  ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+  
+  float max_x = 5.0;
+  float max_y = 5.0;
+  ivec2 dims = imageSize(framebuffer); // fetch image dimensions
+  float dX = (float(pixel_coords.x * 2 - dims.x) / dims.x);
+  float dY = (float(pixel_coords.y * 2 - dims.y) / dims.y);
+
+	vec4 dir = normalize(invView * vec4((invProj * vec4(dX,dY,0.1,1)).xyz,0));
+
+  vec4 color = trace(viewPos,vec3( dir));
+
+  //vec4 color = vec4(ray_d,0);
+  imageStore(framebuffer, pixel_coords, color);
+}

@@ -1,41 +1,295 @@
 #version 430
-layout(local_size_x = 1, local_size_y = 1) in;
-layout(rgba32f, binding = 0) uniform image2D img_output;
 
-vec3 sphere_c = vec3(0.0, 0.0, -10.0);
-float sphere_r = 1.0;
+#define MAX_SCENE_BOUNDS 1000.0
+#define NUM_BOXES 2
 
-vec3 castRaySpheres(vec3 origin, vec3 dir){
-  vec3 omc = origin - sphere_c;
-  float b = dot(dir, omc);
-  float c = dot(omc, omc) - sphere_r * sphere_r;
-  float bsqmc = b * b - c;
-  // hit one or both sides
-  if (bsqmc >= 0.0) {
-    return vec3(0.4, 0.4, 1.0);
-  }else{
-    return vec3(-9999, -9999, -9999);
+layout (local_size_x = 8, local_size_y = 8) in;
+
+uniform vec3 viewPos;
+uniform mat4 invProj;
+uniform mat4 invView;
+
+layout(rgba32f, binding = 0) uniform image2D framebuffer;
+
+vec3 lightPos = vec3(2);
+vec3 lightCol = vec3(15);
+
+const float PI = 3.14159265359;
+
+struct Material {
+  vec3 albedo;
+  float roughness;
+};
+struct dinfo{
+  vec3 albedo;
+  float roughness;  
+};
+struct Triangle {
+  vec4 p0;
+  vec4 p1;
+  vec4 p2;
+  vec4 normal;
+  int dinfo;
+};
+
+layout(std430, binding = 2) buffer triangles 
+{
+    Triangle Triangles[];
+};
+
+/*
+layout(std430, binding = 3) buffer drawInfo 
+{
+    dinfo DrawInfo[];
+};
+
+layout(std430, binding = 4) buffer lightColors 
+{
+    vec3 LightColors[];
+};
+
+layout(std430, binding = 5) buffer lightPositions 
+{
+    vec3 LightPositions[];
+};
+*/
+
+  // light stuff 
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}  
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+    float a      = roughness*roughness;
+    float a2     = a*a;
+    float NdotH  = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
+	
+    float nom   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+	
+    return nom / denom;
+}
+
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return nom / denom;
+}
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+	
+    return ggx1 * ggx2;
+}
+
+
+const Material materials[] = {
+  {vec3(0.9,0.9,0.9),0.2},
+  {vec3(1,0.8,0.6),0.8}
+};
+
+struct hitinfo {
+  float lambda;
+  vec3 pos;
+  vec3 normal;
+  Triangle hitTriangle;
+};
+
+vec3 dirOffset(vec3 input, int dir, float strength){
+  vec3 offsets[] = {
+    vec3(1,0,0),
+    vec3(0,1,0),
+    vec3(0,0,1),
+    vec3(-1,0,0),
+    vec3(0,-1,0),
+    vec3(0,0,-1)
+  };
+  return  (1 - strength) * normalize(input) + strength * offsets[dir];
+}
+
+// see https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+bool intersectTriangle(vec3 origin, vec3 dir, int triangleNum, out float dist, out vec3 hitPos){
+  vec3 normal = Triangles[triangleNum].normal.xyz;
+  vec3 p0 = vec3(Triangles[triangleNum].p0);
+  vec3 p1 = vec3(Triangles[triangleNum].p1);
+  vec3 p2 = vec3(Triangles[triangleNum].p2);
+
+  //vec3 normal = cross(p0 - p1, p0 - p2);
+  //normal = vec3(Triangles[triangleNum].normal);
+  float NdotRayDirection = dot(normal, dir); 
+  if (abs(NdotRayDirection) < 0.0001){ // almost 0 
+      return false; // they are parallel so they don't intersect ! 
+  }
+
+  float d = dot(normal,p0 * -1);
+  dist = -(dot(normal,origin) + d) / NdotRayDirection; 
+  if (dist < 0){
+    return false;
+  }
+
+  hitPos = origin + (dist * dir); 
+  
+  vec3 edge = p1 - p0; 
+  vec3 vp = hitPos - p0; 
+  vec3 C = cross(edge,vp); 
+
+  bool right = dot(normal, C) < 0;
+
+  edge = p2 - p1; 
+  vp = hitPos - p1; 
+  C = cross(edge,vp); 
+  if((dot(normal, C) < 0) != right){
+    return false;
+  }
+
+  edge = p0 - p2; 
+  vp = hitPos - p2; 
+  C = cross(edge,vp); 
+  if((dot(normal, C) < 0) != right){
+    return false;
+  }
+  return true;
+}
+
+bool intersectTriangles(vec3 origin, vec3 dir, out hitinfo info) {
+  float smallest = MAX_SCENE_BOUNDS;
+  bool found = false;
+  for (int i = 0; i < Triangles.length(); i++) {
+    float dist;
+    vec3 hitPos;
+    vec3 normal;
+
+    if(intersectTriangle(origin,dir,i,dist,hitPos) && dist < smallest){
+      smallest = dist;
+      info.lambda = dist;
+      info.hitTriangle = Triangles[i];
+      info.pos = hitPos;
+      info.normal = vec3(Triangles[i].normal);
+      found = true;
+    }
+  }
+  return found;
+}
+
+vec3 lightcol(vec3 pos,vec3 vPos, vec3 normal, int dinfo){
+  hitinfo i;
+  vec3 lightdir = lightPos - pos;
+  normal *= -1;
+  bool hit = intersectTriangles(pos  + (0.0001 * lightdir), lightdir, i);
+  if(hit && i.lambda - 0.001 < (lightPos - pos).length){
+    return vec3(0);
+  }else{   
+    float metallic = 0;
+    vec3 V = normalize(vPos - pos);
+    vec3 L = normalize(lightPos - pos);
+		vec3 H = normalize(V + L);
+	
+		float distance = length(lightPos - pos);
+		float attenuation = 1.0 / (distance * distance);
+		vec3 radiance = lightCol * attenuation; 
+
+		vec3 F0 = vec3(0.04); 
+		F0 = mix(F0, materials[dinfo].albedo, metallic);
+		vec3 F  = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+		float NDF = DistributionGGX(normal, H, materials[dinfo].roughness);       
+		float G = GeometrySmith(normal, V, L, materials[dinfo].roughness); 
+		vec3 nominator    = NDF * G * F;
+		float denominator = 4 * max(dot(normal, V), 0.0) * max(dot(normal, L), 0.0) + 0.001; 
+		vec3 specular     = nominator / denominator;     
+
+		//specular and refraction components  
+		vec3 kS = F;
+		vec3 kD = vec3(1.0) - kS;
+		kD *= 1.0 - metallic;	
+
+		float NdotL = max(dot(normal, L), 0.0);        
+		return (kD * materials[dinfo].albedo / PI + specular) * radiance * NdotL;
   }
 }
 
+vec4 trace(vec3 origin, vec3 dir) {
+  hitinfo i;
+  if (intersectTriangles(origin, dir, i)) {
+    vec3 col = lightcol(i.pos, viewPos, i.normal,i.hitTriangle.dinfo);
+    vec3 nextDir = dir - 2 * dot(dir, i.normal)*i.normal;
+    vec3 nextcol = vec3(0);
+    vec3 nextColSmooth = vec3(0);
+    float roughness = materials[i.hitTriangle.dinfo].roughness;
+    hitinfo j;
+    if(roughness > 0.21){
+      for(int k = 0; k < 6; k++){
+        vec3 ndir = dirOffset(nextDir,k,0.1);
+        hitinfo l;
+        if (intersectTriangles(i.pos  +  (0.001 * ndir), ndir, l)) {
+          float distance = (l.lambda * materials[i.hitTriangle.dinfo].roughness) * 2;
+          float attenuation = 1 / (distance * distance);
+          if(attenuation > 1){
+            attenuation = 1;
+          }
+          nextColSmooth += lightcol(l.pos,i.pos, l.normal,l.hitTriangle.dinfo) * attenuation;
+        }
+      }
+      nextColSmooth /= 6;
+    }
+    
+    if (intersectTriangles(i.pos  +  (0.001 * nextDir), nextDir, j)) {
+      float distance = (j.lambda * materials[i.hitTriangle.dinfo].roughness) * 2;
+      float attenuation = 1 / (distance * distance);
+      if(attenuation > 1){
+        attenuation = 1;
+      }
+      nextcol = lightcol(j.pos,i.pos, j.normal,j.hitTriangle.dinfo) * attenuation;
+    }
+    nextcol = ((0.9 - roughness) * nextcol + (roughness + 0.2) * nextColSmooth)* materials[i.hitTriangle.dinfo].albedo;
+    return vec4(col.rgb * roughness + nextcol.rgb *  ( 1 - roughness), 1.0);
+  }
+  return vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+
+
 void main() {
-  // base pixel colour for image
-  vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);
+
   // get index in global work group i.e x,y position
   ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+
+/*
+  Triangles[0].p0 = vec3(-1,-1,-1);
+  Triangles[0].p1 = vec3(-1,-1,1);
+  Triangles[0].p2 = vec3(-1,1,1);
+
+  Triangles[1].p0 = vec3(-1,1,1);
+  Triangles[1].p1 = vec3(-1,1,-1);
+  Triangles[1].p2 = vec3(-1,-1,-1);
+  */
   
+
   float max_x = 5.0;
   float max_y = 5.0;
-  ivec2 dims = imageSize(img_output); // fetch image dimensions
-  float x = (float(pixel_coords.x * 2 - dims.x) / dims.x);
-  float y = (float(pixel_coords.y * 2 - dims.y) / dims.y);
-  vec3 ray_o = vec3(x * max_x, y * max_y, 0.0);
-  vec3 ray_d = vec3(0.0, 0.0, -1.0); // ortho
+  ivec2 dims = imageSize(framebuffer); // fetch image dimensions
+  float dX = (float(pixel_coords.x * 2 - dims.x) / dims.x);
+  float dY = (float(pixel_coords.y * 2 - dims.y) / dims.y);
 
-  if(castRaySpheres(ray_o,ray_d) != vec3(-9999, -9999, -9999)){
-      pixel = vec4(0.4, 0.4, 1.0, 1.0);
-  }
+	vec4 dir = normalize(invView * vec4((invProj * vec4(dX,dY,0.1,1)).xyz,0));
 
-  // output to a specific pixel in the image
-  imageStore(img_output, pixel_coords, pixel);
+
+  float num = Triangles.length();
+
+
+  //vec4 color = vec4(num);
+  vec4 color = trace(viewPos,vec3( dir));
+  //vec4 color = vec4(ray_d,0);
+  imageStore(framebuffer, pixel_coords, color);
 }

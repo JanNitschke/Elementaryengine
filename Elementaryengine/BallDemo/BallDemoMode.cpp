@@ -37,88 +37,87 @@ void BallDemoMode::Tick(double deltaTime)
 	else {
 		p_pressedLastFrame = false;
 	}
-	vec3 dir = game->activeCam->cameraFront;
-	vec3 pos = game->activeCam->position;
-	RayCastHit r = game->Raycast(pos, pos + dir * 10.0f);
-	vec3 result = r.hitPos;
-	vec3 norm = r.hitNormal;
+	//vec3 dir = game->activeCam->cameraFront;
+	//vec3 pos = game->activeCam->position;
+	//RayCastHit r = game->Raycast(pos, pos + dir * 10.0f);
+	//vec3 result = r.hitPos;
+	//vec3 norm = r.hitNormal;
 
-	// correct the normal  to 1 and 0;
-	if (norm.x < 0.5f && norm.x > -0.5f) {
-		norm.x = 0;
-	} else {
-		if (norm.x > 0.5f)
-			norm.x = 1.0f;
-		if (norm.x < 0.5f)
-			norm.x = -1.0f;
-	}
+	//// correct the normal  to 1 and 0;
+	//if (norm.x < 0.5f && norm.x > -0.5f) {
+	//	norm.x = 0;
+	//} else {
+	//	if (norm.x > 0.5f)
+	//		norm.x = 1.0f;
+	//	if (norm.x < 0.5f)
+	//		norm.x = -1.0f;
+	//}
 
-	if (norm.y < 0.5f && norm.y > -0.5f) {
-		norm.y = 0;
-	} else {
-		if (norm.y > 0.5f)
-			norm.y = 1.0f;
-		if (norm.y < 0.5f)
-			norm.y = -1.0f;
-	}
-		
-	if (norm.z < 0.5f && norm.z > -0.5f) {
-		norm.z = 0;
-	} else {
-		if (norm.z > 0.5f)
- 			norm.z = 1.0f;
-		if (norm.z < 0.5f)
-			norm.z = -1.0f;
-	}
+	//if (norm.y < 0.5f && norm.y > -0.5f) {
+	//	norm.y = 0;
+	//} else {
+	//	if (norm.y > 0.5f)
+	//		norm.y = 1.0f;
+	//	if (norm.y < 0.5f)
+	//		norm.y = -1.0f;
+	//}
+	//	
+	//if (norm.z < 0.5f && norm.z > -0.5f) {
+	//	norm.z = 0;
+	//} else {
+	//	if (norm.z > 0.5f)
+ //			norm.z = 1.0f;
+	//	if (norm.z < 0.5f)
+	//		norm.z = -1.0f;
+	//}
 
-	if (Game::isKeyDown(GLFW_MOUSE_BUTTON_1)) {
-		if (placedLastFrame == false) {
-			if (r.hitAsset != nullptr) {
-				Asset* a;
-				int db = 0;
-				if (std::find(placedAssets.begin(), placedAssets.end(), r.hitAsset) != placedAssets.end()) {
-					a = new Asset(r.hitAsset->position + (norm * 0.5f), vec3(0.25f), 0, assetShapes::cube);
-					db = 1;
-				}
-				else {
-					a = new Asset(result + (norm * 0.25f), vec3(0.25f), 0, assetShapes::cube);
-					db = 2;
-				}
-				cube->attachTo(a);
-				placedAssets.push_back(a);
-			}
-		}
-		placedLastFrame = true;
-	}
-	else {
-		placedLastFrame = false;
-	}
+	//if (Game::isKeyDown(GLFW_MOUSE_BUTTON_1)) {
+	//	if (placedLastFrame == false) {
+	//		if (r.hitAsset != nullptr) {
+	//			Asset* a;
+	//			int db = 0;
+	//			if (std::find(placedAssets.begin(), placedAssets.end(), r.hitAsset) != placedAssets.end()) {
+	//				a = new Asset(r.hitAsset->position + (norm * 0.5f), vec3(0.25f), 0, assetShapes::cube);
+	//				db = 1;
+	//			}
+	//			else {
+	//				a = new Asset(result + (norm * 0.25f), vec3(0.25f), 0, assetShapes::cube);
+	//				db = 2;
+	//			}
+	//			cube->attachTo(a);
+	//			placedAssets.push_back(a);
+	//		}
+	//	}
+	//	placedLastFrame = true;
+	//}
+	//else {
+	//	placedLastFrame = false;
+	//}
 
-	if (Game::isKeyDown(GLFW_MOUSE_BUTTON_2)) {
-		if (destroyedLastFrame == false) {
-			if (r.hitAsset != nullptr) {
-				if (std::find(placedAssets.begin(), placedAssets.end(), r.hitAsset) != placedAssets.end()) {
+	//if (Game::isKeyDown(GLFW_MOUSE_BUTTON_2)) {
+	//	if (destroyedLastFrame == false) {
+	//		if (r.hitAsset != nullptr) {
+	//			if (std::find(placedAssets.begin(), placedAssets.end(), r.hitAsset) != placedAssets.end()) {
 
-					r.hitAsset->Destroy();
-				}
-			}
-		}
-		destroyedLastFrame = true;
-	}
-	else {
-		destroyedLastFrame = false;
-	}
+	//				r.hitAsset->Destroy();
+	//			}
+	//		}
+	//	}
+	//	destroyedLastFrame = true;
+	//}
+	//else {
+	//	destroyedLastFrame = false;
+	//}
 }
 
 void BallDemoMode::Load()
 {
 	Game::simulatePhysics = false;
 	game->SetActiveCam(new FPCam());
-	game->activeCam->setPosition(vec3(0,0,0));
 	Model* m = new Model("Assets/Meshs/Cube.obj");
 	Model* lamp = new Model("Assets/Meshs/Sphere.obj");
 	Model* sp = new Model("Assets/Meshs/Cube.obj");
-	Model * room = new Model("Assets/Meshs/Room.obj");
+	Model* room = new Model("Assets/Meshs/Room.obj");
 	Model* table = new Model("Assets/Meshs/tt.obj");
 	Model* candleMod = new Model("Assets/Meshs/Candle.obj");
 
@@ -129,7 +128,7 @@ void BallDemoMode::Load()
 	Mesh* ro = room->meshes[0];
 	Mesh* cMesh = candleMod->meshes[0];
 
-	Asset* a = new Asset(vec3(0,-0.9,0),vec3(50,0.1f,50),0,assetShapes::cube);
+	Asset* a = new Asset(vec3(0,-0.9,0),vec3(20,0.1,20),0,assetShapes::cube);
 	a->setFriction(2);
 	cube->attachTo(a);
 	a->renderEnvironment = false;
@@ -180,11 +179,11 @@ void BallDemoMode::Load()
 	sphere->material = pbrwood;
 
 
-	Asset* t = new Asset(vec3(-2.0f, -0.20, -4.0f), vec3(1.4, .75,.8), 1000, assetShapes::cube);
+	Asset* t = new Asset(vec3(0, -0.15, 0), vec3(1.4, .75,.8), 1000, assetShapes::cube);
 	tab->attachTo(t);
 
-	Asset* r = new Asset(vec3(-2.5, -1.0f, -2.5), vec3(4, 2, 4), 0, assetShapes::cube);
-	ro->attachTo(r);
+	//Asset* r = new Asset(vec3(-2.5, -1.0f, -2.5), vec3(4, 2, 4), 0, assetShapes::cube);
+	//ro->attachTo(r);
 
 	Lamp* l = new Lamp();
 	Asset* b = new Asset();
@@ -193,17 +192,17 @@ void BallDemoMode::Load()
 	b->scale = vec3(.10f);
 	b->position = vec3(-2.0f, 2.2f, -8.0f);
 	//b->OnTick = LampTick;
-	lam->attachTo(b);
+	//lam->attachTo(b);
 
-	Lamp* ca = new Lamp();
-	Asset* candle = new Asset();
-	ca->attachTo(candle);
-	ca->color = vec3(1.0, 0.6, 0.3);
-	candle->scale = vec3(0.7,1.2,0.7);
-	candle->position = vec3(-2.0, 0.9f, -4.0f);
-	candle->OnTick = CandleTick;
-	cMesh->attachTo(candle);
-	cMesh->posOffset = vec3(0, -0.04, 0);
+	//Lamp* ca = new Lamp();
+	//Asset* candle = new Asset();
+	//ca->attachTo(candle);
+	//ca->color = vec3(1.0, 0.6, 0.3);
+	//candle->scale = vec3(0.7,1.2,0.7);
+	//candle->position = vec3(-2.0, 0.9f, -4.0f);
+	//candle->OnTick = CandleTick;
+	//cMesh->attachTo(candle);
+	//cMesh->posOffset = vec3(0, -0.04, 0);
 
 	//400 baseline defered : 30 fps
 	float height = -0.2f;

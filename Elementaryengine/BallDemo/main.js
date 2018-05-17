@@ -3,6 +3,20 @@ var v = new Vec3(0.5,0.5,0.5);
 var mat = new Material(v);
 var m = new Mesh("Assets/Meshs/Cube.obj",mat);
 
+var tex = new Texture("Assets/Textures/Plaster.jpg")
+
+mat.setAlbedo(new Vec3(1,1,1));
+mat.setAlbedoMap(tex);
+mat.setAO(new Vec3(0.01,0.01,0.01));
+
+var mat2 = new Material(v);
+mat2.setAlbedo(new Vec3(8,8,8));
+mat2.setAO(new Vec3(0.1,0.1,0.1));
+mat2.setRoughness(0.2);
+mat2.setMetallic(0.2);
+
+var m2 = new Mesh("Assets/Meshs/t.obj",mat2);
+
 // Array to hold our placed blocks
 var placedBlocks = [];
 
@@ -16,7 +30,8 @@ var crosshairTexture = new Texture("Assets/Textures/ch.jpg");
 var selectedItem = 0;
 
 // Keep track if the placing button was pressed last frane
-var qPressedLastFrame = false;
+var placePressedLastFrame = false;
+var deletePressedLastFrame = false;
 
 // Define the foreground color for the UI as a Vec3. This is done so it can be sinply changed for all elements at once. For Colors the X component of the Vector equals Red, Y equals Green and Z equals Blue.
 var fgCol = new Vec3(0.5,0.5,0.9);
@@ -46,6 +61,20 @@ var j = 0;
 var z = 0;
 var k = 0;
 
+function PlaceFeeeeest(){
+    if(j < -15){
+        j = 0;
+        z += 2;
+    }
+    if(z > 15){
+        z = 0;
+        k += 2;
+    }
+    var as = new Asset(new Vec3(z,k,j),new Vec3(0.8,2,1.5),0); 
+    j -= 2;
+    m2.attachto(as);
+}
+
 // called once per frame. Only used for input in this example
 function OnTick(){
 
@@ -61,28 +90,29 @@ function OnTick(){
     } 
 
     if(input.getKey(70)){
-        if(j > 15){
-            j = 0;
-            z += 0.5;
+        for (i = 0; i < 2; i++) { 
+            PlaceFeeeeest();
         }
-        if(z > 15){
-            z = 0;
-            k += 0.5;
-        }
-        var as = new Asset(new Vec3(z,k,j),new Vec3(0.2,0.2,0.2 ),0); 
-        j += 0.5;
-        m.attachto(as);
     }
 
 
     // place a block if Q key is pressed and has not been pressed last frame. This is done to ensure that holding the button down won't place more than one block.
-    if(input.getKey(81)){
-        if(!qPressedLastFrame){
+    if(input.getKey(0)){
+        if(!placePressedLastFrame){
             placeBlock();
         }
-        qPressedLastFrame = true;
+        placePressedLastFrame = true;
     }else{
-        qPressedLastFrame = false;
+        placePressedLastFrame = false;
+    }
+
+    if(input.getKey(1)){
+        if(!deletePressedLastFrame){
+            deleteBlock();
+        }
+        deletePressedLastFrame = true;
+    }else{
+        deletePressedLastFrame = false;
     }
 }
 
@@ -111,6 +141,29 @@ function updateHud(){
 
     // Set the position of the selection marker to 'px' pixel from left and 4 pixel from the bottom 
     selected.setPositionPx(new Vec3(px,4,0));
+}
+
+function deleteBlock(){
+    var cam = game.getActiveCamera();
+    var campos = cam.getPosition();
+    var camdir = cam.getForeward();
+    var raydir = camdir;
+    // normailze the foreward vector of the camera to lenght 15
+    raydir.normalize(15);
+
+    // Add the campos to the vector to get a point exactly 15 units infront of the camera
+    raydir.add(campos);
+
+    // Raycast from the camera to this point
+    var rc = game.RayCast(campos,raydir);
+    if(rc != false){
+        // If we hit something - get the data
+        var hitAsset = rc.getHitAsset();
+
+        if(isPlaced(hitAsset)){
+            hitAsset.destroy();
+        }
+    }
 }
 
 // Place a block on the point we are looking at
@@ -191,15 +244,10 @@ function nn(norm){
 
 // Function to check if an Asset is contained int 'placedBlocks'. native Javascript Comparison is not possible due to limitations of chakra core.
 function isPlaced(hitAsset){
-    var o = false;
     for (i = 0; i < placedBlocks.length; i++) { 
-        var a = hitAsset.getPosition();
-        var b = placedBlocks[i].getPosition();
-        if(a.getX() == b.getX() && a.getY() == b.getY() && a.getZ() == b.getZ()){
-            o = true;
-        }
-        var t = placedBlocks[i].getPosition();   
+        if (placedBlocks[i].equals(hitAsset))
+        return true;
     }
 
-    return o;
+    return false;
 }

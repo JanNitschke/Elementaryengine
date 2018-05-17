@@ -105,6 +105,15 @@
     <ClCompile Include="ERaytracer.cpp">
       <Filter>Quelldateien\Renderers</Filter>
     </ClCompile>
+    <ClCompile Include="ERender.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EModularRasterizer.cpp">
+      <Filter>Quelldateien\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="EOGLUniform.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -202,6 +211,12 @@
     </ClInclude>
     <ClInclude Include="ERaytracer.h">
       <Filter>Headerdateien\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="EModularRasterizer.h">
+      <Filter>Headerdateien\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="EOGLUniform.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

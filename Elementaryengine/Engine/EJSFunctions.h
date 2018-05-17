@@ -26,7 +26,7 @@ namespace EJSFunction {
 	// Javascript to Native object conversion
 	vec3 JSToNativeVec3(JsValueRef jsVec3);
 	Texture* JSToNativeTexture(JsValueRef jsTexture);
-	Material* JSToNativeMaterial(JsValueRef jsMaterial);
+	PBRMaterial* JSToNativeMaterial(JsValueRef jsMaterial);
 	Mesh* JSToNativeMesh(JsValueRef jsMesh);
 	Asset* JSToNativeAsset(JsValueRef jsAsset);
 	UIElement* JSToNativeUI(JsValueRef jsUI);
@@ -66,6 +66,7 @@ namespace EJSFunction {
 
 	JsValueRef CALLBACK JSMaterialSetRoughnessMap(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSMaterialGetRoughnessMap(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSMaterialEqual(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 
 	// Mesh
@@ -81,6 +82,7 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSVec3Scale(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSVec3Add(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSVec3Normalize(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSVec3Equal(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 	// UIElement
 	JsValueRef CALLBACK JSUIElementSetPositionPc(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
@@ -102,6 +104,7 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSUIElementGetBackgroundBlur(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSUIElementGetTexture(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSUIElementGetAlphamap(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSUIElementEqual(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 	// Asset
 	JsValueRef CALLBACK JSAssetSetPosition(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
@@ -118,11 +121,13 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSAssetGetMass(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSAssetGetColliderOffsetPos(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSAssetGetColliderOffsetSize(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
-	
+	JsValueRef CALLBACK JSAssetEqual(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
 	// Camera 
 	JsValueRef CALLBACK JSCameraGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSCameraSetPosition(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSCameraGetForward(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSCameraEqual(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 	// Global
 	JsValueRef CALLBACK JSLog(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);

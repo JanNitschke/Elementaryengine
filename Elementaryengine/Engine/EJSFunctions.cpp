@@ -29,7 +29,7 @@ Texture * EJSFunction::JSToNativeTexture(JsValueRef jsTexture)
 	return reinterpret_cast<Texture*>(p);
 }
 
-Material * EJSFunction::JSToNativeMaterial(JsValueRef jsMaterial)
+PBRMaterial * EJSFunction::JSToNativeMaterial(JsValueRef jsMaterial)
 {
 	void* p;
 	JsGetExternalData(jsMaterial, &p);
@@ -264,8 +264,6 @@ JsValueRef EJSFunction::JSConstructorUI(JsValueRef callee, bool isConstructCall,
 		ele->alphamap = new Texture();;
 		ele->zindex = 0;
 	}
-
-	
 
 	JsCreateExternalObject(ele, nullptr, &output);
 	JsSetPrototype(output, JSUIPrototype);
@@ -503,6 +501,20 @@ JsValueRef EJSFunction::JSMaterialGetRoughnessMap(JsValueRef callee, bool isCons
 	return output;
 }
 
+JsValueRef EJSFunction::JSMaterialEqual(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool equal = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		PBRMaterial* a1 = JSToNativeMaterial(arguments[0]);
+		PBRMaterial* a2 = JSToNativeMaterial(arguments[1]);
+		equal = (a1 == a2);
+	}
+	JsBoolToBoolean(equal, &output);
+	return output;
+}
+
 // mesh.attachTo();
 JsValueRef EJSFunction::JSMeshAttachTo(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
@@ -685,6 +697,21 @@ JsValueRef EJSFunction::JSVec3Normalize(JsValueRef callee, bool isConstructCall,
 		noError = true;
 	}
 	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSVec3Equal(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool equal = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		vec3 v1 = JSToNativeVec3(arguments[0]);
+		vec3 v2 = JSToNativeVec3(arguments[1]);
+		bvec3 t = glm::equal(v1,v2);
+		equal = t.x && t.y && t.z;
+	}
+	JsBoolToBoolean(equal, &output);
 	return output;
 }
 
@@ -944,6 +971,20 @@ JsValueRef EJSFunction::JSUIElementGetAlphamap(JsValueRef callee, bool isConstru
 	return output;
 }
 
+JsValueRef EJSFunction::JSUIElementEqual(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool equal = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		UIElement* a1 = JSToNativeUI(arguments[0]);
+		UIElement* a2 = JSToNativeUI(arguments[1]);
+		equal = (a1 == a2);
+	}
+	JsBoolToBoolean(equal, &output);
+	return output;
+}
+
 // ----------------------------------------------------------------------------
 // ASSET MEMBER FUNCTIONS
 // ----------------------------------------------------------------------------
@@ -1134,6 +1175,20 @@ JsValueRef EJSFunction::JSAssetGetColliderOffsetSize(JsValueRef callee, bool isC
 	return output;
 }
 
+JsValueRef EJSFunction::JSAssetEqual(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool equal = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Asset* a1 = JSToNativeAsset(arguments[0]);
+		Asset* a2 = JSToNativeAsset(arguments[1]);
+		equal = (a1 == a2);
+	}
+	JsBoolToBoolean(equal, &output);
+	return output;
+}
+
 JsValueRef EJSFunction::JSCameraGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
 	JsValueRef output = JS_INVALID_REFERENCE;
@@ -1178,6 +1233,20 @@ JsValueRef EJSFunction::JSCameraGetForward(JsValueRef callee, bool isConstructCa
 		JsCreateExternalObject(val, nullptr, &output);
 		JsSetPrototype(output, JSVec3Prototype);
 	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSCameraEqual(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool equal = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Camera* a1 = JSToNativeCamera(arguments[0]);
+		Camera* a2 = JSToNativeCamera(arguments[1]);
+		equal = (a1 == a2);
+	}
+	JsBoolToBoolean(equal, &output);
 	return output;
 }
 

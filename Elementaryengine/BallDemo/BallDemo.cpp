@@ -13,6 +13,7 @@ using namespace std;
 #include <iostream>
 #include "AstroidDemo.h"
 #include <ERasterizer.h>
+#include <EModularRasterizer.h>
 #include <ERaytracer.h>
 
 int main()
@@ -22,7 +23,11 @@ int main()
 	a = 1;
 	if (a == 1) {
 		Game game = Game::Instance();
-		game.renderer = new ERasterizer();
+		//game.renderer = new ERasterizer();
+		game.displaySettings->windowHeight = 512;
+		game.displaySettings->windowWidth = 1024;
+
+		game.renderer = new EModularRasterizer();
 		game.name = "Ball demo";
 		BallDemoMode* mode = new BallDemoMode();
 		mode->game = &game;

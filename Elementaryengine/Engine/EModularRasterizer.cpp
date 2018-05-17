@@ -1,4 +1,4 @@
-#include "ERasterizer.h"
+#include "EModularRasterizer.h"
 #include "Game.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -6,25 +6,25 @@
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
 
-//#include <stb_image.h>
-//#include <stb_image_resize.h>
+#include <stb_image.h>
+#include <stb_image_resize.h>
 
 
-bool ERasterizer::assetCreated = true;
-bool ERasterizer::assetChanged = true;
+bool EModularRasterizer::assetCreated = true;
+bool EModularRasterizer::assetChanged = true;
 
-ERasterizer::ERasterizer()
+EModularRasterizer::EModularRasterizer()
 {
 
 }
 
 
-ERasterizer::~ERasterizer()
+EModularRasterizer::~EModularRasterizer()
 {
 
 }
 
-void ERasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
+void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 {
 	glGenTextures(1, &eOpenGl->shadowMaps);
 	glGenFramebuffers(1, &eOpenGl->lBuffer);
@@ -56,62 +56,80 @@ void ERasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 	Asset::rendererAssetChangedCallback = &AssetChangedCallback;
 	Asset::rendererAssetDestroyedCallback = &AssetDestroyedCallback;
 
-}
+	uniformViewPos = EOGLUniform<vec3>(Mesh::pbrShader, "viewPos", vec3(0));
 
-Texture* ERasterizer::loadTexture(const char * path)
+	// Shadow uniforms
+	shadowUniformLayer = EOGLUniform<int>(Mesh::lightmapShader, "layer", 0);
+	shadowUniformFar_plane = EOGLUniform<float>(Mesh::lightmapShader, "far_plane", 25.0f);
+	shadowUniformLightPos = EOGLUniform<vec3>(Mesh::lightmapShader, "lightPos", vec3(0));
+
+	// Geometry pass Uniforms
+	geometryUniformVP = EOGLUniform<mat4>(Mesh::geometryShader, "VP", mat4(0));
+	geometryUniformVP.SetValueFunction([]() { return Game::Instance().Projection * Game::Instance().View; });
+
+	geometryUniformTextures = EOGLUniform<int>(Mesh::geometryShader, "textures", 0);
+
+	// lighting pass Uniforms
+	lightingUniformPosition = EOGLUniform<int>(Mesh::pbrShader, "gPosition", 0);
+	lightingUniformNormal = EOGLUniform<int>(Mesh::pbrShader, "gNormal", 1);
+	lightingUniformAlbedoSpec = EOGLUniform<int>(Mesh::pbrShader, "gAlbedoSpec", 2);
+	lightingUniformMaterial = EOGLUniform<int>(Mesh::pbrShader, "gMaterial", 3);
+	lightingUniformFar_plane = EOGLUniform<float>(Mesh::pbrShader, "far_plane", 25.0f);
+}
+Texture* EModularRasterizer::loadTexture(const char * path)
 {
 	Texture* tex = new Texture();
 	if (!Game::isServer) {
 		int width, height, nrChannels;
 		int size = 1024;
-		//unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
-		////unsigned char *fdata;
-		////stbir_resize_uint8(data, width, height, 0, fdata, size, size, 0, nrChannels);
-		//if (width != size || height != size) {
-		//	cout << "Invalid Texture size\n";
-		//	return nullptr;
-		//}
-		//tex->layer = 10000;
-		//for each (int i in Game::eOpenGl->freeLayers)
-		//{
-		//	if (i < tex->layer) {
-		//		tex->layer = i;
-		//	}
-		//}
-		//glBindTexture(GL_TEXTURE_2D_ARRAY, Game::eOpenGl->textureArray);
-		//glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, tex->layer, size, size, 1, GL_RGB, GL_UNSIGNED_BYTE, data);
+		unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
+		//unsigned char *fdata;
+		//stbir_resize_uint8(data, width, height, 0, fdata, size, size, 0, nrChannels);
+		if (width != size || height != size) {
+			cout << "Invalid Texture size\n";
+			return nullptr;
+		}
+		tex->layer = 10000;
+		for each (int i in Game::eOpenGl->freeLayers)
+		{
+			if (i < tex->layer) {
+				tex->layer = i;
+			}
+		}
+		glBindTexture(GL_TEXTURE_2D_ARRAY, Game::eOpenGl->textureArray);
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, tex->layer, size, size, 1, GL_RGB, GL_UNSIGNED_BYTE, data);
 
-		//Game::eOpenGl->freeLayers.erase(std::remove(Game::eOpenGl->freeLayers.begin(), Game::eOpenGl->freeLayers.end(), tex->layer), Game::eOpenGl->freeLayers.end());
+		Game::eOpenGl->freeLayers.erase(std::remove(Game::eOpenGl->freeLayers.begin(), Game::eOpenGl->freeLayers.end(), tex->layer), Game::eOpenGl->freeLayers.end());
 
-		//stbi_image_free(data);
+		stbi_image_free(data);
 	}
 	return tex;
 }
 
-void ERasterizer::AssetCreatedCallback(Asset * asset)
+void EModularRasterizer::AssetCreatedCallback(Asset * asset)
 {
 	assetCreated = true;
 }
 
-void ERasterizer::AssetChangedCallback(Asset * asset)
+void EModularRasterizer::AssetChangedCallback(Asset * asset)
 {
 	bool c = false;
 	for each (AssetComponent* com in asset->components)
 	{
-		if (Mesh* m = static_cast<Mesh*>(com)){
+		if (Mesh* m = static_cast<Mesh*>(com)) {
 			c = true;
 		}
 	}
-	if(c)assetChanged = true;
+	if (c)assetChanged = true;
 }
 
-void ERasterizer::AssetDestroyedCallback(Asset * asset)
+void EModularRasterizer::AssetDestroyedCallback(Asset * asset)
 {
 	assetCreated = true;
 }
 
 
-void ERasterizer::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl)
+void EModularRasterizer::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOpenGl)
 {
 	// see if new mesh is loaded or new asset is created
 	if (meshChanged || assetsChanged) {
@@ -213,7 +231,7 @@ void ERasterizer::BuildMeshes(bool assetsChanged, bool meshChanged, EOpenGl* eOp
 	}
 }
 
-void ERasterizer::BuildUI(EOpenGl * eOpenGl)
+void EModularRasterizer::BuildUI(EOpenGl * eOpenGl)
 {
 	eOpenGl->ERUIElements.clear();
 	eOpenGl->ERUIElements.resize(0);
@@ -241,7 +259,7 @@ void ERasterizer::BuildUI(EOpenGl * eOpenGl)
 
 }
 
-void ERasterizer::BuildDrawAtrib(EOpenGl * eOpenGl)
+void EModularRasterizer::BuildDrawAtrib(EOpenGl * eOpenGl)
 {
 	if (assetChanged || assetCreated) {
 		// create a vector for the draw Atributes
@@ -249,7 +267,7 @@ void ERasterizer::BuildDrawAtrib(EOpenGl * eOpenGl)
 		vector<DrawMeshAtributes> drawAtrib;
 		for each (Mesh* m in Game::meshs) {
 			int lastoffset = eOpenGl->drawInstanceOffset.back();
-		
+
 			for each(Asset* as in m->parents) {
 				// create a new atribute
 				DrawMeshAtributes a = DrawMeshAtributes();
@@ -287,7 +305,7 @@ void ERasterizer::BuildDrawAtrib(EOpenGl * eOpenGl)
 	}
 }
 
-void ERasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
+void EModularRasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
 {
 	// use the lightmap shader
 	Shader* shader = Mesh::lightmapShader;
@@ -345,11 +363,7 @@ void ERasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
 			shadowTransforms.push_back(shadowProj *
 				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
-			// set layer uniform wich tell the shader wich slice of the texture array to render to
-			if (eOpenGl->shadowUniformLayer < 0) {
-				eOpenGl->shadowUniformLayer = glGetUniformLocation(shader->ID, "layer");
-			}
-			shader->setInt(eOpenGl->shadowUniformLayer, count);
+			shadowUniformLayer.Update(count);
 
 			// copy the created shadow matrix to the GPU
 			if (eOpenGl->shadowUniformShadowMatrices < 0) {
@@ -358,16 +372,8 @@ void ERasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
 			glUniformMatrix4fv(eOpenGl->shadowUniformShadowMatrices, shadowTransforms.size(), GL_FALSE, glm::value_ptr(shadowTransforms[0]));
 			count++;
 
-
-			if (eOpenGl->shadowUniformFar_plane < 0) {
-				eOpenGl->shadowUniformFar_plane = glGetUniformLocation(shader->ID, "far_plane");
-			}
-			shader->setFloat(eOpenGl->shadowUniformFar_plane, 25);
-
-			if (eOpenGl->shadoeUniformLightPos < 0) {
-				eOpenGl->shadoeUniformLightPos = glGetUniformLocation(shader->ID, "lightPos");
-			}
-			shader->set3Float(eOpenGl->shadoeUniformLightPos, l->parents[0]->position);
+			shadowUniformFar_plane.Update(25);
+			shadowUniformLightPos.Update(l->parents[0]->position);
 
 			glBindVertexArray(eOpenGl->vao);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eOpenGl->gElementBuffer);
@@ -383,25 +389,25 @@ void ERasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ERasterizer::SetupFrame(bool meshChanged, EOpenGl * eOpenGl)
+void EModularRasterizer::SetupFrame(bool meshChanged, EOpenGl * eOpenGl)
 {
 	BuildMeshes(assetChanged || assetCreated, meshChanged, eOpenGl);
 	BuildDrawAtrib(eOpenGl);
 }
 
-void ERasterizer::RenderFrame(EOpenGl * eOpenGl, EDisplaySettings * displaySettings, mat4 View, mat4 Projection)
+void EModularRasterizer::RenderFrame(EOpenGl * eOpenGl, EDisplaySettings * displaySettings, mat4 View, mat4 Projection)
 {
 	RenderShadowMaps(eOpenGl);
-	RenderFrameMain(eOpenGl, displaySettings,View,Projection); 
+	RenderFrameMain(eOpenGl, displaySettings, View, Projection);
 	assetCreated = false;
 	assetChanged = false;
 }
 
-void ERasterizer::RenderFX(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
+void EModularRasterizer::RenderFX(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 {
 }
 
-void ERasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection)
+void EModularRasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection)
 {
 	// geometry pass
 
@@ -421,10 +427,8 @@ void ERasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySet
 	Mesh::geometryShader->use();
 
 	// copy View Projection Matrix to GPU
-	if (eOpenGl->geometryUniformVP < 0) {
-		eOpenGl->geometryUniformVP = glGetUniformLocation(Mesh::geometryShader->ID, "VP");
-	}
-	Mesh::geometryShader->setMat4f(eOpenGl->geometryUniformVP, Projection * View);
+	geometryUniformVP.Update(Projection * View);
+	//geometryUniformVP.Update();
 
 	// bind the composed mesh and its buffers
 	glBindVertexArray(eOpenGl->vao);
@@ -433,11 +437,11 @@ void ERasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySet
 
 	// bind the array of textures
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, eOpenGl->textureArray);
-	if (eOpenGl->geometryUniformTextures < 0) {
-		eOpenGl->geometryUniformTextures = glGetUniformLocation(Mesh::geometryShader->ID, "textures");
-	}
-	Mesh::geometryShader->setInt(eOpenGl->geometryUniformTextures, 0);
+	geometryUniformTextures.Update(0);
+	//if (eOpenGl->lightingUniformPosition < 0) {
+	//	eOpenGl->lightingUniformPosition = glGetUniformLocation(Mesh::pbrShader->ID, "gPosition");
+	//}
+	//Mesh::pbrShader->setInt(eOpenGl->lightingUniformPosition, 0);
 
 	// draw all elements to the geometry buffer
 	glMultiDrawElementsIndirect(GL_TRIANGLES,
@@ -467,40 +471,26 @@ void ERasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySet
 	// bind Position buffer texture and set its uniform
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, eOpenGl->gPosition);
-	if (eOpenGl->lightingUniformPosition < 0) {
-		eOpenGl->lightingUniformPosition = glGetUniformLocation(Mesh::pbrShader->ID, "gPosition");
-	}
-	shader->setInt(eOpenGl->lightingUniformPosition, 0);
+	// Value 0
+	lightingUniformPosition.Set();
 
 	// bind Normal buffer texture and set its uniform
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, eOpenGl->gNormal);
-	if (eOpenGl->lightingUniformNormal < 0) {
-		eOpenGl->lightingUniformNormal = glGetUniformLocation(Mesh::pbrShader->ID, "gNormal");
-	}
-	shader->setInt(eOpenGl->lightingUniformNormal, 1);
+	lightingUniformNormal.Set();
 
 	// bind AlbedoSpec buffer texture and set its uniform
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, eOpenGl->gAlbedoSpec);
-	if (eOpenGl->lightingUniformAlbedoSpec < 0) {
-		eOpenGl->lightingUniformAlbedoSpec = glGetUniformLocation(Mesh::pbrShader->ID, "gAlbedoSpec");
-	}
-	shader->setInt(eOpenGl->lightingUniformAlbedoSpec, 2);
+	lightingUniformAlbedoSpec.Set();
 
 	// bind MaterialBuffer texture and set its uniform
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, eOpenGl->gMaterial);
-	if (eOpenGl->lightingUniformMaterial < 0) {
-		eOpenGl->lightingUniformMaterial = glGetUniformLocation(Mesh::pbrShader->ID, "gMaterial");
-	}
-	shader->setInt(eOpenGl->lightingUniformMaterial, 3);
+	lightingUniformMaterial.Set();
 
 	// set far_plane uniform
-	if (eOpenGl->lightingUniformFar_plane < 0) {
-		eOpenGl->lightingUniformFar_plane = glGetUniformLocation(Mesh::pbrShader->ID, "far_plane");
-	}
-	shader->setFloat(eOpenGl->lightingUniformFar_plane, 25);
+	lightingUniformFar_plane.Update(25.0f);
 
 	// bind depth texture and set its uniform
 	glActiveTexture(GL_TEXTURE6);
@@ -522,11 +512,15 @@ void ERasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySet
 	}
 	shader->setMat4f(eOpenGl->lightingUniformView, inverse(View));
 
-	// set view position uniform
-	if (eOpenGl->lightingUniformViewPos < 0) {
-		eOpenGl->lightingUniformViewPos = glGetUniformLocation(shader->ID, "viewPos");
-	}
-	shader->set3Float(eOpenGl->lightingUniformViewPos, Game::activeCam->position);
+	//// set view position uniform
+	//if (eOpenGl->lightingUniformViewPos < 0) {
+	//	eOpenGl->lightingUniformViewPos = glGetUniformLocation(shader->ID, "viewPos");
+	//}
+	//shader->set3Float(eOpenGl->lightingUniformViewPos, Game::activeCam->position);
+	uniformViewPos.Update(Game::activeCam->position);
+
+
+
 
 	SetupLamps(eOpenGl, shader);
 
@@ -662,7 +656,7 @@ void ERasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySet
 	glEnable(GL_DEPTH_TEST);
 }
 
-void ERasterizer::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
+void EModularRasterizer::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 {
 	// create vectors for light colors and positions
 	vector<vec4> lightColors;
@@ -701,7 +695,7 @@ void ERasterizer::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 	glBufferData(GL_SHADER_STORAGE_BUFFER, lps, lightPositions.data(), GL_DYNAMIC_DRAW);
 }
 
-void ERasterizer::RenderUI(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
+void EModularRasterizer::RenderUI(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -711,4 +705,9 @@ void ERasterizer::RenderUI(EOpenGl * eOpenGl, EDisplaySettings * displaySettings
 
 	glDisable(GL_BLEND);
 
+}
+
+DWORD AssetDataThread(LPVOID lpParam)
+{
+	return 0;
 }
