@@ -186,6 +186,7 @@
     <ClCompile Include="ERender.cpp" />
     <ClCompile Include="ERenderPass.cpp" />
     <ClCompile Include="EScriptContext.cpp" />
+    <ClCompile Include="EShadowPass.cpp" />
     <ClCompile Include="FPCam.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Lamp.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="EEngine.h" />
     <ClInclude Include="ERenderPass.h" />
     <ClInclude Include="EScriptContext.h" />
+    <ClInclude Include="EShadowPass.h" />
     <ClInclude Include="FPCam.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameMode.h" />

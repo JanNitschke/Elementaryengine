@@ -26,8 +26,6 @@ EModularRasterizer::~EModularRasterizer()
 
 void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 {
-	glGenTextures(1, &eOpenGl->shadowMaps);
-
 	glGenTextures(1, &Game::eOpenGl->textureArray);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, Game::eOpenGl->textureArray);
@@ -36,7 +34,6 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGB8, TextureSize, TextureSize, TextureCount);
-	//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB, Game::TextureSize, Game::TextureSize, TextureCount,0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	for (int i = 0; i < TextureCount; i++)
@@ -54,18 +51,15 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 	Asset::rendererAssetChangedCallback = &AssetChangedCallback;
 	Asset::rendererAssetDestroyedCallback = &AssetDestroyedCallback;
 
-	uniformViewPos = EOGLUniform<vec3>(Mesh::pbrShader, "viewPos", vec3(0));
-
-	// Shadow uniforms
-	shadowUniformLayer = EOGLUniform<int>(Mesh::lightmapShader, "layer", 0);
-	shadowUniformFar_plane = EOGLUniform<float>(Mesh::lightmapShader, "far_plane", 25.0f);
-	shadowUniformLightPos = EOGLUniform<vec3>(Mesh::lightmapShader, "lightPos", vec3(0));
-
+	GLuint shadowMaps;
 	EOpenGl* eOpenGL = Game::eOpenGl;
+	shadowPass = new EShadowPass(eOpenGL->vao, eOpenGL->gElementBuffer, eOpenGL->gIndirectBuffer, eOpenGL->instance, &shadowMaps);
+
 	geometryPass = new EGeometryPass(&eOpenGL->gPosition,&eOpenGL->gNormal,&eOpenGL->gAlbedoSpec,&eOpenGL->gMaterial,&eOpenGL->gDepth);
-	illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial);
+	illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial,eOpenGL->gDepth);
 	postPass = new EPostPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, illuminationPass->frameOut, eOpenGL->gDepth);
 
+	renderPasses.push_back(shadowPass);
 	renderPasses.push_back(geometryPass);
 	renderPasses.push_back(illuminationPass);
 	renderPasses.push_back(postPass);
@@ -304,90 +298,6 @@ void EModularRasterizer::BuildDrawAtrib(EOpenGl * eOpenGl)
 	}
 }
 
-void EModularRasterizer::RenderShadowMaps(EOpenGl * eOpenGl)
-{
-	// use the lightmap shader
-	Shader* shader = Mesh::lightmapShader;
-	shader->use();
-
-	// get the number of lights in a scene
-	int lightcount = Game::lamps.size();
-
-	// bind the cubemap array containing the shadowmap
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, eOpenGl->shadowMaps);
-
-	// setup the texture array to resize to fit all the lights in the scene
-	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT32, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT, 6 * lightcount, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
-
-	// change the viewport to the resolution of the shadowmaps
-	glViewport(0, 0, Lamp::SHADOW_WIDTH, Lamp::SHADOW_HEIGHT);
-
-	// bind the Texture array to framebuffer and clear it
-	glBindFramebuffer(GL_FRAMEBUFFER, Lamp::depthMapFBO);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, eOpenGl->shadowMaps, 0);
-	glClearDepth(1);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	// render each lamp to a layer
-	int count = 0;
-	for each (Lamp* l in Game::lamps)
-	{
-
-		// only rerender the layer if a shadowmap is needed
-		if (l->throwShadows) {
-
-			// create the projection matrix
-			float aspect = (float)Lamp::SHADOW_WIDTH / (float)Lamp::SHADOW_WIDTH;
-			float Snear = 1.0f;
-			float Sfar = 25.0f;
-			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, Snear, Sfar);
-			vec3 lightPos = l->parents[0]->position;
-			std::vector<glm::mat4> shadowTransforms;
-			shadowTransforms.push_back(shadowProj *
-				glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(shadowProj *
-				glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(shadowProj *
-				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-			shadowTransforms.push_back(shadowProj *
-				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-			shadowTransforms.push_back(shadowProj *
-				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(shadowProj *
-				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
-
-			shadowUniformLayer.Update(count);
-
-			// copy the created shadow matrix to the GPU
-			if (eOpenGl->shadowUniformShadowMatrices < 0) {
-				eOpenGl->shadowUniformShadowMatrices = glGetUniformLocation(shader->ID, "shadowMatrices");
-			}
-			glUniformMatrix4fv(eOpenGl->shadowUniformShadowMatrices, shadowTransforms.size(), GL_FALSE, glm::value_ptr(shadowTransforms[0]));
-			count++;
-
-			shadowUniformFar_plane.Update(25);
-			shadowUniformLightPos.Update(l->parents[0]->position);
-
-			glBindVertexArray(eOpenGl->vao);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eOpenGl->gElementBuffer);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, eOpenGl->gIndirectBuffer);
-
-			glMultiDrawElementsIndirect(GL_TRIANGLES,
-				GL_UNSIGNED_INT,
-				(GLvoid*)0,
-				eOpenGl->instance,
-				0);
-		}
-	}
-	glBindTexture(GL_TEXTURE_2D, 0);
-}
-
 void EModularRasterizer::SetupFrame(bool meshChanged, EOpenGl * eOpenGl)
 {
 	BuildMeshes(assetChanged || assetCreated, meshChanged, eOpenGl);
@@ -396,7 +306,6 @@ void EModularRasterizer::SetupFrame(bool meshChanged, EOpenGl * eOpenGl)
 
 void EModularRasterizer::RenderFrame(EOpenGl * eOpenGl, EDisplaySettings * displaySettings, mat4 View, mat4 Projection)
 {
-	RenderShadowMaps(eOpenGl);
 	RenderFrameMain(eOpenGl, displaySettings, View, Projection);
 	assetCreated = false;
 	assetChanged = false;

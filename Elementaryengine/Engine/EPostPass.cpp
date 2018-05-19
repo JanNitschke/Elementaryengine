@@ -83,15 +83,15 @@ void EPostPass::Initialize()
 	_uniforms.push_back(new EOGLUniform<int>(_shader, "gAlbedoSpec", 2));
 	_uniforms.push_back(new EOGLUniform<int>(_shader, "gMaterial", 3));
 	_uniforms.push_back(new EOGLUniform<int>(_shader, "gDepth", 6));
-	_uniforms.push_back(new EOGLUniform<float>(_shader, "far_plane", 25.0f));
+	//_uniforms.push_back(new EOGLUniform<float>(_shader, "far_plane", 25.0f));
 	_uniforms.push_back(new EOGLUniform<int>(_shader, "gColor", 5));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "textures", 0));
+	//_uniforms.push_back(new EOGLUniform<int>(_shader, "textures", 0));
 
-	_uniforms.push_back(new EOGLUniform<vec3>(_shader, "viewPos",	[](){return Game::activeCam->position; }));
-	_uniforms.push_back(new EOGLUniform<mat4>(_shader, "view",		[](){return Game::View; }));
-	_uniforms.push_back(new EOGLUniform<mat4>(_shader, "invView",	[](){return inverse(Game::View); }));
-	_uniforms.push_back(new EOGLUniform<mat4>(_shader, "proj",		[](){return Game::Projection; }));
-	_uniforms.push_back(new EOGLUniform<mat4>(_shader, "invProj",	[](){return inverse(Game::Projection); }));
+	//_uniforms.push_back(new EOGLUniform<vec3>(_shader, "viewPos",	[](){return Game::activeCam->position; }));
+	//_uniforms.push_back(new EOGLUniform<mat4>(_shader, "view",		[](){return Game::View; }));
+	//_uniforms.push_back(new EOGLUniform<mat4>(_shader, "invView",	[](){return inverse(Game::View); }));
+	//_uniforms.push_back(new EOGLUniform<mat4>(_shader, "proj",		[](){return Game::Projection; }));
+	//_uniforms.push_back(new EOGLUniform<mat4>(_shader, "invProj",	[](){return inverse(Game::Projection); }));
 	_uniforms.push_back(new EOGLUniform<int>(_shader, "screenX",	[](){return Game::displaySettings->windowWidth; }));
 	_uniforms.push_back(new EOGLUniform<int>(_shader, "screenY",	[](){return Game::displaySettings->windowHeight; }));
 

@@ -8,12 +8,13 @@ EIlluminationPass::EIlluminationPass()
 
 }
 
-EIlluminationPass::EIlluminationPass(GLuint positionBuffer, GLuint normalBuffer, GLuint albedoSpecBuffer, GLuint materialBuffer)
+EIlluminationPass::EIlluminationPass(GLuint positionBuffer, GLuint normalBuffer, GLuint albedoSpecBuffer, GLuint materialBuffer, GLuint depthBuffer)
 {
 	PositionBuffer = positionBuffer;
 	NormalBuffer = normalBuffer;
 	AlbedoSpecBuffer = albedoSpecBuffer;
 	MaterialBuffer = materialBuffer;
+	DepthBuffer = depthBuffer;
 	glGenTextures(1, &frameOut);
 
 }
@@ -61,6 +62,7 @@ void EIlluminationPass::Render()
 
 	// bind depth texture and set its uniform
 	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
 
 
 	SetupLamps(Game::eOpenGl, _shader);

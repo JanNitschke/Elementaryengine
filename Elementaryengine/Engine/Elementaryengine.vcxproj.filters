@@ -132,6 +132,9 @@
     <ClCompile Include="EPostPass.cpp">
       <Filter>Quelldateien\Renderers\Modular</Filter>
     </ClCompile>
+    <ClCompile Include="EShadowPass.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="EPostPass.h">
       <Filter>Headerdateien\Renderers\Modular</Filter>
+    </ClInclude>
+    <ClInclude Include="EShadowPass.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -26,7 +26,7 @@ void ERenderPass::Render()
 	{
 		uniform->Update();
 	}
-
+	return;
 }
 
 void ERenderPass::Initialize()

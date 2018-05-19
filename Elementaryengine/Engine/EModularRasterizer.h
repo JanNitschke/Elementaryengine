@@ -6,6 +6,7 @@
 #include "EIlluminationPass.h"
 #include <EGeometryPass.h>
 #include "EPostPass.h"
+#include <EShadowPass.h>
 
 class EModularRasterizer : public ERenderer
 {
@@ -35,6 +36,8 @@ private:
 	EIlluminationPass * illuminationPass;
 	EGeometryPass * geometryPass;
 	EPostPass * postPass;
+	EShadowPass * shadowPass;
+
 	///<summary>
 	///builds the composed mesh needed for multiDrawIndirect and copies it to the GPU buffers
 	///</summary> 
@@ -65,14 +68,6 @@ private:
 	///</summary> 
 	// TODO: implement ChangeAssetInfo using compute shader on ssbo
 	void ChangeAssetInfo();
-
-	///<summary>
-	///renders the Shadowmaps to the cubemap array specified in eOpenGl
-	///</summary> 
-	///<param name="eOpenGl">
-	///the EOpenGl object that holds the buffer ids that should be worked on and the cubemap array texture
-	///</param>
-	void RenderShadowMaps(EOpenGl* eOpenGl);
 
 	///<summary>
 	///renders the frame and PostFX in 3 passes: geometry, lighting, postFX

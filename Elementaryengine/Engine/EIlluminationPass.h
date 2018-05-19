@@ -5,7 +5,7 @@ class EIlluminationPass :
 {
 public:
 	EIlluminationPass();
-	EIlluminationPass(GLuint positionBuffer, GLuint normalBuffer, GLuint albedoSpecBuffer, GLuint materialBuffer);
+	EIlluminationPass(GLuint positionBuffer, GLuint normalBuffer, GLuint albedoSpecBuffer, GLuint materialBuffer, GLuint depthBuffer);
 	~EIlluminationPass();
 
 	virtual void Render();
@@ -15,7 +15,7 @@ public:
 	GLuint NormalBuffer;
 	GLuint AlbedoSpecBuffer;
 	GLuint MaterialBuffer;
-
+	GLuint DepthBuffer;
 
 	GLuint lightColorSSBO;
 	GLuint lightPositionSSBO;
