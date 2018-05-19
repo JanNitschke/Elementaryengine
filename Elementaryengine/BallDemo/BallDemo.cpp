@@ -24,8 +24,8 @@ int main()
 	if (a == 1) {
 		Game game = Game::Instance();
 		//game.renderer = new ERasterizer();
-		game.displaySettings->windowHeight = 512;
-		game.displaySettings->windowWidth = 1024;
+		Game::displaySettings->windowHeight = 900;
+		Game::displaySettings->windowWidth = 1600;
 
 		game.renderer = new EModularRasterizer();
 		game.name = "Ball demo";

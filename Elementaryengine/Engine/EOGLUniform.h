@@ -7,8 +7,13 @@
 using namespace std;
 using namespace glm;
 
+class EOGLBaseUniform {
+public:
+	virtual void Update() = 0;
+};
+
 template <class T>
-class EOGLUniform {
+class EOGLUniform: public EOGLBaseUniform{
 public:
 	Shader * _shader;
 	T _value;
@@ -80,10 +85,9 @@ public:
 		SetValuePointer(valuePt);
 		Set();
 	}
-	void Update() {
+	virtual void Update() {
 		if(_valueFunction != NULL)
 			SetValue(_valueFunction());
-		mat4 test = Game::Instance().Projection;
 		Set();
 	}
 	T GetValue()
@@ -101,6 +105,13 @@ public:
 		SetShader(shader);
 		SetName(name);
 		SetValue(value);
+	}
+
+	EOGLUniform(Shader * shader, const std::string & name, ValueFn valueFunction)
+	{
+		SetShader(shader);
+		SetName(name);
+		SetValueFunction(valueFunction);
 	}
 	void SetValueFunction(ValueFn valueFunction) {
 		_valueFunction = valueFunction;

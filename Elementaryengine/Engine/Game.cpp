@@ -64,6 +64,10 @@ vec2 Game::scroll;
 bool Game::scrolledThisFrame = false;
 ERenderer* Game::renderer;
 
+mat4 Game::View;
+mat4 Game::Projection;
+EDisplaySettings* Game::displaySettings = new EDisplaySettings();
+
 // start the game and run the main loop
 void Game::Start()
 {

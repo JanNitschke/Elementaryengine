@@ -2,6 +2,11 @@
 #include <ERender.h>
 #include <Game.h>
 #include <EOGLUniform.h>
+#include <ERenderPass.h>
+#include "EIlluminationPass.h"
+#include <EGeometryPass.h>
+#include "EPostPass.h"
+
 class EModularRasterizer : public ERenderer
 {
 public:
@@ -25,6 +30,11 @@ public:
 	const unsigned int TextureCount = 64;
 private:
 
+	vector<ERenderPass*> renderPasses;
+
+	EIlluminationPass * illuminationPass;
+	EGeometryPass * geometryPass;
+	EPostPass * postPass;
 	///<summary>
 	///builds the composed mesh needed for multiDrawIndirect and copies it to the GPU buffers
 	///</summary> 

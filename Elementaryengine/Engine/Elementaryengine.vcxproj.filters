@@ -19,9 +19,6 @@
     <Filter Include="Headerdateien\Engine">
       <UniqueIdentifier>{937ffd72-d338-40de-9ca5-4a254d8d9165}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\Interfaces">
-      <UniqueIdentifier>{5e833530-0cb9-443b-8ae9-fe37a4651f10}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Headerdateien\JavaScript">
       <UniqueIdentifier>{8697a9cb-b003-4c10-8349-39a190f1b7b6}</UniqueIdentifier>
     </Filter>
@@ -42,6 +39,15 @@
     </Filter>
     <Filter Include="Quelldateien\Asset">
       <UniqueIdentifier>{b0c2efff-566e-4b09-b61d-411498b3f85d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Renderers\Modular">
+      <UniqueIdentifier>{115d4c7f-724d-44e6-8e4a-da02b714b46e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Renderers\Modular">
+      <UniqueIdentifier>{bf37d534-2808-492d-badb-2cf3fbae39f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Engine\Interfaces">
+      <UniqueIdentifier>{5e833530-0cb9-443b-8ae9-fe37a4651f10}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,11 +114,23 @@
     <ClCompile Include="ERender.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="EModularRasterizer.cpp">
-      <Filter>Quelldateien\Renderers</Filter>
-    </ClCompile>
     <ClCompile Include="EOGLUniform.cpp">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EModularRasterizer.cpp">
+      <Filter>Quelldateien\Renderers\Modular</Filter>
+    </ClCompile>
+    <ClCompile Include="ERenderPass.cpp">
+      <Filter>Quelldateien\Renderers\Modular</Filter>
+    </ClCompile>
+    <ClCompile Include="EGeometryPass.cpp">
+      <Filter>Quelldateien\Renderers\Modular</Filter>
+    </ClCompile>
+    <ClCompile Include="EIlluminationPass.cpp">
+      <Filter>Quelldateien\Renderers\Modular</Filter>
+    </ClCompile>
+    <ClCompile Include="EPostPass.cpp">
+      <Filter>Quelldateien\Renderers\Modular</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -147,7 +165,7 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="GameMode.h">
-      <Filter>Headerdateien\Interfaces</Filter>
+      <Filter>Headerdateien\Engine\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="stb_image_resize.h">
       <Filter>Headerdateien</Filter>
@@ -212,11 +230,23 @@
     <ClInclude Include="ERaytracer.h">
       <Filter>Headerdateien\Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="EModularRasterizer.h">
-      <Filter>Headerdateien\Renderers</Filter>
-    </ClInclude>
     <ClInclude Include="EOGLUniform.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EModularRasterizer.h">
+      <Filter>Headerdateien\Renderers\Modular</Filter>
+    </ClInclude>
+    <ClInclude Include="EGeometryPass.h">
+      <Filter>Headerdateien\Renderers\Modular</Filter>
+    </ClInclude>
+    <ClInclude Include="ERenderPass.h">
+      <Filter>Headerdateien\Renderers\Modular</Filter>
+    </ClInclude>
+    <ClInclude Include="EIlluminationPass.h">
+      <Filter>Headerdateien\Renderers\Modular</Filter>
+    </ClInclude>
+    <ClInclude Include="EPostPass.h">
+      <Filter>Headerdateien\Renderers\Modular</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

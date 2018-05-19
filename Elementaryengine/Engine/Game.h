@@ -25,7 +25,6 @@ class DllExport Game
 
 public:
 	static Game& Instance() { static Game game;
-	game.displaySettings = new EDisplaySettings();
 	return game; }
 
 	///<summary>
@@ -40,7 +39,7 @@ public:
 	///</summary> 
 	static EOpenGl* eOpenGl;
 
-	EDisplaySettings* displaySettings;
+	static EDisplaySettings* displaySettings;
 	///<summary>
 	///The Gamemode to load
 	///</summary> 
@@ -112,7 +111,7 @@ public:
 	///<summary>
 	///Projection matrix for 3D scene;
 	///</summary> 
-	glm::mat4 Projection;
+	static glm::mat4 Projection;
 
 	///<summary>
 	///Projection matrix for UI;
@@ -129,7 +128,7 @@ public:
 	///<summary>
 	///View matrix for the 3D scene;
 	///</summary> 
-	glm::mat4 View;
+	static glm::mat4 View;
 
 	///<summary>
 	///Smoothed FPS counter

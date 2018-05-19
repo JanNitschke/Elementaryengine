@@ -27,8 +27,6 @@ EModularRasterizer::~EModularRasterizer()
 void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 {
 	glGenTextures(1, &eOpenGl->shadowMaps);
-	glGenFramebuffers(1, &eOpenGl->lBuffer);
-	glGenTextures(1, &eOpenGl->frameOut);
 
 	glGenTextures(1, &Game::eOpenGl->textureArray);
 	glActiveTexture(GL_TEXTURE0);
@@ -63,18 +61,19 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 	shadowUniformFar_plane = EOGLUniform<float>(Mesh::lightmapShader, "far_plane", 25.0f);
 	shadowUniformLightPos = EOGLUniform<vec3>(Mesh::lightmapShader, "lightPos", vec3(0));
 
-	// Geometry pass Uniforms
-	geometryUniformVP = EOGLUniform<mat4>(Mesh::geometryShader, "VP", mat4(0));
-	geometryUniformVP.SetValueFunction([]() { return Game::Instance().Projection * Game::Instance().View; });
+	EOpenGl* eOpenGL = Game::eOpenGl;
+	geometryPass = new EGeometryPass(&eOpenGL->gPosition,&eOpenGL->gNormal,&eOpenGL->gAlbedoSpec,&eOpenGL->gMaterial,&eOpenGL->gDepth);
+	illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial);
+	postPass = new EPostPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, illuminationPass->frameOut, eOpenGL->gDepth);
 
-	geometryUniformTextures = EOGLUniform<int>(Mesh::geometryShader, "textures", 0);
+	renderPasses.push_back(geometryPass);
+	renderPasses.push_back(illuminationPass);
+	renderPasses.push_back(postPass);
 
-	// lighting pass Uniforms
-	lightingUniformPosition = EOGLUniform<int>(Mesh::pbrShader, "gPosition", 0);
-	lightingUniformNormal = EOGLUniform<int>(Mesh::pbrShader, "gNormal", 1);
-	lightingUniformAlbedoSpec = EOGLUniform<int>(Mesh::pbrShader, "gAlbedoSpec", 2);
-	lightingUniformMaterial = EOGLUniform<int>(Mesh::pbrShader, "gMaterial", 3);
-	lightingUniformFar_plane = EOGLUniform<float>(Mesh::pbrShader, "far_plane", 25.0f);
+	for each (ERenderPass* pass in renderPasses)
+	{
+		pass->Initialize();
+	}
 }
 Texture* EModularRasterizer::loadTexture(const char * path)
 {
@@ -409,247 +408,11 @@ void EModularRasterizer::RenderFX(EOpenGl * eOpenGl, EDisplaySettings * displayS
 
 void EModularRasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection)
 {
-	// geometry pass
-
-	// bind and setup framebuffer for geometry pass
-	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->gBuffer);
-	glDisable(GL_BLEND);
-	glClearColor(0.050f, 0.125f, 0.247f, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	//set viewport
-	glViewport(0, 0, displaySettings->windowWidth, displaySettings->windowHeight);
-
-	// use the geometry shader
-	Mesh::geometryShader->use();
-
-	// copy View Projection Matrix to GPU
-	geometryUniformVP.Update(Projection * View);
-	//geometryUniformVP.Update();
-
-	// bind the composed mesh and its buffers
-	glBindVertexArray(eOpenGl->vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eOpenGl->gElementBuffer);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, eOpenGl->gIndirectBuffer);
-
-	// bind the array of textures
-	glActiveTexture(GL_TEXTURE0);
-	geometryUniformTextures.Update(0);
-	//if (eOpenGl->lightingUniformPosition < 0) {
-	//	eOpenGl->lightingUniformPosition = glGetUniformLocation(Mesh::pbrShader->ID, "gPosition");
-	//}
-	//Mesh::pbrShader->setInt(eOpenGl->lightingUniformPosition, 0);
-
-	// draw all elements to the geometry buffer
-	glMultiDrawElementsIndirect(GL_TRIANGLES,
-		GL_UNSIGNED_INT,
-		(GLvoid*)0,
-		eOpenGl->instance,
-		0);
-
-
-	// lighting pass	
-	// bind and setup framebuffer for lighting pass
-	glBindFramebuffer(GL_FRAMEBUFFER, eOpenGl->lBuffer);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->frameOut);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, displaySettings->windowWidth, displaySettings->windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, eOpenGl->frameOut, 0);
-
-	// use the pbrlighting shader
-	Shader* shader = Mesh::pbrShader;
-	shader->use();
-
-	// clear buffers
-	glDisable(GL_DEPTH_TEST);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// bind Position buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gPosition);
-	// Value 0
-	lightingUniformPosition.Set();
-
-	// bind Normal buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gNormal);
-	lightingUniformNormal.Set();
-
-	// bind AlbedoSpec buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gAlbedoSpec);
-	lightingUniformAlbedoSpec.Set();
-
-	// bind MaterialBuffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gMaterial);
-	lightingUniformMaterial.Set();
-
-	// set far_plane uniform
-	lightingUniformFar_plane.Update(25.0f);
-
-	// bind depth texture and set its uniform
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gDepth);
-	if (eOpenGl->lightingUniformDepth < 0) {
-		eOpenGl->lightingUniformDepth = glGetUniformLocation(shader->ID, "gDepth");
+	
+	for each (ERenderPass* pass in renderPasses)
+	{
+		pass->Render();
 	}
-	shader->setInt(eOpenGl->lightingUniformDepth, 6);
-
-	// set projection unform
-	if (eOpenGl->lightingUniformProj < 0) {
-		eOpenGl->lightingUniformProj = glGetUniformLocation(shader->ID, "invProj");
-	}
-	shader->setMat4f(eOpenGl->lightingUniformProj, inverse(Projection));
-
-	// set view unform
-	if (eOpenGl->lightingUniformView < 0) {
-		eOpenGl->lightingUniformView = glGetUniformLocation(shader->ID, "invView");
-	}
-	shader->setMat4f(eOpenGl->lightingUniformView, inverse(View));
-
-	//// set view position uniform
-	//if (eOpenGl->lightingUniformViewPos < 0) {
-	//	eOpenGl->lightingUniformViewPos = glGetUniformLocation(shader->ID, "viewPos");
-	//}
-	//shader->set3Float(eOpenGl->lightingUniformViewPos, Game::activeCam->position);
-	uniformViewPos.Update(Game::activeCam->position);
-
-
-
-
-	SetupLamps(eOpenGl, shader);
-
-	eOpenGl->renderQuad();
-
-	//post fx (ssr) 
-	glBlitFramebuffer(0, 0, displaySettings->windowWidth, displaySettings->windowHeight, 0, 0, displaySettings->windowWidth, displaySettings->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// use the ssr Shader
-	shader = Mesh::ssrShader;
-	shader->use();
-
-	// clear the frame
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// bind Position buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gPosition);
-	if (eOpenGl->ssrUniformPosition < 0) {
-		eOpenGl->ssrUniformPosition = glGetUniformLocation(shader->ID, "gPosition");
-	}
-	shader->setInt(eOpenGl->ssrUniformPosition, 0);
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gNormal);
-	if (eOpenGl->ssrUniformNormal < 0) {
-		eOpenGl->ssrUniformNormal = glGetUniformLocation(shader->ID, "gNormal");
-	}
-	shader->setInt(eOpenGl->ssrUniformNormal, 1);
-
-	// bind AlbedoSpec buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gAlbedoSpec);
-	if (eOpenGl->ssrUniformAlbedoSpec < 0) {
-		eOpenGl->ssrUniformAlbedoSpec = glGetUniformLocation(shader->ID, "gAlbedoSpec");
-	}
-	shader->setInt(eOpenGl->ssrUniformAlbedoSpec, 2);
-
-	// bind MaterialBuffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gMaterial);
-	if (eOpenGl->ssrUniformMaterial < 0) {
-		eOpenGl->ssrUniformMaterial = glGetUniformLocation(shader->ID, "gMaterial");
-	}
-	shader->setInt(eOpenGl->ssrUniformMaterial, 3);
-
-	// set far_plane uniform
-	if (eOpenGl->ssrUniformFar_plane < 0) {
-		eOpenGl->ssrUniformFar_plane = glGetUniformLocation(shader->ID, "far_plane");
-	}
-	shader->setFloat(eOpenGl->ssrUniformFar_plane, 25);
-
-	// bind Lighting pass output texture and set its uniform
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->frameOut);
-	if (eOpenGl->ssrUniformColor < 0) {
-		eOpenGl->ssrUniformColor = glGetUniformLocation(shader->ID, "gColor");
-	}
-	shader->setInt(eOpenGl->ssrUniformColor, 5);
-
-	// bind depth texture and set its uniform
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, eOpenGl->gDepth);
-	if (eOpenGl->ssrUniformDepth < 0) {
-		eOpenGl->ssrUniformDepth = glGetUniformLocation(shader->ID, "gDepth");
-	}
-	shader->setInt(eOpenGl->ssrUniformDepth, 6);
-
-	//SetupLamps(eOpenGl, shader);
-	// set view position uniform
-	if (eOpenGl->ssrUniformViewPos < 0) {
-		eOpenGl->ssrUniformViewPos = glGetUniformLocation(shader->ID, "viewPos");
-	}
-	shader->set3Float(eOpenGl->ssrUniformViewPos, Game::activeCam->position);
-
-	// set view inverse unform
-	if (eOpenGl->ssrUniformInvView < 0) {
-		eOpenGl->ssrUniformInvView = glGetUniformLocation(shader->ID, "invView");
-	}
-	shader->setMat4f(eOpenGl->ssrUniformInvView, inverse(View));
-
-	// set projection inverse unform
-	if (eOpenGl->ssrUniformInvProj < 0) {
-		eOpenGl->ssrUniformInvProj = glGetUniformLocation(shader->ID, "invProj");
-	}
-	shader->setMat4f(eOpenGl->ssrUniformInvProj, inverse(Projection));
-
-	// set view unform
-	if (eOpenGl->ssrUniformView < 0) {
-		eOpenGl->ssrUniformView = glGetUniformLocation(shader->ID, "view");
-	}
-	shader->setMat4f(eOpenGl->ssrUniformView, View);
-
-	// set projection unform
-	if (eOpenGl->ssrUniformProj < 0) {
-		eOpenGl->ssrUniformProj = glGetUniformLocation(shader->ID, "proj");
-	}
-
-
-	if (eOpenGl->ssrUniformSW < 0) {
-		eOpenGl->ssrUniformSW = glGetUniformLocation(shader->ID, "screenX");
-	}
-	shader->setInt(eOpenGl->ssrUniformSW, Game::Instance().displaySettings->windowWidth);
-
-	if (eOpenGl->ssrUniformSH < 0) {
-		eOpenGl->ssrUniformSH = glGetUniformLocation(shader->ID, "screenY");
-	}
-	shader->setInt(eOpenGl->ssrUniformSH, Game::Instance().displaySettings->windowHeight);
-
-
-	shader->setMat4f(eOpenGl->ssrUniformProj, Projection);
-
-	BuildUI(eOpenGl);
-
-	// bind the array of textures
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, eOpenGl->textureArray);
-	if (eOpenGl->ssrUniformTex < 0) {
-		eOpenGl->ssrUniformTex = glGetUniformLocation(shader->ID, "textures");
-	}
-	shader->setInt(eOpenGl->ssrUniformTex, 0);
-
-
-	eOpenGl->renderQuad();
-
-
-	// copy content of geometry's depth buffer to default framebuffer's depth buffer
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, eOpenGl->gBuffer);
 
 	// write to default framebuffer
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
