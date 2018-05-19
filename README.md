@@ -8,4 +8,5 @@ This project is intended to bring game development closer to gamers and creative
 ## I do not recommend using this engine right now. Its far from finished and will never be as user friendly as unity, cryengine or unreal. I only recommend using it when your needs are out of reach for those engines and you want something very customizable or want to  learn on a deeper level.
 Another goal for this engine is to be friendly to people that are not experienced in c++ and graphics APIs. That's why it uses JavaScript as an interface to be reachable for many people. You can still code in c++ of course
 
-## If you want to use my work commercially please get in contact with me at jan-nitschke@gmail.com for licensing
+## If you want to use my work commercially please get in contact with me for licensing at:
+jan-nitschke@gmail.com 
