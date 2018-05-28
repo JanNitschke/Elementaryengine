@@ -36,12 +36,14 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGB8, TextureSize, TextureSize, TextureCount);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	// Set all texture layers to empty. Then load an empty texture at index 0.
 	for (int i = 0; i < TextureCount; i++)
 	{
 		eOpenGl->freeLayers.push_back(i);
 	}
 	loadTexture("Assets/Textures/empty.jpg");
-	// Setup Render buffers for mdei
+
+	// Setup Render buffers for MultiDrawIndirect
 	glGenVertexArrays(1, &eOpenGl->vao);
 	glGenBuffers(1, &eOpenGl->gElementBuffer);
 	glGenBuffers(1, &eOpenGl->gIndirectBuffer);
@@ -51,12 +53,17 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 	Asset::rendererAssetChangedCallback = &AssetChangedCallback;
 	Asset::rendererAssetDestroyedCallback = &AssetDestroyedCallback;
 
-	GLuint shadowMaps;
+	GLuint shadowMaps, elementBuffer, indirectBuffer, positionBuffer, normalBuffer, albedoSpecBuffer, materialBuffer, depthBuffer;
 	EOpenGl* eOpenGL = Game::eOpenGl;
-	shadowPass = new EShadowPass(eOpenGL->vao, eOpenGL->gElementBuffer, eOpenGL->gIndirectBuffer, eOpenGL->instance, &shadowMaps);
 
-	geometryPass = new EGeometryPass(&eOpenGL->gPosition,&eOpenGL->gNormal,&eOpenGL->gAlbedoSpec,&eOpenGL->gMaterial,&eOpenGL->gDepth);
-	illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial,eOpenGL->gDepth);
+	//shadowPass = new EShadowPass(eOpenGL->vao, eOpenGL->gElementBuffer, eOpenGL->gIndirectBuffer, eOpenGL->instance, &shadowMaps);
+	//geometryPass = new EGeometryPass(&eOpenGL->gPosition,&eOpenGL->gNormal,&eOpenGL->gAlbedoSpec,&eOpenGL->gMaterial,&eOpenGL->gDepth);
+	//illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial,eOpenGL->gDepth);
+	//postPass = new EPostPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, illuminationPass->frameOut, eOpenGL->gDepth);
+
+	shadowPass = new EShadowPass(eOpenGL->vao, eOpenGL->gElementBuffer, eOpenGL->gIndirectBuffer, eOpenGL->instance, &shadowMaps);
+	geometryPass = new EGeometryPass(&eOpenGL->gPosition, &eOpenGL->gNormal, &eOpenGL->gAlbedoSpec, &eOpenGL->gMaterial, &eOpenGL->gDepth);
+	illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, eOpenGL->gDepth);
 	postPass = new EPostPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, illuminationPass->frameOut, eOpenGL->gDepth);
 
 	renderPasses.push_back(shadowPass);
