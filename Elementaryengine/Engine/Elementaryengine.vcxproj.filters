@@ -135,6 +135,9 @@
     <ClCompile Include="EShadowPass.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="ETextPass.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -252,6 +255,9 @@
       <Filter>Headerdateien\Renderers\Modular</Filter>
     </ClInclude>
     <ClInclude Include="EShadowPass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ETextPass.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
