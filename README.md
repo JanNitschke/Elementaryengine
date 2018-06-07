@@ -10,3 +10,5 @@ Another goal for this engine is to be friendly to people that are not experience
 
 ## If you want to use my work commercially please get in contact with me for licensing at:
 jan-nitschke@gmail.com 
+
+[![](https://codescene.io/projects/2920/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/2920/jobs/latest-successful/results)
