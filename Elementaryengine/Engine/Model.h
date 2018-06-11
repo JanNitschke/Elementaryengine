@@ -19,6 +19,7 @@ public:
 	~Model();
 	Model(char *path);
 	vector<Mesh*> meshes;
+	vector<Material*> materials;
 
 private:
 	/*  Model Data  */

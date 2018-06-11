@@ -13,7 +13,10 @@ using namespace std;
 #include <glm/glm.hpp>
 #include "shader.h"
 #include <EEngine.h>
+#include <Game.h>
+#include <string>
 
+string Shader::defines;
 
 Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 {
@@ -45,8 +48,13 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 	{
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 	}
-	const char* vShaderCode = vertexCode.c_str();
-	const char * fShaderCode = fragmentCode.c_str();
+	string veCode = "";
+	string frCode = "";
+	veCode.append(defines).append(vertexCode);
+	frCode.append(defines).append(fragmentCode);
+
+	const char* vShaderCode = veCode.c_str();
+	const char * fShaderCode = frCode.c_str();
 	// 2. compile shaders
 	unsigned int vertex, fragment;
 	// vertex shader
@@ -114,9 +122,16 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * geompath, const GLchar 
 	{
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 	}
-	const char* vShaderCode = vertexCode.c_str();
-	const char * fShaderCode = fragmentCode.c_str();
-	const char * gShaderCode = geomCode.c_str();
+	string veCode = "";
+	string frCode = "";
+	string geCode = "";
+	veCode.append(defines).append(vertexCode);
+	geCode.append(defines).append(geomCode);
+	frCode.append(defines).append(fragmentCode);
+
+	const char* vShaderCode = veCode.c_str();
+	const char * fShaderCode = frCode.c_str();
+	const char * gShaderCode = geCode.c_str();
 
 	// 2. compile shaders
 	unsigned int vertex, fragment, geom;

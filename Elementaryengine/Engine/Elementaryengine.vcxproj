@@ -175,9 +175,12 @@
     <ClCompile Include="Asset.cpp" />
     <ClCompile Include="AssetComponent.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EConsole.cpp" />
     <ClCompile Include="EGeometryPass.cpp" />
     <ClCompile Include="EIlluminationPass.cpp" />
     <ClCompile Include="EJSFunctions.cpp" />
+    <ClCompile Include="EModularRenderSettings.cpp" />
+    <ClCompile Include="EOGLFramebuffer.cpp" />
     <ClCompile Include="EOGLUniform.cpp" />
     <ClCompile Include="EOpenGl.cpp" />
     <ClCompile Include="EPostPass.cpp" />
@@ -196,7 +199,6 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="EModularRasterizer.cpp" />
-    <ClCompile Include="OldRenderCode.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -218,9 +220,12 @@
     <ClInclude Include="Asset.h" />
     <ClInclude Include="AssetComponent.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="EConsole.h" />
     <ClInclude Include="EGeometryPass.h" />
     <ClInclude Include="EIlluminationPass.h" />
     <ClInclude Include="EJSFunctions.h" />
+    <ClInclude Include="EModularRenderSettings.h" />
+    <ClInclude Include="EOGLFramebuffer.h" />
     <ClInclude Include="EOGLUniform.h" />
     <ClInclude Include="EOpenGl.h" />
     <ClInclude Include="EPostPass.h" />
@@ -231,6 +236,7 @@
     <ClInclude Include="ERenderPass.h" />
     <ClInclude Include="EScriptContext.h" />
     <ClInclude Include="EShadowPass.h" />
+    <ClInclude Include="ETextElement.h" />
     <ClInclude Include="ETextPass.h" />
     <ClInclude Include="FPCam.h" />
     <ClInclude Include="Game.h" />

@@ -17,9 +17,9 @@ using namespace std;
 
 double timerunning = 0;
 bool p_pressedLastFrame = false;
-
 BallDemoMode::BallDemoMode()
 {
+
 }
 
 BallDemoMode::~BallDemoMode()

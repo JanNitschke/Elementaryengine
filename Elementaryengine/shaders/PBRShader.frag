@@ -1,10 +1,3 @@
-// shadertype=glsl
-#version 430 core
-
-#define near 0.1
-#define far 100
-#define vlSampleCount 120
-#define vlMax 0.7
 layout (location = 0) out vec4 FragColor;
 
 in vec2 TexCoord;
@@ -54,8 +47,8 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
 float lightVolume(vec3 lightPos, int index,float depth){
 	int sampleCount = vlSampleCount;
 	float bias = 0.0050;
-	if(depth > 3){
-		depth = 3;
+	if(depth > 2){
+		depth = 2;
 	}
 	depth = (depth * (far - near)) - near;
 	float strength = 0;
@@ -219,11 +212,18 @@ void main(){
 
 		float shadow = ShadowCalculation(FragPos,LightPositions[i],i);        
 		float NdotL = max(dot(N, L), 0.0);  
+		float lr = 0;
+		vec3 LoAdd = (kD * albedo / PI + specular) * radiance * NdotL * shadow;
 
-		float lr = lightVolume(LightPositions[i],i,liniarDepth);
-      
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;
-		rays += LightColors[i] * lr * 0.001;
+		if(useBasicVl){
+			lr = lightVolume(LightPositions[i],i,liniarDepth);
+			rays += LightColors[i] * lr * 0.0005;
+			LoAdd *= 3;
+		}else{
+			LoAdd *= 4;
+		}
+		Lo += LoAdd;
+
 	}   
 	vec3 am = vec3(0.3) * albedo * ambient;
 

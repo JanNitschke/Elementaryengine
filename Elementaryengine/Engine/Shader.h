@@ -14,7 +14,7 @@ class Shader
 public:
 	// the program ID
 	unsigned int ID;
-
+	static string defines;
 	// constructor reads and builds the shader
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
 	Shader(const GLchar* vertexPath, const GLchar* geompath, const GLchar* fragmentPath);

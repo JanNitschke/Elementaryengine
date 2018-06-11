@@ -8,6 +8,7 @@ class UIElement
 public:
 
 	Texture* texture;
+	Texture* alphamap;
 
 	vec2 positionPixel;
 	vec2 posisionPercent;
@@ -20,7 +21,6 @@ public:
 	float backgoundBlur;
 	float foregroundBlur;
 	float opacity;
-	Texture* alphamap;
 	float zindex;
 	UIElement();
 	~UIElement();

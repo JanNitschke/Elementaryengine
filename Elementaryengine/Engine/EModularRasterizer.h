@@ -7,6 +7,8 @@
 #include <EGeometryPass.h>
 #include "EPostPass.h"
 #include <EShadowPass.h>
+#include <ETextPass.h>
+#include <EModularRenderSettings.h>
 
 class EModularRasterizer : public ERenderer
 {
@@ -18,6 +20,8 @@ public:
 	void RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection);
 	void RenderFX(EOpenGl* eOpenGl, EDisplaySettings* displaySettings);
 	void Setup(EOpenGl* eOpenGl, EDisplaySettings* displaySettings);
+	string getShaderDefines();
+
 	Texture* loadTexture(const char* path);
 
 	static void AssetCreatedCallback(Asset* asset);
@@ -29,6 +33,9 @@ public:
 
 	const unsigned int TextureSize = 1024;
 	const unsigned int TextureCount = 64;
+
+	EModularRenderSettings renderSettings = EModularRenderSettings();
+
 private:
 
 	vector<ERenderPass*> renderPasses;
@@ -37,7 +44,7 @@ private:
 	EGeometryPass * geometryPass;
 	EPostPass * postPass;
 	EShadowPass * shadowPass;
-
+	ETextPass * textPass;
 	///<summary>
 	///builds the composed mesh needed for multiDrawIndirect and copies it to the GPU buffers
 	///</summary> 

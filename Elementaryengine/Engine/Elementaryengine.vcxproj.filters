@@ -54,9 +54,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="OldRenderCode.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="EScriptContext.cpp">
       <Filter>Quelldateien\JavaScript</Filter>
     </ClCompile>
@@ -111,9 +108,6 @@
     <ClCompile Include="ERaytracer.cpp">
       <Filter>Quelldateien\Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="ERender.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="EOGLUniform.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -132,10 +126,22 @@
     <ClCompile Include="EPostPass.cpp">
       <Filter>Quelldateien\Renderers\Modular</Filter>
     </ClCompile>
-    <ClCompile Include="EShadowPass.cpp">
+    <ClCompile Include="EConsole.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="ERender.cpp">
+      <Filter>Quelldateien\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="EShadowPass.cpp">
+      <Filter>Quelldateien\Renderers\Modular</Filter>
+    </ClCompile>
     <ClCompile Include="ETextPass.cpp">
+      <Filter>Quelldateien\Renderers\Modular</Filter>
+    </ClCompile>
+    <ClCompile Include="EModularRenderSettings.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EOGLFramebuffer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -254,10 +260,22 @@
     <ClInclude Include="EPostPass.h">
       <Filter>Headerdateien\Renderers\Modular</Filter>
     </ClInclude>
-    <ClInclude Include="EShadowPass.h">
+    <ClInclude Include="ETextElement.h">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="EConsole.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="ETextPass.h">
+      <Filter>Headerdateien\Renderers\Modular</Filter>
+    </ClInclude>
+    <ClInclude Include="EShadowPass.h">
+      <Filter>Headerdateien\Renderers\Modular</Filter>
+    </ClInclude>
+    <ClInclude Include="EModularRenderSettings.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EOGLFramebuffer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

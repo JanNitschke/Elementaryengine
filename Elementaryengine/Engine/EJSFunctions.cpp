@@ -1276,10 +1276,8 @@ JsValueRef EJSFunction::JSLog(JsValueRef callee, bool isConstructCall, JsValueRe
 
 		wstring ws(p);
 		string str(ws.begin(), ws.end());
-		printf("%s", str.c_str());
-
+		Game::console.Print(str);
 	}
-	printf("\n");
 	return JS_INVALID_REFERENCE;
 }
 

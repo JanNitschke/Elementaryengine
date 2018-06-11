@@ -22,6 +22,25 @@ void Model::loadModel(string path)
 {
 	Assimp::Importer import;
 	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+	for (int i = 0; i < scene->mNumMaterials; i++)
+	{
+		const aiMaterial * aiMat = scene->mMaterials[i];
+		Material * eMat = new Material();
+
+		if (aiMat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+			aiString Path;
+			if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+			
+			}
+		}
+		if (aiMat->GetTextureCount(aiTextureType_SHININESS)) {
+			aiString Path;
+			if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+
+			}
+		}
+		materials.push_back(eMat);
+	}
 
 	// check for broken scene
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -104,6 +123,9 @@ Mesh* Model::processMesh(aiMesh * mesh, const aiScene * scene)
 		texturesout.push_back(&t);
 	}
 	Mesh* m = new Mesh(vertices, indices, texturesout);
+	if(mesh->mMaterialIndex >= 0)
+		m->material = materials[mesh->mMaterialIndex];
+
 	return m;
 }
 

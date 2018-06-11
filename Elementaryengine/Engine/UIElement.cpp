@@ -5,6 +5,7 @@
 UIElement::UIElement()
 {
 	texture = new Texture();
+	alphamap = new Texture();
 	Game::uiElements.push_back(this);
 }
 

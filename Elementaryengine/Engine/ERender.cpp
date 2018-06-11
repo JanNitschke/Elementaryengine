@@ -11,3 +11,6 @@ void ERenderer::AssetChangedCallback(Asset * asset)
 void ERenderer::AssetDestroyedCallback(Asset * asset)
 {
 }
+string ERenderer::getShaderDefines() {
+	return "";
+}

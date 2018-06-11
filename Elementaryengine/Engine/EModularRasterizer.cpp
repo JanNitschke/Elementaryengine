@@ -26,6 +26,7 @@ EModularRasterizer::~EModularRasterizer()
 
 void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)
 {
+
 	glGenTextures(1, &Game::eOpenGl->textureArray);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, Game::eOpenGl->textureArray);
@@ -65,16 +66,50 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 	geometryPass = new EGeometryPass(&eOpenGL->gPosition, &eOpenGL->gNormal, &eOpenGL->gAlbedoSpec, &eOpenGL->gMaterial, &eOpenGL->gDepth);
 	illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, eOpenGL->gDepth);
 	postPass = new EPostPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, illuminationPass->frameOut, eOpenGL->gDepth);
+	textPass = new ETextPass();
 
 	renderPasses.push_back(shadowPass);
 	renderPasses.push_back(geometryPass);
 	renderPasses.push_back(illuminationPass);
 	renderPasses.push_back(postPass);
+	renderPasses.push_back(textPass);
 
 	for each (ERenderPass* pass in renderPasses)
 	{
+
 		pass->Initialize();
 	}
+}
+string EModularRasterizer::getShaderDefines()
+{
+	string out = "#version 460 core \n";
+	out += "#define near 0.1 \n";
+	out += "#define far 100 \n";
+	out += "#define vlSampleCount ";
+	out.append(std::to_string(renderSettings.basicVolumetricLightingSteps));
+	out += " \n";
+	out += "#define useBasicVl ";
+
+	if (renderSettings.useBasicVolumetricLighting) {
+		out += "true \n";
+	}
+	else {
+		out += "false \n";
+	}
+
+	out += "#define useSSR ";
+	if (renderSettings.useSSR) {
+		out += "true \n";
+	}
+	else {
+		out += "false \n";
+	}
+
+	out.append("#define vlMax ");
+	out.append(std::to_string(renderSettings.basicVolumetricLightingMaxBrightness));
+	out.append(" \n");
+
+	return out;
 }
 Texture* EModularRasterizer::loadTexture(const char * path)
 {
@@ -274,8 +309,8 @@ void EModularRasterizer::BuildDrawAtrib(EOpenGl * eOpenGl)
 
 				// calculate model matrix and add it to the draw atribute
 				mat4 model = mat4(1.0f);
-				model = translate(model, as->position + m->posOffset);
-				model = glm::scale(model, as->scale + m->scaleOffset);
+				model = translate(model, as->getPosition() + m->posOffset);
+				model = glm::scale(model, as->getScale() + m->scaleOffset);
 				a.Model = model;
 
 				// set rotation atribute

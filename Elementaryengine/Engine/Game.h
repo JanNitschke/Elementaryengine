@@ -14,6 +14,8 @@
 #include <memory>
 #include <EScriptContext.h>
 #include <RayCastHit.h>
+#include <ETextElement.h>
+#include <EConsole.h>
 
 class GameMode;
 #include <GameMode.h>
@@ -89,6 +91,8 @@ public:
 
 	static vector <Mesh*> meshs;
 
+	static vector <ETextElement*> textElements;
+	
 	///<summary>
 	///Assets to loop trough next frame. You may delete items from this, but the destructor usualy does this by itself.
 	///</summary> 
@@ -133,13 +137,20 @@ public:
 	///<summary>
 	///Smoothed FPS counter
 	///</summary> 
-	double smoothFps;
+	static double smoothFps;
 
 	static double physicsFps;
 	///<summary>
 	///Time since last frame
 	///</summary> 
-	double deltaTime;
+	static double deltaTime;
+
+	static unsigned int frameCount;
+
+	///<summary>
+	///Time since start of the game in ms
+	///</summary> 
+	static double currentTime;
 
 	///<summary>
 	///Starts the game and runs the main loop
@@ -244,6 +255,8 @@ public:
 
 	static vec3 toGlm(btVector3);
 
+	static EConsole console;
+
 private:
 	///<summary>
 	///Private constructor. Use shared_instance() to get the instance. Only one instance can exist simultaneously
@@ -252,10 +265,7 @@ private:
 	static vec2 scroll;
 	static bool scrolledThisFrame;
 
-	///<summary>
-	///Time since start of the game in ms
-	///</summary> 
-	double currentTime;
+
 
 	///<summary>
 	///Time from the start of the game to the last frame in ms
@@ -266,7 +276,7 @@ private:
 	/////</summary> 
 	//Authority authority;
 	
-
+	bool consoleKeyLastFrame = false;
 	
 
 };

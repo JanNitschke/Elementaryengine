@@ -26,7 +26,6 @@ int main()
 		//game.renderer = new ERasterizer();
 		Game::displaySettings->windowHeight = 900;
 		Game::displaySettings->windowWidth = 1600;
-
 		game.renderer = new EModularRasterizer();
 		game.name = "Ball demo";
 		BallDemoMode* mode = new BallDemoMode();

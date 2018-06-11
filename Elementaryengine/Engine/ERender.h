@@ -18,6 +18,7 @@ public:
 	virtual void RenderFrame(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection) = 0;
 	virtual void RenderFX(EOpenGl* eOpenGl, EDisplaySettings* displaySettings) = 0;
 	virtual void Setup(EOpenGl* eOpenGl, EDisplaySettings* displaySettings) = 0;
+	virtual string ERenderer::getShaderDefines();
 	virtual Texture* loadTexture(const char* path) = 0;
 
 	static void AssetCreatedCallback(Asset* asset);

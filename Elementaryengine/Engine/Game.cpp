@@ -53,6 +53,8 @@ vector<Asset*> Game::nextAssets;
 vector<Asset*> Game::assetsToDelete;
 vector<Mesh*> Game::meshs;
 vector<Lamp*> Game::lamps;
+vector<ETextElement*> Game::textElements;
+
 Camera* Game::activeCam;
 btDiscreteDynamicsWorld* Game::dynamicsWorld;
 bool Game::simulatePhysics = true;
@@ -64,10 +66,15 @@ vec2 Game::scroll;
 bool Game::scrolledThisFrame = false;
 ERenderer* Game::renderer;
 
+double Game::deltaTime;
+double Game::currentTime;
+unsigned int Game::frameCount = 0;
+double Game::smoothFps;
+
 mat4 Game::View;
 mat4 Game::Projection;
 EDisplaySettings* Game::displaySettings = new EDisplaySettings();
-
+EConsole Game::console = EConsole();
 // start the game and run the main loop
 void Game::Start()
 {
@@ -90,12 +97,12 @@ void Game::Start()
 	system("cls");
 
 	// Setup components (shaders, textures etc.)
-
+	Shader::defines = renderer->getShaderDefines();
 	Mesh::SetupMeshComp();
 	Lamp::SetupLampComp();
 	Asset::SetupAsset();
-
 	renderer->Setup(eOpenGl,displaySettings);
+	console.SetUp();
 
 	gameMode->window = eOpenGl->window;
 
@@ -158,6 +165,7 @@ void Game::loop()
 		currentTime = glfwGetTime();
 		deltaTime = currentTime - oldTime;
 		smoothFps = (9 * smoothFps / 10) + (.1 / deltaTime);
+		frameCount++;
 		printf(" \r fps smooth: %i loaded Assets: %i accurate: %f physics: %f", (int)(smoothFps + .5), (int)assets.size(), 1 / deltaTime, Game::physicsFps);
 		if (!isServer) {
 			processInput(eOpenGl->window);
@@ -186,11 +194,20 @@ void Game::loop()
 		nextAssets.shrink_to_fit();
 
 		if (!isServer) {
+			console.Update();
 			Render();
-
 			// Swap buffers
 			glfwSwapBuffers(eOpenGl->window);
 			glfwPollEvents();
+		}
+		if (isKeyDown(GLFW_KEY_GRAVE_ACCENT)) {
+			if (!consoleKeyLastFrame) {
+				console.Toggle();
+				consoleKeyLastFrame = true;
+			}
+		}
+		else {
+			consoleKeyLastFrame = false;
 		}
 		if (!(glfwGetKey(eOpenGl->window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(eOpenGl->window) == 0)){
 			shouldClose = true;

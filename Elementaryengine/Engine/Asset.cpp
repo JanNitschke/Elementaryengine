@@ -129,6 +129,21 @@ DllExport void Asset::applyTorque(vec3 torque)
 	assetRigidBody->applyTorqueImpulse(btVector3(torque.x, torque.y, torque.z));
 }
 
+DllExport vec3 Asset::getPosition()
+{
+	return position;
+}
+
+DllExport vec3 Asset::getScale()
+{
+	return scale;
+}
+
+DllExport quat Asset::getRotation()
+{
+	return rotation;
+}
+
 DllExport void Asset::setCollisionSizeOffset(vec3 offset)
 {
 	collisionSizeOffset = offset;

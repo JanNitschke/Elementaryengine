@@ -115,6 +115,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\x64\Debug;C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\lib\bullet3\lib\Debug;C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\lib\glew\lib\Release\x64;C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\lib\glfw\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3dll.lib;glew32.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;BulletCollision_Debug.lib;BulletDynamics_Debug.lib;LinearMath_Debug.lib;Elementaryengine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,6 +152,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\x64\Debug;C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\lib\bullet3\lib\Debug;C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\lib\glew\lib\Release\x64;C:\Users\JanNi\Source\Repos\Elementaryengine\Elementaryengine\lib\glfw\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3dll.lib;glew32.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;BulletCollision_Debug.lib;BulletDynamics_Debug.lib;LinearMath_Debug.lib;Elementaryengine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

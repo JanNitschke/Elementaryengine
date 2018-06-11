@@ -1,5 +1,4 @@
 // shadertype=glsl
-#version 430 core
 layout (location = 0) out vec4 FragColor;
 
 in vec2 TexCoord;
@@ -32,6 +31,7 @@ uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform sampler2D gMaterial;
 uniform sampler2DShadow gDepth;
+//uniform sampler2D gDepth;
 uniform sampler2D gColor;
 uniform mat4 invView;
 uniform mat4 invProj;
@@ -41,7 +41,7 @@ uniform vec3 viewPos;
 uniform int screenX;
 uniform int screenY;
 
-const float rayStep = 0.02;
+const float rayStep = 0.1;
 const float minRayStep = 0.1;
 const int maxSteps = 60;
 const float searchDist = 5;
@@ -103,26 +103,57 @@ vec4 RayCast(in vec3 dir, inout vec3 hitCoord, out float dDepth){
             }
     }
     return vec4(-1);
-}*/
+}
 vec4 RayCast(in vec3 dir, inout vec3 hitCoord, out float dDepth){
     dir *= rayStep;
     float depth = 0.0;
     int steps = 0;
     vec4 projectedCoord = vec4(0.0);
-    vec4 op = vec4(-1);
+    vec4 resCord = vec4(-1);
+    return resCord;
     for(int i = 0; i < maxSteps; ++i){
         hitCoord += dir;
         projectedCoord =  proj * view * vec4(hitCoord,1.0);
         projectedCoord.z -= 0.1;
+        
         float visible = texture(gDepth,projectedCoord.xyz).r;
+
         if(visible > 0.1){
-            op = projectedCoord;
+            resCord = projectedCoord;
         }else{
-            return op;
+            return resCord;
         }
     }
+    
+    return resCord;
+}
+*/
+float linearDepth(float depthSample)
+{
+   return (2 * near) / (far + near - depthSample * (far - near));
+}
+vec4 RayCast(in vec3 dir, inout vec3 hitCoord, out float dDepth){
+    dir = normalize(dir) * rayStep;
+    vec4 projectedCoord = vec4(0);
+    float currentDepth = 0;
+    vec3 lastSuccessPos;
+    for(int i = 0; i < maxSteps; ++i){
+        //hitCoord += dir;
+        projectedCoord = proj * view * vec4(hitCoord,1.0);
+        projectedCoord.xy /= projectedCoord.w;
+        projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
+        projectedCoord.z /= 2;
+        float visible = texture(gDepth,projectedCoord.xyz).r;
+        return vec4(visible);
 
-    return op;
+        if(currentDepth > projectedCoord.z){
+            lastSuccessPos = hitCoord;
+        }else{
+            break;
+        }
+    }
+    hitCoord = lastSuccessPos;
+    return vec4(hitCoord,1);
 }
 vec3 Blurr(vec2 pos, float strength){
     vec3 outColor = vec3(0);
@@ -237,6 +268,22 @@ void main(){
     vec3 globalPos =  vec3(texture(gPosition, TexCoord));
     vec3 color = texture(gColor,TexCoord).rgb;
 
-    FragColor = vec4(UI(color),1);
+    //if(roughness < 100.8 && useSSR){
+        float dX = (2 * TexCoord.x ) - 1;
+        float dY = (2 * TexCoord.y ) - 1; 
+        vec4 dir = invView * vec4((invProj * vec4(dX,dY,0.1,1)).xyz,0);
+
+        vec3 hitCoord = globalPos;
+        float dist;
+        vec3 direction = normalize(reflect(normalize(dir.xyz),normalize(viewNormal)));
+        vec4 hitpos = RayCast(direction,hitCoord, dist);
+        vec3 hitcol =  texture(gColor,hitpos.xy).rgb;
+        FragColor = hitpos;
+        //FragColor = vec4(hitcol,1);
+        //color += 0.5 * hitcol;
+    //}
+    color = UI(color);
+    FragColor = vec4(color,1);
+
     //FragColor = vec4(Blurr(TexCoord,1),0);
 }

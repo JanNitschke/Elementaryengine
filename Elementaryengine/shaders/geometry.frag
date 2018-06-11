@@ -1,5 +1,4 @@
 // shadertype=glsl
-#version 460 core
 #extension GL_ARB_bindless_texture : enable
 layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;

@@ -27,6 +27,9 @@ public:
 	DllExport void applyForce(vec3 force);
 	DllExport void applyForce(vec3 forcepoint,vec3 force);
 	DllExport void applyTorque(vec3 torque);
+	DllExport vec3 getPosition();
+	DllExport vec3 getScale();
+	DllExport quat getRotation();
 
 	DllExport void setCollisionSizeOffset(vec3 offset);
 	DllExport void setCollisionPositionOffset(vec3 offset);

@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include <comdef.h>
-
+#include <Game.h>
 using namespace std;
 
 EScriptContext::EScriptContext()
@@ -66,6 +66,7 @@ void EScriptContext::ReadScript(wstring filename)
 	FILE *file;
 	if (_wfopen_s(&file, filename.c_str(), L"rb"))
 	{
+		Game::console.Print("chakrahost: unable to open file: %s.", filename.c_str());
 		fwprintf(stderr, L"chakrahost: unable to open file: %s.\n", filename.c_str());
 		return;
 	}
@@ -79,6 +80,7 @@ void EScriptContext::ReadScript(wstring filename)
 
 	if (rawBytes == nullptr)
 	{
+		Game::console.Print("chakrahost: fatal error.");
 		fwprintf(stderr, L"chakrahost: fatal error.\n");
 		return;
 	}
@@ -88,6 +90,7 @@ void EScriptContext::ReadScript(wstring filename)
 	wchar_t *contents = (wchar_t *)calloc(lengthBytes + 1, sizeof(wchar_t));
 	if (contents == nullptr)
 	{
+		Game::console.Print("chakrahost: fatal error.");
 		free(rawBytes);
 		fwprintf(stderr, L"chakrahost: fatal error.\n");
 		return;
@@ -95,6 +98,7 @@ void EScriptContext::ReadScript(wstring filename)
 
 	if (MultiByteToWideChar(CP_UTF8, 0, rawBytes, lengthBytes + 1, contents, lengthBytes + 1) == 0)
 	{
+		Game::console.Print("chakrahost: fatal error.");
 		free(rawBytes);
 		free(contents);
 		fwprintf(stderr, L"chakrahost: fatal error.\n");

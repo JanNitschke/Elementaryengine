@@ -77,10 +77,10 @@ function PlaceFeeeeest(){
 
 // called once per frame. Only used for input in this example
 function OnTick(){
-
+    
     // Retrive the users scroll input
     var scroll = input.getScroll();
-
+    
     // Get the Y value of the scroll input (Y is the normal mousewheel, X is used for horizontal scrolling).
     var scY = -scroll.getY();
 
