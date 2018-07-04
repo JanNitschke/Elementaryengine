@@ -107,10 +107,13 @@ void EIlluminationPass::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 
 	// add color and position for each light to vectors
 	for each (Lamp* l in Game::lamps) {
-		vec3 outcol = l->color;
-		vec3 outpos = l->parents[0]->position;
-		lightColors.push_back(vec4(outcol, 0));
-		lightPositions.push_back(vec4(outpos, 0));
+		if (l->throwShadows && l->parent != nullptr) {
+			vec3 outcol = l->color;
+			vec3 outpos = l->parent->position;
+			lightColors.push_back(vec4(outcol, 0));
+			lightPositions.push_back(vec4(outpos, 0));
+		}
+
 	}
 
 	// dont do this for the ssr shader

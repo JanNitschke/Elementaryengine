@@ -106,7 +106,7 @@ void Mesh::SetupMesh()
 mat4 Mesh::Model()
 {
 	mat4 model = mat4(1.0f);
-	model = translate(model, parents[0]->position + posOffset);
-	model = glm::scale(model, parents[0]->scale + scaleOffset);
+	model = translate(model, parent->position + posOffset);
+	model = glm::scale(model, parent->scale + scaleOffset);
 	return model;
 }

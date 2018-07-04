@@ -36,6 +36,7 @@ public:
 
 	EModularRenderSettings renderSettings = EModularRenderSettings();
 
+	GLuint64 textureArrayHandle;
 private:
 
 	vector<ERenderPass*> renderPasses;

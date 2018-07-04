@@ -20,16 +20,16 @@ public:
 	DllExport Asset();
 	DllExport Asset(vec3 pos, vec3 scale, int mass, assetShapes shape);
 	DllExport void setMass(float m);
-	DllExport void setScale(vec3 sca);
-	DllExport void setPosition(vec3 pos);
+	DllExport virtual void setScale(vec3 sca);
+	DllExport virtual void setPosition(vec3 pos);
 	DllExport void setFriction(float f);
-	DllExport void setRotation(quat rot);
+	DllExport virtual void setRotation(quat rot);
 	DllExport void applyForce(vec3 force);
 	DllExport void applyForce(vec3 forcepoint,vec3 force);
 	DllExport void applyTorque(vec3 torque);
-	DllExport vec3 getPosition();
-	DllExport vec3 getScale();
-	DllExport quat getRotation();
+	DllExport virtual vec3 getPosition();
+	DllExport virtual vec3 getScale();
+	DllExport virtual quat getRotation();
 
 	DllExport void setCollisionSizeOffset(vec3 offset);
 	DllExport void setCollisionPositionOffset(vec3 offset);
@@ -58,6 +58,8 @@ public:
 	static unsigned int envMapFBO;
 	static void SetupAsset();
 	
+	virtual void RenderGeometry();
+
 	typedef void(*AssetCallback)(Asset* asset);
 
 	static AssetCallback rendererAssetCreatedCallback;

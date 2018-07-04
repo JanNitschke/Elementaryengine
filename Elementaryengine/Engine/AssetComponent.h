@@ -10,10 +10,8 @@ class DllExport AssetComponent
 public:
 	AssetComponent();
 	~AssetComponent();
-	void attachTo(Asset* a);
-	void detachFrom(Asset* a);
-
-	vector<Asset*> parents;
-
+	virtual void AttachTo(Asset* a);
+	virtual	void Detach();
+	Asset* parent;
 };
 

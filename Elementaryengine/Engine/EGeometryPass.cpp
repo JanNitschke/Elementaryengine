@@ -1,15 +1,20 @@
 #include "EGeometryPass.h"
 #include <EOpenGL.h>
 #include <Game.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm\gtx\quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <EModularRasterizer.h>
+
+Shader * EGeometryPass::meshGeometryShader;
+
 EGeometryPass::EGeometryPass()
 {
 }
 
 EGeometryPass::EGeometryPass(OUT GLuint * positionBuffer, OUT GLuint * normalBuffer, OUT GLuint * albedoSpecBuffer, OUT GLuint * materialBuffer, OUT GLuint * deepthBuffer)
 {
-	_shader = Mesh::geometryShader;
-	_uniforms.push_back(new EOGLUniform<int>(Mesh::geometryShader, "textures", 0));
-	_uniforms.push_back(new EOGLUniform<mat4>(Mesh::geometryShader, "VP", []() { return Game::Projection * Game::View; }));
+
 	ERenderPass::Initialize();
 
 	//Setup framebuffer
@@ -99,29 +104,75 @@ void EGeometryPass::Render()
 	//set viewport
 	glViewport(0, 0, displaySettings->windowWidth, displaySettings->windowHeight);
 
+	meshGeometryShader->use();
+	meshUniformVP.Update();
+	meshUniformTextureArray.Update();
 
-	// bind the composed mesh and its buffers
-	glBindVertexArray(eOpenGl->vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eOpenGl->gElementBuffer);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, eOpenGl->gIndirectBuffer);
-
-	// bind the array of textures
-	glActiveTexture(GL_TEXTURE0);
-
-	// draw all elements to the geometry buffer
-	glMultiDrawElementsIndirect(GL_TRIANGLES,
-		GL_UNSIGNED_INT,
-		(GLvoid*)0,
-		eOpenGl->instance,
-		0);
-
+	for each (auto asset in Game::assets)
+	{
+		for each (AssetComponent* component in asset->components)
+		{
+			if ((dynamic_cast<EMeshReference*>(component) != nullptr)) {
+				RenderMesh((EMeshReference*)component);
+			}
+		}
+		if ((dynamic_cast<EMultiDrawContainer*>(asset) != nullptr)) {
+			RenderMultiDraw((EMultiDrawContainer*)asset);
+		}
+	}
 }
 
 void EGeometryPass::Initialize()
 {
+	meshGeometryShader = new Shader("..\\shaders\\GeometryPassMesh.vert", "..\\shaders\\GeometryPass.frag");
 	_shader = Mesh::geometryShader;
 	_uniforms.push_back(new EOGLUniform<int>(Mesh::geometryShader, "textures", 0));
 	_uniforms.push_back(new EOGLUniform<mat4>(Mesh::geometryShader, "VP", []() { return Game::Projection * Game::View; }));
+
+	meshUniformVP = EOGLUniform<mat4>(meshGeometryShader, "VP", []() { return Game::Projection * Game::View; });
+	meshUniformModel = EOGLUniform<mat4>(meshGeometryShader, "Model", mat4(0));
+	meshUniformRotation = EOGLUniform<mat4>(meshGeometryShader, "Rot", mat4(0));
+	meshUniformAO = EOGLUniform<vec3>(meshGeometryShader, "ao", vec3(0));
+	meshUniformAlbedo = EOGLUniform<vec3>(meshGeometryShader, "albedo", vec3(0));
+	meshUniformRoughness = EOGLUniform<float>(meshGeometryShader, "roughness", 0.0f);
+	meshUniformMetallic = EOGLUniform<float>(meshGeometryShader, "metallic", 0.0f);
+	meshUniformRoughnessTex = EOGLUniform<int>(meshGeometryShader, "roughnessTex", 0);
+	meshUniformAlbedoTex = EOGLUniform<int>(meshGeometryShader, "albedoTex", 0);
+	meshUniformMetallicTex = EOGLUniform<int>(meshGeometryShader, "metallicTex", 0);
+	meshUniformTextureArray = EOGLUniform<int>(meshGeometryShader, "textures", []() { return (int)((EModularRasterizer*)Game::renderer)->textureArrayHandle; });
+
 	ERenderPass::Initialize();
+
+}
+
+void EGeometryPass::RenderMesh(EMeshReference * meshReference)
+{
+	meshGeometryShader->use();
+	Mesh * mesh = meshReference->mesh;
+	Asset * asset = meshReference->parent;
+
+	vec3 position = asset->getPosition() + meshReference->positionOffset;
+	vec3 scale = asset->getScale() + meshReference->scaleOffset;
+	quat rotation = asset->getRotation() + meshReference->rotationOffset;
+	if (PBRMaterial * material = (PBRMaterial*)meshReference->getMaterial()) {
+
+		meshUniformModel.Update(glm::scale(glm::translate(mat4(1.0f), position), scale));
+		meshUniformRotation.Update(glm::toMat4(rotation));
+		meshUniformAO.Update(material->ao);
+		meshUniformAlbedo.Update(material->albedo);
+		meshUniformMetallic.Update(material->metallic);
+		meshUniformRoughness.Update(material->roughness);
+		meshUniformRoughnessTex.Update(material->roughnessMap->layer);
+		meshUniformAlbedoTex.Update(material->albedoMap->layer);
+		meshUniformMetallicTex.Update(material->metallicMap->layer);
+		
+		glBindVertexArray(mesh->VAO);
+		glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+	}
+}
+
+void EGeometryPass::RenderMultiDraw(EMultiDrawContainer * multiCont)
+{
 
 }

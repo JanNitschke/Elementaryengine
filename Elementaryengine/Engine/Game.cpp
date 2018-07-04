@@ -15,7 +15,6 @@ using namespace std;
 #include <glm\gtx\quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <ERender.h>
-#include <ERasterizer.h>
 
 //#include <enet\enet.h>
 
@@ -75,6 +74,7 @@ mat4 Game::View;
 mat4 Game::Projection;
 EDisplaySettings* Game::displaySettings = new EDisplaySettings();
 EConsole Game::console = EConsole();
+ENetworkInterface * Game::networkInterface;
 // start the game and run the main loop
 void Game::Start()
 {
@@ -93,6 +93,7 @@ void Game::Start()
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 	dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
 	
+	networkInterface = new ENetworkInterface();
 
 	system("cls");
 
@@ -120,13 +121,15 @@ void Game::Start()
 
 	loop();
 
-	// cleanup physics
+	// cleanup physics, network and js
 	delete dynamicsWorld;
+	delete networkInterface;
+	delete eScriptContext;
 
 	// Close OpenGL window and terminate GLFW
 	eOpenGl->CleanUp();
 
-	delete eScriptContext;
+
 }
 
 
@@ -323,7 +326,7 @@ DWORD WINAPI PhysicsThread(LPVOID lpParam)
 		cTime = glfwGetTime();
 		dTime = cTime - oTime;
 		if (Game::simulatePhysics) {
-			Game::dynamicsWorld->stepSimulation(dTime, 1);
+			Game::dynamicsWorld->stepSimulation(dTime, 1, 1.0f/30.0f);
 		}
 		else {
 			Sleep(100);

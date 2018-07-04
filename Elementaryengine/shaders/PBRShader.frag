@@ -44,7 +44,8 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
     return cDepth;
 }
 
-float lightVolume(vec3 lightPos, int index,float depth){
+float lightVolume(int index,float depth){
+	vec3 lightPos = LightPositions[index];
 	int sampleCount = vlSampleCount;
 	float bias = 0.0050;
 	if(depth > 2){
@@ -66,7 +67,6 @@ float lightVolume(vec3 lightPos, int index,float depth){
 		float currentDepth = length(currentPosition.xyz - viewPos);
 		float currentDepthToLight = length(posToLight);
 		dfp += stepLength;
-
 		float attenuation = 1.0 / (currentDepthToLight) * (currentDepthToLight);
 		if(attenuation > 0.2){
 			float cDepth = texture(shadowMaps, vec4(posToLight, index),(currentDepthToLight - bias)	/ far_plane).r;
@@ -216,7 +216,7 @@ void main(){
 		vec3 LoAdd = (kD * albedo / PI + specular) * radiance * NdotL * shadow;
 
 		if(useBasicVl){
-			lr = lightVolume(LightPositions[i],i,liniarDepth);
+			lr = lightVolume(i,liniarDepth);
 			rays += LightColors[i] * lr * 0.0005;
 			LoAdd *= 3;
 		}else{

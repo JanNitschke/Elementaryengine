@@ -60,9 +60,6 @@
     <ClCompile Include="EJSFunctions.cpp">
       <Filter>Quelldateien\JavaScript</Filter>
     </ClCompile>
-    <ClCompile Include="ERasterizer.cpp">
-      <Filter>Quelldateien\Renderers</Filter>
-    </ClCompile>
     <ClCompile Include="EOpenGl.cpp">
       <Filter>Quelldateien\Renderers</Filter>
     </ClCompile>
@@ -144,6 +141,18 @@
     <ClCompile Include="EOGLFramebuffer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="ENetworkInterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EMultiDrawContainer.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EMultiDrawMeshInstance.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EMeshReference.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -165,9 +174,6 @@
     <None Include="EnvShader.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="libenet.dylib" />
-    <None Include="ENetX86.dll" />
-    <None Include="ENetX64.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -189,9 +195,6 @@
       <Filter>Headerdateien\JavaScript</Filter>
     </ClInclude>
     <ClInclude Include="EOpenGl.h">
-      <Filter>Headerdateien\Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="ERasterizer.h">
       <Filter>Headerdateien\Renderers</Filter>
     </ClInclude>
     <ClInclude Include="ERender.h">
@@ -276,6 +279,18 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="EOGLFramebuffer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ENetworkInterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EMultiDrawContainer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EMultiDrawMeshInstance.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EMeshReference.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

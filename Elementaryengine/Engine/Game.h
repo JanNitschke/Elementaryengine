@@ -16,6 +16,7 @@
 #include <RayCastHit.h>
 #include <ETextElement.h>
 #include <EConsole.h>
+#include <ENetworkInterface.h>
 
 class GameMode;
 #include <GameMode.h>
@@ -105,6 +106,8 @@ public:
 
 
 	static vector<UIElement*> uiElements;
+
+	static ENetworkInterface * networkInterface;
 
 //TODO Fix ERROR if lamp has no parent
 	///<summary>

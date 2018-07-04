@@ -142,8 +142,7 @@ vec4 RayCast(in vec3 dir, inout vec3 hitCoord, out float dDepth){
         projectedCoord = proj * view * vec4(hitCoord,1.0);
         projectedCoord.xy /= projectedCoord.w;
         projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
-        dDepth = length(hitCoord - viewPos) / 10;
-        projectedCoord.z = 10;
+        projectedCoord.z /= 2;
         float visible = texture(gDepth,projectedCoord.xyz).r;
         return vec4(visible);
 
@@ -281,10 +280,10 @@ void main(){
         vec3 hitcol =  texture(gColor,hitpos.xy).rgb;
         FragColor = hitpos;
         //FragColor = vec4(hitcol,1);
-        color += 0.5 * hitcol;
+        //color += 0.5 * hitcol;
     //}
     color = UI(color);
-    //FragColor = vec4(color,1);
+    FragColor = vec4(color,1);
 
     //FragColor = vec4(Blurr(TexCoord,1),0);
 }

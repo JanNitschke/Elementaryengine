@@ -3,6 +3,7 @@
 #include "Game.h"
 #include <Camera.h>
 #include <ERender.h>
+#include <EMeshReference.h>
 
 
 JsValueRef EJSFunction::JSVec3Prototype;
@@ -526,7 +527,8 @@ JsValueRef EJSFunction::JSMeshAttachTo(JsValueRef callee, bool isConstructCall, 
 		void* v;
 		JsGetExternalData(arguments[1], &v);
 		Asset* asset = static_cast<Asset*>(v);
-		me->attachTo(asset);
+		EMeshReference* reference = new EMeshReference(me);
+		reference->AttachTo(asset);
 		noError = true;
 	}
 	JsBoolToBoolean(noError, &output);

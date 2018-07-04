@@ -86,7 +86,7 @@ void AstroidDemo::Load()
 		int j = rand() % 2;
 		a->setScale(vec3(sc));
 		a->setRotation(quat(w,x,y,z));
-		AstroidMeshs[0]->attachTo(a);
+		AstroidMeshs[0]->AttachTo(a);
 	}
 
 	PBRMaterial* lampmat = new PBRMaterial();
@@ -96,11 +96,11 @@ void AstroidDemo::Load()
 
 	Lamp* l = new Lamp();
 	Asset* b = new Asset();
-	l->attachTo(b);
+	l->AttachTo(b);
 	l->color = vec3(30.0);
 	b->scale = vec3(.10f);
 	b->position = vec3(0,0,0);
-	lam->attachTo(b);
+	lam->AttachTo(b);
 
 }
 

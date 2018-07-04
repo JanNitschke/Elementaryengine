@@ -22,7 +22,7 @@ public:
 	EConsole();
 	~EConsole();
 
-	static string formatToString(string format, ...);
+	static string formatToString(const string format, ...);
 	UIElement* background;
 
 

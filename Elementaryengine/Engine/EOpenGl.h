@@ -19,13 +19,7 @@ struct EDisplaySettings
 	int windowWidth = 1600;
 
 };
-struct DrawElementsIndirectCommand{
-	GLuint  count;
-	GLuint  primCount;
-	GLuint  firstIndex;
-	GLint   baseVertex;
-	GLuint  baseInstance;
-};
+
 struct DrawMeshAtributes {
 	mat4 Model;
 	mat4 Rot;
@@ -94,7 +88,6 @@ public:
 	int currentIndexOffset = 0;
 	int currentVertexOffset = 0;
 	int instance = 0;
-	vector<DrawElementsIndirectCommand> dICommands;
 
 	vector<ERendererUIElement> ERUIElements;
 

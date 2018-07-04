@@ -74,7 +74,7 @@ void EConsole::Toggle()
 	visible = !visible;
 }
 
-void EConsole::Print(string format, ...)
+void EConsole::Print(const string format, ...)
 {
 	va_list args;
 	va_start(args, format);

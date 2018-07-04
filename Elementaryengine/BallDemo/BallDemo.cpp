@@ -12,7 +12,6 @@ using namespace std;
 #include <GameMode.h>
 #include <iostream>
 #include "AstroidDemo.h"
-#include <ERasterizer.h>
 #include <EModularRasterizer.h>
 #include <ERaytracer.h>
 
@@ -36,6 +35,7 @@ int main()
 		game.Start();
 	}
 	else {
+		/*
 		Game game = Game::Instance();
 		game.renderer = new ERasterizer();
 		game.name = "Astroid demo";
@@ -45,6 +45,7 @@ int main()
 		game.setLight(vec3(0.0f), vec3(0.1, 0.2, 0.3));
 		game.gameMode = mode;
 		game.Start();
+		*/
 	}
 	return 0;
 }

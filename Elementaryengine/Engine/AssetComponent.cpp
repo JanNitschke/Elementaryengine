@@ -10,19 +10,20 @@ AssetComponent::AssetComponent()
 
 AssetComponent::~AssetComponent()
 {
-	for each (auto p in parents)
-	{
-		p->components.erase(std::remove(p->components.begin(), p->components.end(), this), p->components.end());
-	}
+	parent->components.erase(std::remove(parent->components.begin(), parent->components.end(), this), parent->components.end());
+	
 }
 
-void AssetComponent::attachTo(Asset * a)
+void AssetComponent::AttachTo(Asset * a)
 {
-	parents.push_back(a);
+	
+	parent = a;
 	a->components.push_back(this);
 }
 
-void AssetComponent::detachFrom(Asset * a)
+void AssetComponent::Detach()
 {
-	parents.erase(std::remove(parents.begin(), parents.end(), a), parents.end());
+	if (parent) {
+		parent->components.erase(std::remove(parent->components.begin(), parent->components.end(), this), parent->components.end());
+	}
 }

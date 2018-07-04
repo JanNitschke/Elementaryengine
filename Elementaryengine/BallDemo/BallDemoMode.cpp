@@ -8,7 +8,7 @@
 #include <FPCam.h>
 #include <Terrain.h>
 #include <algorithm>
-
+#include <EMeshReference.h>
 #define M_PI           3.14159265358979323846  /* pi */
 
 
@@ -130,7 +130,8 @@ void BallDemoMode::Load()
 
 	Asset* a = new Asset(vec3(0,-0.9,0),vec3(20,0.1,20),0,assetShapes::cube);
 	a->setFriction(2);
-	cube->attachTo(a);
+	EMeshReference* floorRef = new EMeshReference(cube);
+	floorRef->AttachTo(a);
 	a->renderEnvironment = false;
 
 	PBRMaterial* pbrwood = new PBRMaterial();
@@ -180,14 +181,16 @@ void BallDemoMode::Load()
 
 
 	Asset* t = new Asset(vec3(0, -0.15, 0), vec3(1.4, .75,.8), 1000, assetShapes::cube);
-	tab->attachTo(t);
+	EMeshReference* tableRef = new EMeshReference(tab);
+
+	tableRef->AttachTo(t);
 
 	//Asset* r = new Asset(vec3(-2.5, -1.0f, -2.5), vec3(4, 2, 4), 0, assetShapes::cube);
 	//ro->attachTo(r);
 
 	Lamp* l = new Lamp();
 	Asset* b = new Asset();
-	l->attachTo(b);
+	l->AttachTo(b);
 	l->color = vec3(3.0,2.0,1.0);
 	b->scale = vec3(.10f);
 	b->position = vec3(-2.0f, 2.2f, -8.0f);
@@ -205,27 +208,29 @@ void BallDemoMode::Load()
 	//cMesh->posOffset = vec3(0, -0.04, 0);
 
 	//400 baseline defered : 30 fps
+	/*
 	float height = -0.2f;
 	float offset = 0.5f;
-	/*
-	for (int i = 0; i < 10; i++)
+	float radius = 1.0f;
+
+	for (int i = 0; i < 1000; i++)
 	{
-		float radius = 0.3f;
 		float lz = (float)sin((i + offset) * (2.0f * M_PI)/ 12.0f) * radius;
 		float lx = (float)cos((i + offset) *  (2.0f * M_PI)/ 12.0f) * radius;
 		vec3 pos = vec3(lx + 2.0f,height - 0.5f,lz - 5);
 		Asset* a = new Asset(pos, vec3(.040f), 1.1f, assetShapes::cube);
 		vec3 rot = vec3((360 * (i % 12) / 12),0.1,0);
 		a->setRotation(quat(rot));
-		sphere->attachTo(a);
+		EMeshReference * ref = new EMeshReference(sphere);
+		ref->AttachTo(a);
 		a->setFriction(1.0f);
-		height += (((i + 1) % 12) == 0)?0.081f:0.0f;
-		
+		//height += (((i + 1) % 12) == 0)?0.081f:0.0f;
+		radius += (((i + 1) % 12) == 0) ? 0.081f : 0.0f;
 		if ((i + 1) % 12 == 0) {
 			offset = (offset == 0.5f) ? 0.0f : 0.5f;
 		}
 	}
-	*/
+	
 	/*
 	height = 1.5f;
 	for (int i = 0; i < 20; i++)
@@ -270,8 +275,8 @@ void CandleTick(GLFWwindow * window, double deltaTime, Asset * asset) {
 	float baseint = 0.14f;
 	float intensety = 0.2f;
 	float i1 = ((float)sin(timerunning * 5) * intensety);
-	float i2 = ((float)cos(timerunning *  7) * intensety);
-	float i3 = ((float)cos(timerunning *  13) * intensety);
+	float i2 = ((float)cos(timerunning * 7) * intensety);
+	float i3 = ((float)cos(timerunning * 13) * intensety);
 
 	l->color = color * (baseint + (i1 * i2 * i3));
 }

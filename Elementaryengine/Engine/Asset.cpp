@@ -193,11 +193,15 @@ void Asset::SetupAsset()
 
 }
 
+void Asset::RenderGeometry()
+{
+}
+
 void Asset::Destroy()
 {
 	for each (AssetComponent* as in components)
 	{
-		as->parents.erase(std::remove(as->parents.begin(), as->parents.end(), this), as->parents.end());
+		delete as;
 	}
 	Game::assetsToDelete.push_back(this);
 	Game::dynamicsWorld->removeRigidBody(assetRigidBody);
