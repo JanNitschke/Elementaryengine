@@ -84,7 +84,6 @@ void Game::Start()
 	eOpenGl->Initialise(displaySettings);
 
 	eScriptContext = new EScriptContext();
-	levels.push_back(mainLevel);
 	mainLevel->Load();
 
 	//Setup Bullet physics

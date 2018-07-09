@@ -199,7 +199,16 @@ JsValueRef EJSFunction::JSConstructorAsset(JsValueRef callee, bool isConstructCa
 	int mass;
 	JsNumberToInt(arguments[3], &mass);
 
-	Asset* asset = new Asset(*pos, *scale, mass, assetShapes::cube);
+	void* level;
+	Asset* asset;
+	if (argumentCount > 4) {
+		ELevel* lev = JSToNativeLevel(arguments[4]);
+		asset = new Asset(*pos, *scale, mass, assetShapes::cube, lev);
+	}
+	else {
+		asset = new Asset(*pos, *scale, mass, assetShapes::cube);
+	}
+
 
 	JsCreateExternalObject(asset, nullptr, &output);
 	JsSetPrototype(output, JSAssetPrototype);
@@ -1208,6 +1217,34 @@ JsValueRef EJSFunction::JSAssetEqual(JsValueRef callee, bool isConstructCall, Js
 	return output;
 }
 
+JsValueRef EJSFunction::JSAssetSetLevel(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		Asset* asset = JSToNativeAsset(arguments[0]);
+		ELevel* level = JSToNativeLevel(arguments[1]);
+		asset->setLevel(level);
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSAssetGetLevel(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		ELevel* val = element->level;
+		JsCreateExternalObject(val, nullptr, &output);
+		JsSetPrototype(output, JSLevelPrototype);
+	}
+	return output;
+}
+
 JsValueRef EJSFunction::JSCameraGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
 	JsValueRef output = JS_INVALID_REFERENCE;
@@ -1394,12 +1431,30 @@ JsValueRef EJSFunction::JSRaycastGetHitAsset(JsValueRef callee, bool isConstruct
 
 JsValueRef EJSFunction::JSLevelLoad(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
-	return JsValueRef();
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		ELevel* element = JSToNativeLevel(arguments[0]);
+		element->Load();
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
 }
 
 JsValueRef EJSFunction::JSLevelUnload(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
 {
-	return JsValueRef();
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		ELevel* element = JSToNativeLevel(arguments[0]);
+		element->Unload();
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
 }
 
 JsValueRef EJSFunction::JSLevelSetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)

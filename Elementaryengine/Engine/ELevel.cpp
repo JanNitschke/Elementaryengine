@@ -1,9 +1,10 @@
 #include "ELevel.h"
-
+#include <Game.h>
 
 
 ELevel::ELevel()
 {
+	Game::levels.push_back(this);
 }
 
 

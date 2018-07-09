@@ -126,6 +126,8 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSAssetGetColliderOffsetPos(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSAssetGetColliderOffsetSize(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSAssetEqual(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSAssetSetLevel(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSAssetGetLevel(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 	// Camera 
 	JsValueRef CALLBACK JSCameraGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);

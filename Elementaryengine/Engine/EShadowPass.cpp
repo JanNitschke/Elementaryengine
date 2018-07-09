@@ -126,15 +126,17 @@ void EShadowPass::Render()
 
 
 			for each (auto level in Game::levels) {
-				for each(auto asset in level->assets) {
-					for each (AssetComponent* component in asset->components)
-					{
-						if ((dynamic_cast<EMeshReference*>(component) != nullptr)) {
-							RenderMesh((EMeshReference*)component);
+				if (level->isLoaded()) {
+					for each(auto asset in level->assets) {
+						for each (AssetComponent* component in asset->components)
+						{
+							if ((dynamic_cast<EMeshReference*>(component) != nullptr)) {
+								RenderMesh((EMeshReference*)component);
+							}
 						}
-					}
-					if ((dynamic_cast<EMultiDrawContainer*>(asset) != nullptr)) {
-						RenderMultiDraw((EMultiDrawContainer*)asset);
+						if ((dynamic_cast<EMultiDrawContainer*>(asset) != nullptr)) {
+							RenderMultiDraw((EMultiDrawContainer*)asset);
+						}
 					}
 				}
 			}

@@ -33,6 +33,9 @@ var selectedItem = 0;
 var placePressedLastFrame = false;
 var deletePressedLastFrame = false;
 
+var level1 = new Level();
+level1.load();
+
 // Define the foreground color for the UI as a Vec3. This is done so it can be sinply changed for all elements at once. For Colors the X component of the Vector equals Red, Y equals Green and Z equals Blue.
 var fgCol = new Vec3(0.5,0.5,0.9);
 
@@ -70,7 +73,7 @@ function PlaceFeeeeest(){
         z = 0;
         k += 2;
     }
-    var as = new Asset(new Vec3(z,k,j),new Vec3(0.8,2,1.5),0); 
+    var as = new Asset(new Vec3(z,k,j),new Vec3(0.8,2,1.5),0,level1); 
     j -= 2;
     m2.attachto(as);
 }
@@ -197,12 +200,12 @@ function placeBlock(){
             normal.scale(0.5);
             var ap = hitAsset.getPosition()
             normal.add(ap);
-            placedAsset = new Asset(normal,new Vec3(0.25,0.25,0.25),0); 
+            placedAsset = new Asset(normal,new Vec3(0.25,0.25,0.25),0,level1); 
         }else{
             // Place the new asset on the surface of the hit asset at our hit position
             normal.scale(0.25);
             normal.add(hitPos);
-            placedAsset = new Asset(normal,new Vec3(0.25,0.25,0.25),0); 
+            placedAsset = new Asset(normal,new Vec3(0.25,0.25,0.25),0,level1); 
         }
         // Attach the cube mesh to the asset
         m.attachto(placedAsset);

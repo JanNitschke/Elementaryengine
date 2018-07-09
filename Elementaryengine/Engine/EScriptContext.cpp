@@ -182,6 +182,7 @@ void EScriptContext::AddBindings()
 	AssetBindings();
 	RayCastBindings();
 	CameraBindings();
+	LevelBindings();
 
 	// Setup bindings for global functions 
 	GlobalConsoleBindings();
@@ -439,7 +440,7 @@ void EScriptContext::LevelBindings()
 	memberFuncsLevel.push_back(EJSFunction::JSLevelGetScale);
 
 
-	projectNativeClass(L"Level", EJSFunction::JSConstructorLevel, EJSFunction::JSRaycastHitPrototype, memberNamesLevel, memberFuncsLevel);
+	projectNativeClass(L"Level", EJSFunction::JSConstructorLevel, EJSFunction::JSLevelPrototype, memberNamesLevel, memberFuncsLevel);
 
 }
 
