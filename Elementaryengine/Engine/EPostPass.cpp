@@ -1,22 +1,13 @@
 #include "EPostPass.h"
 #include <Game.h>
+#include <EModularRasterizer.h>
 
 
 
-EPostPass::EPostPass(GLuint positionBuffer, GLuint normalBuffer, GLuint albedoSpecBuffer, GLuint materialBuffer, GLuint colorBuffer, GLuint depthBuffer)
+EPostPass::EPostPass(EOGLFramebuffer * geometrybuffer, EOGLFramebuffer * colorbuffer)
 {
-	PositionBuffer = positionBuffer;
-	NormalBuffer = normalBuffer;
-	AlbedoSpecBuffer = albedoSpecBuffer;
-	MaterialBuffer = materialBuffer;
-	ColorBuffer = colorBuffer;
-	DepthBuffer = depthBuffer;
-
-}
-
-EPostPass::EPostPass()
-{
-
+	this->geometrybuffer = geometrybuffer;
+	this->colorbuffer = colorbuffer;
 }
 
 
@@ -26,67 +17,42 @@ EPostPass::~EPostPass()
 
 void EPostPass::Render()
 {
+	GLenum err;
+
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error before post " << err << endl;
+	}
 	ERenderPass::Render();
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error before framebuffer post " << err << endl;
+	}
 	//post fx (ssr) 
 	glBlitFramebuffer(0, 0, displaySettings->windowWidth, displaySettings->windowHeight, 0, 0, displaySettings->windowWidth, displaySettings->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error framebuffer post " << err << endl;
+	}
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error after framebuffer post " << err << endl;
+	}
 
 	// clear the frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// bind Position buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, PositionBuffer);
-
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, NormalBuffer);
-
-
-	// bind AlbedoSpec buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, AlbedoSpecBuffer);
-
-
-	// bind MaterialBuffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, MaterialBuffer);
-
-
-	// bind Lighting pass output texture and set its uniform
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, ColorBuffer);
-
-
-	// bind depth texture and set its uniform
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
-
 
 	BuildUI();
 
 	Game::eOpenGl->renderQuad();
 
-
-	// copy content of geometry's depth buffer to default framebuffer's depth buffer
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, DepthBuffer);
-
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error end post " << err << endl;
+	}
 }
 
 void EPostPass::Initialize()
 {
 	_shader = Mesh::ssrShader;
-
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gPosition", 0));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gNormal", 1));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gAlbedoSpec", 2));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gMaterial", 3));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gDepth", 6));
+	_shader->use();
 	_uniforms.push_back(new EOGLUniform<float>(_shader, "far_plane", 25.0f));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gColor", 5));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "textures", 0));
-
 	_uniforms.push_back(new EOGLUniform<vec3>(_shader, "viewPos",	[](){return Game::activeCam->position; }));
 	_uniforms.push_back(new EOGLUniform<mat4>(_shader, "view",		[](){return Game::View; }));
 	_uniforms.push_back(new EOGLUniform<mat4>(_shader, "invView",	[](){return inverse(Game::View); }));
@@ -97,9 +63,6 @@ void EPostPass::Initialize()
 
 	ERenderPass::Initialize();
 	glGenBuffers(1, &uiElementsSSBO);
-
-
-
 }
 
 void EPostPass::BuildUI()
@@ -123,9 +86,15 @@ void EPostPass::BuildUI()
 		u.z = uie->zindex;
 		ERUIElements.push_back(u);
 	}
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error ui 1: " << err << endl;
+	}
 	// copy the atribute vector to the GPU
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 7, uiElementsSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ERendererUIElement) * ERUIElements.size(), ERUIElements.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error ui 2: " << err << endl;
+	}
 }

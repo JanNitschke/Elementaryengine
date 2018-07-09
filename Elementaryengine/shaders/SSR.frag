@@ -24,15 +24,17 @@ layout(std430, binding = 7) buffer UIE
     UIElement uie[];
 };
 
-uniform sampler2DArray textures;
+layout (std140, binding = 1) uniform Samplers{
+	sampler2D gPosition;
+	sampler2D gNormal;
+	sampler2D gAlbedoSpec;
+	sampler2D gMaterial;
+	sampler2D gDepth;
+    sampler2D gColor;
+    samplerCubeArrayShadow shadowMaps;
+    sampler2DArray textures;
+};
 
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
-uniform sampler2D gAlbedoSpec;
-uniform sampler2D gMaterial;
-uniform sampler2DShadow gDepth;
-//uniform sampler2D gDepth;
-uniform sampler2D gColor;
 uniform mat4 invView;
 uniform mat4 invProj;
 uniform mat4 view;
@@ -133,6 +135,7 @@ float linearDepth(float depthSample)
    return (2 * near) / (far + near - depthSample * (far - near));
 }
 vec4 RayCast(in vec3 dir, inout vec3 hitCoord, out float dDepth){
+    /*
     dir = normalize(dir) * rayStep;
     vec4 projectedCoord = vec4(0);
     float currentDepth = 0;
@@ -154,6 +157,8 @@ vec4 RayCast(in vec3 dir, inout vec3 hitCoord, out float dDepth){
     }
     hitCoord = lastSuccessPos;
     return vec4(hitCoord,1);
+    */
+    return vec4(0);
 }
 vec3 Blurr(vec2 pos, float strength){
     vec3 outColor = vec3(0);
@@ -267,7 +272,9 @@ void main(){
     vec3 viewNormal = vec3(texture(gNormal, TexCoord));
     vec3 globalPos =  vec3(texture(gPosition, TexCoord));
     vec3 color = texture(gColor,TexCoord).rgb;
+    float depth =  texture(gDepth, TexCoord).r;
 
+    /*
     //if(roughness < 100.8 && useSSR){
         float dX = (2 * TexCoord.x ) - 1;
         float dY = (2 * TexCoord.y ) - 1; 
@@ -278,12 +285,11 @@ void main(){
         vec3 direction = normalize(reflect(normalize(dir.xyz),normalize(viewNormal)));
         vec4 hitpos = RayCast(direction,hitCoord, dist);
         vec3 hitcol =  texture(gColor,hitpos.xy).rgb;
-        FragColor = hitpos;
+        FragColor = hitpos;*/
         //FragColor = vec4(hitcol,1);
         //color += 0.5 * hitcol;
     //}
+   // color = vec3(0.5);
     color = UI(color);
     FragColor = vec4(color,1);
-
-    //FragColor = vec4(Blurr(TexCoord,1),0);
 }

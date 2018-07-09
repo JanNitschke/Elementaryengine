@@ -2,12 +2,28 @@ layout (location = 0) out vec4 FragColor;
 
 in vec2 TexCoord;
 
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
-uniform sampler2D gAlbedoSpec;
-uniform sampler2D gMaterial;
-uniform sampler2D gDepth;
+layout(std430, binding = 15) buffer lightColors 
+{
+    vec3 LightColors[];
+};
+layout(std430, binding = 16) buffer lightPositions 
+{
+    vec3 LightPositions[];
+};
+
+layout(std140, binding = 1) uniform Samplers{
+	sampler2D gPosition;
+	sampler2D gNormal;
+	sampler2D gAlbedoSpec;
+	sampler2D gMaterial;
+	sampler2D gDepth;
+    sampler2D gColor;
+    sampler2DArray textures;
+};
+
 uniform samplerCubeArrayShadow shadowMaps;
+
+
 uniform	sampler2D colorCorrection;
 
 uniform vec3 directionalLightDirection; 
@@ -17,15 +33,6 @@ uniform float far_plane;
 uniform mat4 invProj;
 uniform mat4 invView;
 
-
-layout(std430, binding = 3) buffer lightColors 
-{
-    vec3 LightColors[];
-};
-layout(std430, binding = 4) buffer lightPositions 
-{
-    vec3 LightPositions[];
-};
 const float PI = 3.14159265359;
 
 float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
@@ -44,29 +51,30 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
     return cDepth;
 }
 
-float lightVolume(vec3 lightPos, int index,float depth){
+float lightVolume(int index,float depth){
+	vec3 lightPos = LightPositions[index];
 	int sampleCount = vlSampleCount;
 	float bias = 0.0050;
-	if(depth > 2){
-		depth = 2;
-	}
-	depth = (depth * (far - near)) - near;
+	//if(depth > 2){
+	//	depth = 2;
+	//}
 	float strength = 0;
 	float dX = (2 * TexCoord.x ) - 1;
 	float dY = (2 * TexCoord.y ) - 1; 
 	vec4 dir = normalize(invView * vec4((invProj * vec4(dX,dY,0.1,1)).xyz,0));
 	float stepLength = depth / sampleCount;
-	stepLength /= 2;
 	vec4 currentPosition = vec4(viewPos,1);
 	float le = 0;
 	float dfp = 0;
+
+	//FragColor = vec4(stepLength);
+
 	for(int i = 0; i < sampleCount; i++){
 		currentPosition += (dir * stepLength);
 		vec3 posToLight = currentPosition.xyz - lightPos;
 		float currentDepth = length(currentPosition.xyz - viewPos);
 		float currentDepthToLight = length(posToLight);
 		dfp += stepLength;
-
 		float attenuation = 1.0 / (currentDepthToLight) * (currentDepthToLight);
 		if(attenuation > 0.2){
 			float cDepth = texture(shadowMaps, vec4(posToLight, index),(currentDepthToLight - bias)	/ far_plane).r;
@@ -182,7 +190,7 @@ void main(){
 	Lo += (dkD * albedo / PI + dspecular) * dradiance * dNdotL;
 	vec3 rays = vec3(0);
 
-	float liniarDepth = (2.0 * near) / (near + far - FDepth * (far - near));
+	float liniarDepth = FDepth * far_plane;
 
 
 	//for each light ... add to lo
@@ -216,7 +224,7 @@ void main(){
 		vec3 LoAdd = (kD * albedo / PI + specular) * radiance * NdotL * shadow;
 
 		if(useBasicVl){
-			lr = lightVolume(LightPositions[i],i,liniarDepth);
+			lr = lightVolume(i,liniarDepth);
 			rays += LightColors[i] * lr * 0.0005;
 			LoAdd *= 3;
 		}else{
@@ -229,4 +237,5 @@ void main(){
 
 	outcolor   = am + Lo + rays;  
 	FragColor = vec4(outcolor * 5, 1.0);
+	//FragColor = vec4(FDepth * 0.1);
 }

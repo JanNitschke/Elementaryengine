@@ -2,15 +2,15 @@
 #include "ERenderPass.h"
 #include <EMultiDrawContainer.h>
 #include <EMeshReference.h>
+#include <EOGLBindlessTexture.h>
+#include <EOGLFramebuffer.h>
 
-#define OUT
 
 class EShadowPass :
 	public ERenderPass
 {
 public:
 	EShadowPass();
-	EShadowPass(GLuint vao,GLuint elementBuffer,GLuint indirectBuffer, int meshCount,OUT GLuint* shadowMaps);
 
 	~EShadowPass();
 
@@ -20,9 +20,8 @@ public:
 	virtual void Initialize();
 	void RenderMesh(EMeshReference * meshReference);
 	void RenderMultiDraw(EMultiDrawContainer * multiCont);
-	GLuint ShadowMaps;
-
-
+	EOGLBindlessTexture * shadowMaps;
+	EOGLFramebuffer * framebuffer;
 	GLuint VAO;
 	GLuint ElementBuffer;
 	GLuint IndirectBuffer;

@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+
 #include <glm/gtc/quaternion.hpp>
 #include <EEngine.h>
 #include <AssetComponent.h>
@@ -14,11 +15,17 @@ using namespace std;
 static void defaultOnTick(GLFWwindow * window, double deltaTime, Asset* asset){}
 enum assetShapes{ball,cube};
 
+class ELevel;
+
 class Asset
 {
 public:
 	DllExport Asset();
 	DllExport Asset(vec3 pos, vec3 scale, int mass, assetShapes shape);
+	DllExport Asset(vec3 pos, vec3 scale, int mass, assetShapes shape, ELevel * level);
+	virtual ~Asset();
+
+	DllExport void setLevel(ELevel* level);
 	DllExport void setMass(float m);
 	DllExport virtual void setScale(vec3 sca);
 	DllExport virtual void setPosition(vec3 pos);
@@ -35,6 +42,7 @@ public:
 	DllExport void setCollisionPositionOffset(vec3 offset);
 
 	DllExport btRigidBody* getRigidBody();
+	ELevel * level;
 
 	float mass = 1;
 

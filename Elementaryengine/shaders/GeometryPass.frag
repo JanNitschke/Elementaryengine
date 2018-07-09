@@ -3,6 +3,17 @@ layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec4 gAlbedoSpec;
 layout (location = 3) out vec3 gMaterial;
 
+layout(std140,binding = 1) uniform Samplers{
+	sampler2D Position;
+	sampler2D Normal;
+	sampler2D AlbedoSpec;
+	sampler2D Material;
+	sampler2D Depth;
+    sampler2D Color;
+    samplerCubeArrayShadow shadowMaps;
+    sampler2DArray textures;
+};
+
 in VertexData
 {
     vec2 TexCoord;
@@ -10,8 +21,6 @@ in VertexData
     vec3 Normal;
 } inData;
 
- 
-uniform sampler2DArray textures;
 
 uniform vec3 albedo;
 uniform float roughness;

@@ -1,6 +1,6 @@
 #pragma once
-#include <Mesh.h>
 #include <EEngine.h>
+#include <Mesh.h>
 #include <Camera.h>
 #include <Asset.h>
 #include <Lamp.h>
@@ -17,6 +17,7 @@
 #include <ETextElement.h>
 #include <EConsole.h>
 #include <ENetworkInterface.h>
+#include <ELevel.h>
 
 class GameMode;
 #include <GameMode.h>
@@ -85,19 +86,14 @@ public:
 	///</summary> 
 	void SetActiveCam(Camera* camera);
 
-	///<summary>
-	///Assets to loop trough this frame. DO NOT DELETE FROM THIS! Created assets register themselfs here.
-	///</summary> 
-	static vector<Asset*> assets;
-
 	static vector <Mesh*> meshs;
+
+	static vector <ELevel*> levels;
+
+	static ELevel* mainLevel;
 
 	static vector <ETextElement*> textElements;
 	
-	///<summary>
-	///Assets to loop trough next frame. You may delete items from this, but the destructor usualy does this by itself.
-	///</summary> 
-	static vector<Asset*> nextAssets;
 
 	///<summary>
 	///Assets to delete once the frame is completed

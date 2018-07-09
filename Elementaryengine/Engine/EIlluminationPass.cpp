@@ -2,22 +2,20 @@
 #include <Game.h>
 
 
-
-EIlluminationPass::EIlluminationPass()
+EIlluminationPass::EIlluminationPass(EOGLFramebuffer * inBuffer)
 {
+	ERenderPass::Initialize();
+	glGenBuffers(1, &lightColorSSBO);
+	glGenBuffers(1, &lightPositionSSBO);
+	this->inBuffer = inBuffer;
+	outBuffer = new EOGLFramebuffer();
+	outBuffer->Bind();
+	EOGLBindlessTexture* positionBuffer = new EOGLBindlessTexture("illuminationBuffer", GL_TEXTURE_2D, GL_NEAREST, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, displaySettings->windowWidth, displaySettings->windowHeight);
+	outBuffer->AppendTexture(positionBuffer, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D);
 
+	outBuffer->Complete();
 }
 
-EIlluminationPass::EIlluminationPass(GLuint positionBuffer, GLuint normalBuffer, GLuint albedoSpecBuffer, GLuint materialBuffer, GLuint depthBuffer)
-{
-	PositionBuffer = positionBuffer;
-	NormalBuffer = normalBuffer;
-	AlbedoSpecBuffer = albedoSpecBuffer;
-	MaterialBuffer = materialBuffer;
-	DepthBuffer = depthBuffer;
-	glGenTextures(1, &frameOut);
-
-}
 
 
 EIlluminationPass::~EIlluminationPass()
@@ -28,75 +26,38 @@ EIlluminationPass::~EIlluminationPass()
 
 void EIlluminationPass::Render()
 {
+	GLenum err;
+
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error before illu " << err << endl;
+	}
 	ERenderPass::Render();
-	// bind and setup framebuffer for lighting pass
-	glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer);
-	glBindTexture(GL_TEXTURE_2D, frameOut);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, displaySettings->windowWidth, displaySettings->windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameOut, 0);
-
-
+	outBuffer->Bind();
 	// clear buffers
 	glDisable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// bind Position buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, PositionBuffer);
-	// Value 0
-
-	// bind Normal buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, NormalBuffer);
-
-	// bind AlbedoSpec buffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, AlbedoSpecBuffer);
-
-	// bind MaterialBuffer texture and set its uniform
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, MaterialBuffer);
-
-
-	// bind depth texture and set its uniform
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
-
-
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error before lamps illu pass " << err << endl;
+	}
 	SetupLamps(Game::eOpenGl, _shader);
-
 	Game::eOpenGl->renderQuad();
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error in illu pass " << err << endl;
+	}
 }
 
 void EIlluminationPass::Initialize()
 {
 	_shader = Mesh::pbrShader;
-	_uniforms.push_back(new EOGLUniform<vec3>(_shader, "viewPos", []() {return Game::activeCam->position; }));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gPosition", 0));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gNormal", 1));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gAlbedoSpec", 2));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gMaterial", 3));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gDepth", 6));
+	_shader->use();
 
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "gDepth", 6));
+	_uniforms.push_back(new EOGLUniform<vec3>(_shader, "viewPos", []() {return Game::activeCam->position; }));
 	_uniforms.push_back(new EOGLUniform<mat4>(_shader, "invProj", []() {return inverse(Game::Projection); }));
 	_uniforms.push_back(new EOGLUniform<mat4>(_shader, "invView", []() {return inverse(Game::View); }));
 	_uniforms.push_back(new EOGLUniform<float>(_shader, "far_plane", 25.0f));
-	_uniforms.push_back(new EOGLUniform<int>(_shader, "shadowMaps", 8));
-
-	ERenderPass::Initialize();
-
-	//Setup framebuffer
-	glGenFramebuffers(1, &renderBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer);
-
-	glGenBuffers(1, &lightColorSSBO);
-	glGenBuffers(1, &lightPositionSSBO);
-	glGenBuffers(1, &meshDataSSBO);
-	glGenBuffers(1, &uiElementsSSBO);
-	glGenBuffers(1, &drawIdOffsetBuffer);
 }
 
 void EIlluminationPass::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
@@ -115,24 +76,20 @@ void EIlluminationPass::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 		}
 
 	}
-
-	// dont do this for the ssr shader
-	if (shader != Mesh::ssrShader) {
-		// bind Shadowmap texture array and set its uniform
-		glActiveTexture(GL_TEXTURE8);
-		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, Game::eOpenGl->shadowMaps);
-	}
-
-
+	_shader->use();
+	
 	// copy color SSBO
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightColorSSBO);
 	GLsizeiptr lcs = sizeof(glm::vec4) * (lightColors.size());
-	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 3, lightColorSSBO, 0, lcs);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, lcs, lightColors.data(), GL_DYNAMIC_DRAW);
+	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 15, lightColorSSBO, 0, lcs);
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 15, lightColorSSBO);
 
 	// copy position SSBO
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightPositionSSBO);
 	GLsizeiptr lps = sizeof(glm::vec4) * lightPositions.size();
-	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 4, lightPositionSSBO, 0, lps);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, lps, lightPositions.data(), GL_DYNAMIC_DRAW);
+	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 16, lightPositionSSBO, 0, lps);
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 16, lightPositionSSBO);
+	
 }

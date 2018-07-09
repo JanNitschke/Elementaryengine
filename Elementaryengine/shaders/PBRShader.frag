@@ -2,12 +2,28 @@ layout (location = 0) out vec4 FragColor;
 
 in vec2 TexCoord;
 
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
-uniform sampler2D gAlbedoSpec;
-uniform sampler2D gMaterial;
-uniform sampler2D gDepth;
-uniform samplerCubeArrayShadow shadowMaps;
+layout(std430, binding = 15) buffer lightColors 
+{
+    vec3 LightColors[];
+};
+layout(std430, binding = 16) buffer lightPositions 
+{
+    vec3 LightPositions[];
+};
+
+layout(std140, binding = 1) uniform Samplers{
+	sampler2D gPosition;
+	sampler2D gNormal;
+	sampler2D gAlbedoSpec;
+	sampler2D gMaterial;
+	sampler2D gDepth;
+    sampler2D gColor;
+	samplerCubeArrayShadow shadowMaps;
+    sampler2DArray textures;
+};
+
+
+
 uniform	sampler2D colorCorrection;
 
 uniform vec3 directionalLightDirection; 
@@ -17,20 +33,12 @@ uniform float far_plane;
 uniform mat4 invProj;
 uniform mat4 invView;
 
-
-layout(std430, binding = 3) buffer lightColors 
-{
-    vec3 LightColors[];
-};
-layout(std430, binding = 4) buffer lightPositions 
-{
-    vec3 LightPositions[];
-};
 const float PI = 3.14159265359;
 
-float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
+float ShadowCalculation(vec3 fragPos, int index)
 {
-	float bias = 0.10;
+	vec3 lightPos = LightPositions[index];
+	float bias = 0.15;
 
 	// get vector between fragment position and light position
 	vec3 fragToLight = fragPos - lightPos;
@@ -47,9 +55,9 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, int index)
 float lightVolume(int index,float depth){
 	vec3 lightPos = LightPositions[index];
 	int sampleCount = vlSampleCount;
-	float bias = 0.0050;
-	if(depth > 2){
-		depth = 2;
+	float bias = 0.1;
+	if(depth > 5){
+		depth = 5;
 	}
 	depth = (depth * (far - near)) - near;
 	float strength = 0;
@@ -70,10 +78,13 @@ float lightVolume(int index,float depth){
 		float attenuation = 1.0 / (currentDepthToLight) * (currentDepthToLight);
 		if(attenuation > 0.2){
 			float cDepth = texture(shadowMaps, vec4(posToLight, index),(currentDepthToLight - bias)	/ far_plane).r;
-			strength += ((cDepth / dfp) + cDepth) * attenuation;
+			strength += (-1 + (2 * cDepth * cDepth)) * attenuation;
+			//strength += ((cDepth / dfp) + cDepth) * attenuation;
 		}
 
 	}
+	return strength * depth / sampleCount;
+
 	if(depth / sampleCount > 0.97){
 		return 0.0;
 	}else{
@@ -149,6 +160,7 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
 void main(){
 	vec3 FragPos = texture(gPosition, TexCoord).rgb;
 	float FDepth = texture(gDepth, TexCoord).r;
+	vec4 DDepth = texture(gDepth, TexCoord).rgba;
 	vec3 Normal = texture(gNormal, TexCoord).rgb;
 	vec3 albedo = pow(texture(gAlbedoSpec, TexCoord).rgb, vec3(0.8));
 	float roughness = texture(gMaterial, TexCoord).r;
@@ -180,9 +192,7 @@ void main(){
 	dkD *= 1.0 - metallic;	
 	float dNdotL = max(dot(N, dL), 0.0);        
 	Lo += (dkD * albedo / PI + dspecular) * dradiance * dNdotL;
-	vec3 rays = vec3(0);
-
-	float liniarDepth = (2.0 * near) / (near + far - FDepth * (far - near));
+	float liniarDepth = (2.0 * near) / (near + far - DDepth.r * (far - near));
 
 
 	//for each light ... add to lo
@@ -190,7 +200,7 @@ void main(){
 		
 	    vec3 L = normalize(LightPositions[i] - FragPos);
 		vec3 H = normalize(V + L);
-	
+		
 		float distance = length(LightPositions[i] - FragPos);
 		float attenuation = 1.0 / (distance * distance);
 		vec3 radiance = LightColors[i] * attenuation; 
@@ -210,15 +220,17 @@ void main(){
 		vec3 kD = vec3(1.0) - kS;
 		kD *= 1.0 - metallic;	
 
-		float shadow = ShadowCalculation(FragPos,LightPositions[i],i);        
+		float shadow = ShadowCalculation(FragPos,i);      
 		float NdotL = max(dot(N, L), 0.0);  
 		float lr = 0;
 		vec3 LoAdd = (kD * albedo / PI + specular) * radiance * NdotL * shadow;
-
 		if(useBasicVl){
 			lr = lightVolume(i,liniarDepth);
-			rays += LightColors[i] * lr * 0.0005;
 			LoAdd *= 3;
+			lr *= 0.1;
+			lr += 0.5;
+			if(lr > 2) lr = 2;
+			LoAdd *=lr; 
 		}else{
 			LoAdd *= 4;
 		}
@@ -227,6 +239,7 @@ void main(){
 	}   
 	vec3 am = vec3(0.3) * albedo * ambient;
 
-	outcolor   = am + Lo + rays;  
+	outcolor   = am + Lo;  
 	FragColor = vec4(outcolor * 5, 1.0);
+	//FragColor = vec4(liniarDepth * 0.05);
 }

@@ -5,81 +5,36 @@
 #include <glm\gtx\quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <EModularRasterizer.h>
+#include <iostream>
 
 Shader * EGeometryPass::meshGeometryShader;
 
 EGeometryPass::EGeometryPass()
 {
-}
-
-EGeometryPass::EGeometryPass(OUT GLuint * positionBuffer, OUT GLuint * normalBuffer, OUT GLuint * albedoSpecBuffer, OUT GLuint * materialBuffer, OUT GLuint * deepthBuffer)
-{
-
 	ERenderPass::Initialize();
 
-	//Setup framebuffer
-	glGenFramebuffers(1, &renderBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer);
-	EDisplaySettings* settings = Game::displaySettings;
+	GLenum err = 0;
 
+	framebuffer = new EOGLFramebuffer();
+	framebuffer->Bind();
 
-	// - position color buffer
-	glGenTextures(1, &PositionBuffer);
-	glBindTexture(GL_TEXTURE_2D, PositionBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, settings->windowWidth, settings->windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, PositionBuffer, 0);
+	EOGLBindlessTexture* positionBuffer = new EOGLBindlessTexture("positionBuffer", GL_TEXTURE_2D, GL_NEAREST, GL_RGB16F, GL_RGB, GL_FLOAT, displaySettings->windowWidth, displaySettings->windowHeight);
+	framebuffer->AppendTexture(positionBuffer, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D);
 
-	// - normal color buffer
-	glGenTextures(1, &NormalBuffer);
-	glBindTexture(GL_TEXTURE_2D, NormalBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, settings->windowWidth, settings->windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, NormalBuffer, 0);
+	EOGLBindlessTexture* normalBuffer = new EOGLBindlessTexture("normalBuffer", GL_TEXTURE_2D, GL_NEAREST, GL_RGB16F, GL_RGB, GL_FLOAT, displaySettings->windowWidth, displaySettings->windowHeight);
+	framebuffer->AppendTexture(normalBuffer, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D);
 
-	// - color + specular color buffer
-	glGenTextures(1, &AlbedoSpecBuffer);
-	glBindTexture(GL_TEXTURE_2D, AlbedoSpecBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, settings->windowWidth, settings->windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, AlbedoSpecBuffer, 0);
+	EOGLBindlessTexture* albedoSpecBuffer = new EOGLBindlessTexture("albedoSpecBuffer", GL_TEXTURE_2D, GL_NEAREST, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, displaySettings->windowWidth, displaySettings->windowHeight);
+	framebuffer->AppendTexture(albedoSpecBuffer, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D);
 
-	// - material buffer, R = roughtniss, G = Metallic, B = Ambient
-	glGenTextures(1, &MaterialBuffer);
-	glBindTexture(GL_TEXTURE_2D, MaterialBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, settings->windowWidth, settings->windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, MaterialBuffer, 0);
+	EOGLBindlessTexture* materialBuffer = new EOGLBindlessTexture("materialBuffer", GL_TEXTURE_2D, GL_NEAREST, GL_RGB16F, GL_RGB, GL_FLOAT, displaySettings->windowWidth, displaySettings->windowHeight);
+	framebuffer->AppendTexture(materialBuffer, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D);
 
-	glGenTextures(1, &DepthBuffer);
-	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, settings->windowWidth, settings->windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	EOGLBindlessTexture* depthBuffer = new EOGLBindlessTexture("depthBuffer", GL_TEXTURE_2D, GL_LINEAR, GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_FLOAT, displaySettings->windowWidth, displaySettings->windowHeight);
+	framebuffer->AppendTexture(depthBuffer, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, DepthBuffer, 0);
-
-	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
-	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(4, attachments);
-
-	// finally check if framebuffer is complete
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "Framebuffer not complete!" << std::endl;
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	*positionBuffer = PositionBuffer;
-	*normalBuffer = NormalBuffer;
-	*albedoSpecBuffer = AlbedoSpecBuffer;
-	*materialBuffer = MaterialBuffer;
-	*deepthBuffer = DepthBuffer;
+	framebuffer->Complete();
 }
-
 
 
 EGeometryPass::~EGeometryPass()
@@ -88,12 +43,18 @@ EGeometryPass::~EGeometryPass()
 
 void EGeometryPass::Render()
 {
+	GLenum err = 0;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error before geom: " << err << endl;
+	}
 	ERenderPass::Render();
 
 	EOpenGl* eOpenGl = Game::eOpenGl;
-	// geometry pass
-	// bind and setup framebuffer for geometry pass
-	glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer);
+	framebuffer->Bind();
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error geom framebuffer: " << err << endl;
+	}
+
 	glDisable(GL_BLEND);
 	glClearColor(0.050f, 0.125f, 0.247f, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -106,29 +67,33 @@ void EGeometryPass::Render()
 
 	meshGeometryShader->use();
 	meshUniformVP.Update();
-	meshUniformTextureArray.Update();
 
-	for each (auto asset in Game::assets)
-	{
-		for each (AssetComponent* component in asset->components)
-		{
-			if ((dynamic_cast<EMeshReference*>(component) != nullptr)) {
-				RenderMesh((EMeshReference*)component);
+	for each (auto level in Game::levels) {
+		if (level->isLoaded()) {
+			for each(auto asset in level->assets) {
+				for each (AssetComponent* component in asset->components)
+				{
+					if ((dynamic_cast<EMeshReference*>(component) != nullptr)) {
+						RenderMesh((EMeshReference*)component);
+					}
+				}
+				if ((dynamic_cast<EMultiDrawContainer*>(asset) != nullptr)) {
+					RenderMultiDraw((EMultiDrawContainer*)asset);
+				}
 			}
 		}
-		if ((dynamic_cast<EMultiDrawContainer*>(asset) != nullptr)) {
-			RenderMultiDraw((EMultiDrawContainer*)asset);
-		}
+	}
+
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error geom end: " << err << endl;
 	}
 }
 
 void EGeometryPass::Initialize()
 {
 	meshGeometryShader = new Shader("..\\shaders\\GeometryPassMesh.vert", "..\\shaders\\GeometryPass.frag");
-	_shader = Mesh::geometryShader;
-	_uniforms.push_back(new EOGLUniform<int>(Mesh::geometryShader, "textures", 0));
-	_uniforms.push_back(new EOGLUniform<mat4>(Mesh::geometryShader, "VP", []() { return Game::Projection * Game::View; }));
-
+	_shader = meshGeometryShader;
+	_shader->use();
 	meshUniformVP = EOGLUniform<mat4>(meshGeometryShader, "VP", []() { return Game::Projection * Game::View; });
 	meshUniformModel = EOGLUniform<mat4>(meshGeometryShader, "Model", mat4(0));
 	meshUniformRotation = EOGLUniform<mat4>(meshGeometryShader, "Rot", mat4(0));
@@ -139,10 +104,6 @@ void EGeometryPass::Initialize()
 	meshUniformRoughnessTex = EOGLUniform<int>(meshGeometryShader, "roughnessTex", 0);
 	meshUniformAlbedoTex = EOGLUniform<int>(meshGeometryShader, "albedoTex", 0);
 	meshUniformMetallicTex = EOGLUniform<int>(meshGeometryShader, "metallicTex", 0);
-	meshUniformTextureArray = EOGLUniform<int>(meshGeometryShader, "textures", []() { return (int)((EModularRasterizer*)Game::renderer)->textureArrayHandle; });
-
-	ERenderPass::Initialize();
-
 }
 
 void EGeometryPass::RenderMesh(EMeshReference * meshReference)
@@ -152,10 +113,10 @@ void EGeometryPass::RenderMesh(EMeshReference * meshReference)
 	Asset * asset = meshReference->parent;
 
 	vec3 position = asset->getPosition() + meshReference->positionOffset;
-	vec3 scale = asset->getScale() + meshReference->scaleOffset;
-	quat rotation = asset->getRotation() + meshReference->rotationOffset;
-	if (PBRMaterial * material = (PBRMaterial*)meshReference->getMaterial()) {
+	vec3 scale = asset->getScale() * meshReference->scaleOffset;
+	quat rotation = asset->getRotation() * meshReference->rotationOffset;
 
+	if (PBRMaterial * material = (PBRMaterial*)meshReference->getMaterial()) {
 		meshUniformModel.Update(glm::scale(glm::translate(mat4(1.0f), position), scale));
 		meshUniformRotation.Update(glm::toMat4(rotation));
 		meshUniformAO.Update(material->ao);

@@ -10,6 +10,7 @@
 #include <UIElement.h>
 #include <RayCastHit.h>
 #include <Camera.h>
+#include <ELevel.h>
 
 namespace EJSFunction {
 
@@ -22,6 +23,7 @@ namespace EJSFunction {
 	extern JsValueRef JSUIPrototype;
 	extern JsValueRef JSRaycastHitPrototype;
 	extern JsValueRef JSCameraPrototype;
+	extern JsValueRef JSLevelPrototype;
 
 	// Javascript to Native object conversion
 	vec3 JSToNativeVec3(JsValueRef jsVec3);
@@ -32,6 +34,7 @@ namespace EJSFunction {
 	UIElement* JSToNativeUI(JsValueRef jsUI);
 	RayCastHit* JsToNativeRaycast(JsValueRef jsRaycast);
 	Camera* JSToNativeCamera(JsValueRef jsCamera);
+	ELevel* JSToNativeLevel(JsValueRef jsLevel);
 
 	// Constructors
 	JsValueRef CALLBACK JSConstructorVec3(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
@@ -42,6 +45,7 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSConstructorUI(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSConstructorRaycastResult(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 	JsValueRef CALLBACK JSConstructorCamera(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSConstructorLevel(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 // member functions
 
@@ -140,4 +144,12 @@ namespace EJSFunction {
 	JsValueRef CALLBACK JSRaycastGetHitPos(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
 	JsValueRef CALLBACK JSRaycastGetHitNormal(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
 	JsValueRef CALLBACK JSRaycastGetHitAsset(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState);
+
+	// Level
+	JsValueRef CALLBACK JSLevelLoad(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSLevelUnload(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSLevelSetPosition(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSLevelGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSLevelSetScale(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+	JsValueRef CALLBACK JSLevelGetScale(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 }

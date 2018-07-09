@@ -14,7 +14,7 @@ JsValueRef EJSFunction::JSAssetPrototype;
 JsValueRef EJSFunction::JSUIPrototype;
 JsValueRef EJSFunction::JSRaycastHitPrototype;
 JsValueRef EJSFunction::JSCameraPrototype;
-
+JsValueRef EJSFunction::JSLevelPrototype;
 
 vec3 EJSFunction::JSToNativeVec3(JsValueRef jsVec3)
 {
@@ -71,6 +71,12 @@ Camera * EJSFunction::JSToNativeCamera(JsValueRef jsCamera)
 	JsGetExternalData(jsCamera, &p);
 	return reinterpret_cast<Camera*>(p);
 }
+ELevel* EJSFunction::JSToNativeLevel(JsValueRef jsLevel) {
+	void* p;
+	JsGetExternalData(jsLevel, &p);
+	return reinterpret_cast<ELevel*>(p);
+}
+
 
 // new Vec3(number x, number y, number z)
 JsValueRef EJSFunction::JSConstructorVec3(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
@@ -291,6 +297,17 @@ JsValueRef EJSFunction::JSConstructorCamera(JsValueRef callee, bool isConstructC
 
 	JsCreateExternalObject(cam, nullptr, &output);
 	JsSetPrototype(output, JSCameraPrototype);
+	return output;
+}
+
+JsValueRef EJSFunction::JSConstructorLevel(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+
+	ELevel* lev = new ELevel();
+
+	JsCreateExternalObject(lev, nullptr, &output);
+	JsSetPrototype(output, JSLevelPrototype);
 	return output;
 }
 
@@ -1371,6 +1388,72 @@ JsValueRef EJSFunction::JSRaycastGetHitAsset(JsValueRef callee, bool isConstruct
 		RayCastHit* element = static_cast<RayCastHit*>(vec);
 		JsCreateExternalObject(element->hitAsset, nullptr, &output);
 		JsSetPrototype(output, JSAssetPrototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSLevelLoad(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	return JsValueRef();
+}
+
+JsValueRef EJSFunction::JSLevelUnload(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	return JsValueRef();
+}
+
+JsValueRef EJSFunction::JSLevelSetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		ELevel* element = JSToNativeLevel(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		element->setPosition(val);
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSLevelGetPosition(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		vec3 val = element->getPosition();
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
+	}
+	return output;
+}
+
+JsValueRef EJSFunction::JSLevelSetScale(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	bool noError = false;
+	void* uie;
+	if (JsGetExternalData(arguments[0], &uie) == JsNoError) {
+		ELevel* element = JSToNativeLevel(arguments[0]);
+		vec3 val = JSToNativeVec3(arguments[1]);
+		element->setScale(val);
+		noError = true;
+	}
+	JsBoolToBoolean(noError, &output);
+	return output;
+}
+
+JsValueRef EJSFunction::JSLevelGetScale(JsValueRef callee, bool isConstructCall, JsValueRef * arguments, unsigned short argumentCount, void * callbackState)
+{
+	JsValueRef output = JS_INVALID_REFERENCE;
+	void* vec;
+	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
+		Asset* element = static_cast<Asset*>(vec);
+		vec3 val = element->getScale();
+		JsCreateExternalObject(&val, nullptr, &output);
+		JsSetPrototype(output, JSVec3Prototype);
 	}
 	return output;
 }

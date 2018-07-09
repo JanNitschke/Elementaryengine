@@ -189,11 +189,18 @@ void BallDemoMode::Load()
 	//ro->attachTo(r);
 
 	Lamp* l = new Lamp();
-	Asset* b = new Asset();
+	Asset* b = new Asset(vec3(-2.0f, 2.2f, -8.0f), vec3(.10f), 0, assetShapes::ball);
 	l->AttachTo(b);
 	l->color = vec3(3.0,2.0,1.0);
-	b->scale = vec3(.10f);
-	b->position = vec3(-2.0f, 2.2f, -8.0f);
+	EMeshReference* lampRef = new EMeshReference(lam);
+	lampRef->AttachTo(b);
+
+	//Lamp* l2 = new Lamp();
+	//Asset* b2 = new Asset();
+	//l2->AttachTo(b2);
+	//l2->color = vec3(3.0, 2.0, 1.0);
+	//b2->scale = vec3(.10f);
+	//b2->position = vec3(-2.0f, 2.2f, -8.0f);
 	//b->OnTick = LampTick;
 	//lam->attachTo(b);
 

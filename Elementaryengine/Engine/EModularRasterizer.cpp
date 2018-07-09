@@ -37,9 +37,10 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGB8, TextureSize, TextureSize, TextureCount);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// set TexHandle
-	//textureArrayHandle = glGetTextureHandleARB(eOpenGl->textureArray);
-	//glMakeTextureHandleResidentARB(textureArrayHandle);
+	textureArray = new EOGLBindlessTexture("textureArray");
+	textureArray->id = Game::eOpenGl->textureArray;
+	textureArray->GenerateHandle();
+
 
 	// Set all texture layers to empty. Then load an empty texture at index 0.
 	for (int i = 0; i < TextureCount; i++)
@@ -61,15 +62,11 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 	GLuint shadowMaps, elementBuffer, indirectBuffer, positionBuffer, normalBuffer, albedoSpecBuffer, materialBuffer, depthBuffer;
 	EOpenGl* eOpenGL = Game::eOpenGl;
 
-	//shadowPass = new EShadowPass(eOpenGL->vao, eOpenGL->gElementBuffer, eOpenGL->gIndirectBuffer, eOpenGL->instance, &shadowMaps);
-	//geometryPass = new EGeometryPass(&eOpenGL->gPosition,&eOpenGL->gNormal,&eOpenGL->gAlbedoSpec,&eOpenGL->gMaterial,&eOpenGL->gDepth);
-	//illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial,eOpenGL->gDepth);
-	//postPass = new EPostPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, illuminationPass->frameOut, eOpenGL->gDepth);
 
-	shadowPass = new EShadowPass(eOpenGL->vao, eOpenGL->gElementBuffer, eOpenGL->gIndirectBuffer, eOpenGL->instance, &shadowMaps);
-	geometryPass = new EGeometryPass(&eOpenGL->gPosition, &eOpenGL->gNormal, &eOpenGL->gAlbedoSpec, &eOpenGL->gMaterial, &eOpenGL->gDepth);
-	illuminationPass = new EIlluminationPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, eOpenGL->gDepth);
-	postPass = new EPostPass(eOpenGL->gPosition, eOpenGL->gNormal, eOpenGL->gAlbedoSpec, eOpenGL->gMaterial, illuminationPass->frameOut, eOpenGL->gDepth);
+	shadowPass = new EShadowPass();
+	geometryPass = new EGeometryPass();
+	illuminationPass = new EIlluminationPass(geometryPass->framebuffer);
+	postPass = new EPostPass(geometryPass->framebuffer,illuminationPass->outBuffer);
 	textPass = new ETextPass();
 
 	renderPasses.push_back(shadowPass);
@@ -83,10 +80,24 @@ void EModularRasterizer::Setup(EOpenGl * eOpenGl, EDisplaySettings * displaySett
 
 		pass->Initialize();
 	}
+
+	vector<EOGLBindlessTexture*> textures;
+	textures.push_back(geometryPass->framebuffer->textures[0]);
+	textures.push_back(geometryPass->framebuffer->textures[1]);
+	textures.push_back(geometryPass->framebuffer->textures[2]);
+	textures.push_back(geometryPass->framebuffer->textures[3]);
+	textures.push_back(geometryPass->framebuffer->textures[4]);
+	textures.push_back(illuminationPass->outBuffer->textures[0]);
+	textures.push_back(shadowPass->shadowMaps);
+	textures.push_back(textureArray);
+	EOGLBindlessTexture::CreateUBO(textures, 0);
+
 }
 string EModularRasterizer::getShaderDefines()
 {
 	string out = "#version 460 core \n";
+	out.append("#extension GL_ARB_bindless_texture : enable \n ");
+
 	out += "#define near 0.1 \n";
 	out += "#define far 100 \n";
 	out += "#define vlSampleCount ";
@@ -267,19 +278,23 @@ void EModularRasterizer::RenderFX(EOpenGl * eOpenGl, EDisplaySettings * displayS
 
 void EModularRasterizer::RenderFrameMain(EOpenGl* eOpenGl, EDisplaySettings* displaySettings, mat4 View, mat4 Projection)
 {
-	
+	GLenum err = 0;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		cout << "OpenGL error before frame: " << err << endl;
+	}
 	for each (ERenderPass* pass in renderPasses)
 	{
 		pass->Render();
 	}
 
 	// write to default framebuffer
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1);
 	glEnable(GL_DEPTH_TEST);
 }
 
 void EModularRasterizer::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 {
+	/*
 	// create vectors for light colors and positions
 	vector<vec4> lightColors;
 	vector<vec4> lightPositions;
@@ -298,9 +313,9 @@ void EModularRasterizer::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 		glActiveTexture(GL_TEXTURE8);
 		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, Game::eOpenGl->shadowMaps);
 		if (eOpenGl->lightingUniformShadowMaps < 0) {
-			eOpenGl->lightingUniformShadowMaps = glGetUniformLocation(shader->ID, "shadowMaps");
+			//eOpenGl->lightingUniformShadowMaps = glGetUniformLocation(shader->ID, "shadowMaps");
 		}
-		shader->setInt(eOpenGl->lightingUniformShadowMaps, 8);
+		//shader->setInt(eOpenGl->lightingUniformShadowMaps, 8);
 	}
 
 
@@ -315,6 +330,7 @@ void EModularRasterizer::SetupLamps(EOpenGl * eOpenGl, Shader * shader)
 	GLsizeiptr lps = sizeof(glm::vec4) * lightPositions.size();
 	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 4, eOpenGl->lightPositionSSBO, 0, lps);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, lps, lightPositions.data(), GL_DYNAMIC_DRAW);
+	*/
 }
 
 void EModularRasterizer::RenderUI(EOpenGl * eOpenGl, EDisplaySettings * displaySettings)

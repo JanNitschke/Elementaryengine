@@ -2,6 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Game.h"
 #include <BulletCollision\CollisionShapes\btHeightfieldTerrainShape.h>
+#include <ELevel.h>
 
 const unsigned int Asset::ENVIRONMENT_WIDTH = 1024, Asset::ENVIRONMENT_HEIGHT = 1024;
 unsigned int Asset::envMapFBO;
@@ -13,15 +14,13 @@ Asset::Asset()
 {
 	scale = vec3(1.0f);
 
-	Game::nextAssets.push_back(this);
 	OnTick = &defaultOnTick;
 
 	rendererAssetCreatedCallback(this);
-
+	setLevel(Game::mainLevel);
 }
 Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 {
-	Game::nextAssets.push_back(this);
 	OnTick = &defaultOnTick;
 
 	this->scale = scale;
@@ -42,10 +41,54 @@ Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape)
 	Game::dynamicsWorld->addRigidBody(assetRigidBody);
 	assetRigidBody->setFriction(1);
 	assetRigidBody->setRestitution(0);
+	setLevel(Game::mainLevel);
 
 	rendererAssetCreatedCallback(this);
 }
 
+Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape, ELevel * level)
+{
+	OnTick = &defaultOnTick;
+
+	this->scale = scale;
+	position = pos;
+	assetShape = shape;
+	if (assetShape == assetShapes::ball) {
+		btAssetShape = new btSphereShape(scale.x);
+	}
+	else {
+		btAssetShape = new btBoxShape(btVector3(scale.x * collisionSizeOffset.x, scale.y* collisionSizeOffset.y, scale.z* collisionSizeOffset.z));
+	}
+	btVector3 inertia(1, 1, 1);
+	q = glm::quat(vec3(0, 0, 0));
+	btAssetShape->calculateLocalInertia(mass, inertia);
+	assetMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(position.x + collisionPosOffset.x, position.y + collisionPosOffset.y, position.z + collisionPosOffset.z)));
+	btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(mass, assetMotionState, btAssetShape, inertia);
+	assetRigidBody = new btRigidBody(groundRigidBodyCI);
+	Game::dynamicsWorld->addRigidBody(assetRigidBody);
+	assetRigidBody->setFriction(1);
+	assetRigidBody->setRestitution(0);
+	setLevel(level);
+
+	rendererAssetCreatedCallback(this);
+}
+
+Asset::~Asset()
+{
+}
+
+
+DllExport void Asset::setLevel(ELevel * level)
+{
+	if (this->level != nullptr) {
+		for (auto i = level->assets.begin(); i != level->assets.end(); )
+		{
+			if (*i._Ptr == this) i = level->assets.erase(i); else ++i;
+		}
+	}
+	this->level = level;
+	level->assets.push_back(this);
+}
 
 DllExport void Asset::setMass(float m)
 {
@@ -131,17 +174,17 @@ DllExport void Asset::applyTorque(vec3 torque)
 
 DllExport vec3 Asset::getPosition()
 {
-	return position;
+	return position + level->getPosition();
 }
 
 DllExport vec3 Asset::getScale()
 {
-	return scale;
+	return scale * level->getScale();
 }
 
 DllExport quat Asset::getRotation()
 {
-	return rotation;
+	return rotation * level->getRotation();
 }
 
 DllExport void Asset::setCollisionSizeOffset(vec3 offset)
@@ -199,14 +242,17 @@ void Asset::RenderGeometry()
 
 void Asset::Destroy()
 {
-	for each (AssetComponent* as in components)
-	{
-		delete as;
-	}
 	Game::assetsToDelete.push_back(this);
-	Game::dynamicsWorld->removeRigidBody(assetRigidBody);
+	for (int i = 0; i < components.size(); i++)
+	{
+		delete components[i];
+	}
+	components.clear();
+	if (assetRigidBody) {
+		Game::dynamicsWorld->removeRigidBody(assetRigidBody);
+		delete assetRigidBody;
 
-	delete assetRigidBody;
+	}
 }
 
 void Asset::setHeightmapCollision(const char * path)

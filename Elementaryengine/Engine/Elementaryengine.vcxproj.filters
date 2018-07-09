@@ -102,12 +102,6 @@
     <ClCompile Include="Terrain.cpp">
       <Filter>Quelldateien\Asset</Filter>
     </ClCompile>
-    <ClCompile Include="ERaytracer.cpp">
-      <Filter>Quelldateien\Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="EOGLUniform.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="EModularRasterizer.cpp">
       <Filter>Quelldateien\Renderers\Modular</Filter>
     </ClCompile>
@@ -126,9 +120,6 @@
     <ClCompile Include="EConsole.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="ERender.cpp">
-      <Filter>Quelldateien\Renderers</Filter>
-    </ClCompile>
     <ClCompile Include="EShadowPass.cpp">
       <Filter>Quelldateien\Renderers\Modular</Filter>
     </ClCompile>
@@ -136,9 +127,6 @@
       <Filter>Quelldateien\Renderers\Modular</Filter>
     </ClCompile>
     <ClCompile Include="EModularRenderSettings.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="EOGLFramebuffer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="ENetworkInterface.cpp">
@@ -152,6 +140,21 @@
     </ClCompile>
     <ClCompile Include="EMeshReference.cpp">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="ELevel.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EOGLFramebuffer.cpp">
+      <Filter>Quelldateien\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="EOGLUniform.cpp">
+      <Filter>Quelldateien\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="EOGLBindlessTexture.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="ERender.cpp">
+      <Filter>Quelldateien\Renderers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,9 +200,6 @@
     <ClInclude Include="EOpenGl.h">
       <Filter>Headerdateien\Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="ERender.h">
-      <Filter>Headerdateien\Renderers</Filter>
-    </ClInclude>
     <ClInclude Include="EEngine.h">
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
@@ -241,9 +241,6 @@
     </ClInclude>
     <ClInclude Include="UIElement.h">
       <Filter>Headerdateien\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="ERaytracer.h">
-      <Filter>Headerdateien\Renderers</Filter>
     </ClInclude>
     <ClInclude Include="EOGLUniform.h">
       <Filter>Headerdateien</Filter>
@@ -292,6 +289,15 @@
     </ClInclude>
     <ClInclude Include="EMeshReference.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ELevel.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EOGLBindlessTexture.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ERender.h">
+      <Filter>Headerdateien\Renderers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

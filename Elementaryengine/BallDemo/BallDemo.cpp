@@ -13,40 +13,24 @@ using namespace std;
 #include <iostream>
 #include "AstroidDemo.h"
 #include <EModularRasterizer.h>
-#include <ERaytracer.h>
 
 int main()
 {
 	int a; 
 	//cin >> a;
-	a = 1;
-	if (a == 1) {
-		Game game = Game::Instance();
-		//game.renderer = new ERasterizer();
-		Game::displaySettings->windowHeight = 900;
-		Game::displaySettings->windowWidth = 1600;
-		game.renderer = new EModularRasterizer();
-		game.name = "Ball demo";
-		BallDemoMode* mode = new BallDemoMode();
-		mode->game = &game;
-		game.displaySettings->fullscreen = false;
-		game.setLight(vec3(0.02f), vec3(0.1, 0.2, 0.3));
-		game.gameMode = mode;
-		game.Start();
-	}
-	else {
-		/*
-		Game game = Game::Instance();
-		game.renderer = new ERasterizer();
-		game.name = "Astroid demo";
-		AstroidDemo* mode = new AstroidDemo();
-		mode->game = &game;
-		game.displaySettings->fullscreen = false;
-		game.setLight(vec3(0.0f), vec3(0.1, 0.2, 0.3));
-		game.gameMode = mode;
-		game.Start();
-		*/
-	}
-	return 0;
+
+	Game game = Game::Instance();
+	//game.renderer = new ERasterizer();
+	Game::displaySettings->windowHeight = 900;
+	Game::displaySettings->windowWidth = 1600;
+	game.renderer = new EModularRasterizer();
+	game.name = "Ball demo";
+	BallDemoMode* mode = new BallDemoMode();
+	mode->game = &game;
+	game.displaySettings->fullscreen = false;
+	game.setLight(vec3(0.02f), vec3(0.1, 0.2, 0.3));
+	game.gameMode = mode;
+	game.Start();
+
 }
 

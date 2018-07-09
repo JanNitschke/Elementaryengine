@@ -47,13 +47,14 @@ bool Game::physicsFinished = false;
 bool Game::shouldClose = false;
 vec3 Game::directionalLightColor;
 vec3 Game::directionalLightDirection;
-vector<Asset*> Game::assets;
-vector<Asset*> Game::nextAssets;
+
 vector<Asset*> Game::assetsToDelete;
+
 vector<Mesh*> Game::meshs;
 vector<Lamp*> Game::lamps;
 vector<ETextElement*> Game::textElements;
-
+vector<ELevel*> Game::levels;
+ELevel* Game::mainLevel = new ELevel();
 Camera* Game::activeCam;
 btDiscreteDynamicsWorld* Game::dynamicsWorld;
 bool Game::simulatePhysics = true;
@@ -83,6 +84,8 @@ void Game::Start()
 	eOpenGl->Initialise(displaySettings);
 
 	eScriptContext = new EScriptContext();
+	levels.push_back(mainLevel);
+	mainLevel->Load();
 
 	//Setup Bullet physics
 	btBroadphaseInterface* broadphase = new btDbvtBroadphase();
@@ -154,8 +157,6 @@ void Game::loop()
 	bool ff = true;
 
 	do {
-		assets = vector<Asset*>(nextAssets);
-
 		if (isServer || requireServer) {
 			updateNetwork();
 		}
@@ -169,7 +170,7 @@ void Game::loop()
 		deltaTime = currentTime - oldTime;
 		smoothFps = (9 * smoothFps / 10) + (.1 / deltaTime);
 		frameCount++;
-		printf(" \r fps smooth: %i loaded Assets: %i accurate: %f physics: %f", (int)(smoothFps + .5), (int)assets.size(), 1 / deltaTime, Game::physicsFps);
+		printf(" \r fps smooth: %i loaded Levels: %i accurate: %f physics: %f", (int)(smoothFps + .5), (int)levels.size(), 1 / deltaTime, Game::physicsFps);
 		if (!isServer) {
 			processInput(eOpenGl->window);
 		}
@@ -179,22 +180,28 @@ void Game::loop()
 			gameMode->Tick(deltaTime);
 		}
 		eScriptContext->RunFunction("OnTick");
-		for each (Asset* asset in assets)
+		for each (auto * level in levels)
 		{
-			if (asset) {
-				asset->Tick(eOpenGl->window, deltaTime);
+			if (level->isLoaded()) {
+				for (auto i = level->assets.begin(); i != level->assets.end(); )
+				{
+					if ((*i)) (*i)->Tick(eOpenGl->window, deltaTime);
+					i++;
+				}
 			}
 		}
 		scrolledThisFrame = false;
+
 		// delete all Assets that were destroyed this frame
 		for each (Asset* a in assetsToDelete)
 		{
-			nextAssets.erase(std::remove(Game::nextAssets.begin(), Game::nextAssets.end(), a), Game::nextAssets.end());
+			ELevel* level = a->level;
+			level->assets.erase(std::remove(level->assets.begin(), level->assets.end(), a), level->assets.end());
 			Asset::rendererAssetChangedCallback(a);
 			delete a;
 		}
+	
 		assetsToDelete.clear();
-		nextAssets.shrink_to_fit();
 
 		if (!isServer) {
 			console.Update();
@@ -276,11 +283,12 @@ RayCastHit Game::Raycast(vec3 Start, vec3 End)
 	if (RayCallback.hasHit()) {
 		r.hitPos = toGlm(RayCallback.m_hitPointWorld);
 		r.hitNormal = toGlm(RayCallback.m_hitNormalWorld);
-		for each (Asset* a in assets)
-		{
-			if (a->getRigidBody() == RayCallback.m_collisionObject) {
-				r.hitAsset = a;
-				break;
+		for each (auto level in Game::levels) {
+			for each(auto asset in level->assets) {
+				if (asset->getRigidBody() == RayCallback.m_collisionObject) {
+					r.hitAsset = asset;
+					break;
+				}
 			}
 		}
 	}

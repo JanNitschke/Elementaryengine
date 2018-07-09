@@ -415,6 +415,34 @@ void EScriptContext::CameraBindings()
 	projectNativeClass(L"Camera", EJSFunction::JSConstructorCamera, EJSFunction::JSCameraPrototype , memberNamesCamera, memberFuncsCamera);
 }
 
+void EScriptContext::LevelBindings()
+{
+	vector<const wchar_t *> memberNamesLevel;
+	vector<JsNativeFunction> memberFuncsLevel;
+
+	memberNamesLevel.push_back(L"load");
+	memberFuncsLevel.push_back(EJSFunction::JSLevelLoad);
+
+	memberNamesLevel.push_back(L"unload");
+	memberFuncsLevel.push_back(EJSFunction::JSLevelUnload);
+
+	memberNamesLevel.push_back(L"getPosition");
+	memberFuncsLevel.push_back(EJSFunction::JSLevelGetPosition);
+
+	memberNamesLevel.push_back(L"setPosition");
+	memberFuncsLevel.push_back(EJSFunction::JSLevelSetPosition);
+
+	memberNamesLevel.push_back(L"getScale");
+	memberFuncsLevel.push_back(EJSFunction::JSLevelGetScale);
+
+	memberNamesLevel.push_back(L"getScale");
+	memberFuncsLevel.push_back(EJSFunction::JSLevelGetScale);
+
+
+	projectNativeClass(L"Level", EJSFunction::JSConstructorLevel, EJSFunction::JSRaycastHitPrototype, memberNamesLevel, memberFuncsLevel);
+
+}
+
 void EScriptContext::GlobalConsoleBindings()
 {
 	vector<const wchar_t *> memberNames;

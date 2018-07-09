@@ -9,6 +9,7 @@
 #include <EShadowPass.h>
 #include <ETextPass.h>
 #include <EModularRenderSettings.h>
+#include <EOGLBindlessTexture.h>
 
 class EModularRasterizer : public ERenderer
 {
@@ -35,8 +36,9 @@ public:
 	const unsigned int TextureCount = 64;
 
 	EModularRenderSettings renderSettings = EModularRenderSettings();
+	EOGLBindlessTexture * textureArray;
+	EOGLBindlessTexture * shadowMaps;
 
-	GLuint64 textureArrayHandle;
 private:
 
 	vector<ERenderPass*> renderPasses;

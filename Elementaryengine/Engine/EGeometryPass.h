@@ -2,7 +2,7 @@
 #include "ERenderPass.h"
 #include <EMultiDrawContainer.h>
 #include <EMeshReference.h>
-
+#include <EOGLFramebuffer.h>
 #define OUT
 
 class EGeometryPass :
@@ -10,7 +10,6 @@ class EGeometryPass :
 {
 public:
 	EGeometryPass();
-	EGeometryPass(OUT GLuint* positionBuffer, OUT GLuint* normalBuffer, OUT GLuint* albedoSpecBuffer, OUT GLuint* materialBuffer, OUT GLuint* deepthBuffer);
 	~EGeometryPass();
 
 	static Shader * meshGeometryShader;
@@ -18,12 +17,8 @@ public:
 	virtual void Render();
 	virtual void Initialize();
 
+	EOGLFramebuffer* framebuffer;
 
-	GLuint PositionBuffer;
-	GLuint NormalBuffer;
-	GLuint AlbedoSpecBuffer;
-	GLuint MaterialBuffer;
-	GLuint DepthBuffer;
 private:
 	void RenderMesh(EMeshReference *);
 	void RenderMultiDraw(EMultiDrawContainer *);
@@ -38,7 +33,5 @@ private:
 	EOGLUniform<int> meshUniformRoughnessTex;
 	EOGLUniform<int> meshUniformAlbedoTex;
 	EOGLUniform<int> meshUniformMetallicTex;
-	EOGLUniform<int> meshUniformTextureArray;
-
 };
 

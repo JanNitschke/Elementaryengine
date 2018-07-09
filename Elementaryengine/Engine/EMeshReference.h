@@ -10,9 +10,9 @@ class EMeshReference :
 {
 public:
 
-	vec3 positionOffset;
-	vec3 scaleOffset;
-	quat rotationOffset;
+	vec3 positionOffset = vec3(0);
+	vec3 scaleOffset = vec3(1);
+	quat rotationOffset = quat();
 	Mesh * mesh;
 
 	EMeshReference(Mesh * referenced);

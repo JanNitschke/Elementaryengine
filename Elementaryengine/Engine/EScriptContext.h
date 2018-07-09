@@ -60,6 +60,7 @@ private:
 	void AssetBindings();
 	void RayCastBindings();
 	void CameraBindings();
+	void LevelBindings();
 
 	// setup global functions
 	void GlobalConsoleBindings();
