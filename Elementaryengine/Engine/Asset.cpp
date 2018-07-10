@@ -53,6 +53,8 @@ Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape, ELevel * level)
 	this->scale = scale;
 	position = pos;
 	assetShape = shape;
+	setLevel(level);
+
 	if (assetShape == assetShapes::ball) {
 		btAssetShape = new btSphereShape(scale.x);
 	}
@@ -62,13 +64,12 @@ Asset::Asset(vec3 pos, vec3 scale, int mass, assetShapes shape, ELevel * level)
 	btVector3 inertia(1, 1, 1);
 	q = glm::quat(vec3(0, 0, 0));
 	btAssetShape->calculateLocalInertia(mass, inertia);
-	assetMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(position.x + collisionPosOffset.x, position.y + collisionPosOffset.y, position.z + collisionPosOffset.z)));
+	assetMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(getPosition().x + collisionPosOffset.x, getPosition().y + collisionPosOffset.y, getPosition().z + collisionPosOffset.z)));
 	btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(mass, assetMotionState, btAssetShape, inertia);
 	assetRigidBody = new btRigidBody(groundRigidBodyCI);
 	Game::dynamicsWorld->addRigidBody(assetRigidBody);
 	assetRigidBody->setFriction(1);
 	assetRigidBody->setRestitution(0);
-	setLevel(level);
 
 	rendererAssetCreatedCallback(this);
 }

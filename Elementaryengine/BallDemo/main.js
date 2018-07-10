@@ -36,6 +36,31 @@ var deletePressedLastFrame = false;
 var level1 = new Level();
 level1.load();
 
+var worldSize = 3;
+var worldLevelSize = 25;
+var worldLevelBlockSize = 1;
+
+var levels = [];
+var loadedLevels = [];
+
+for (wx = 0; wx < worldSize; wx++) {
+    for (wy = 0; wy < worldSize; wy++) {
+        var posX = wx * worldLevelSize;
+        var posZ = wy * worldLevelSize;
+        posX -= worldSize / 2 * worldLevelSize;
+        posZ -= worldSize / 2 * worldLevelSize;
+        console.log("X:"+wx +" Y:"+wy+" PosX:" + posX+" lvls:"+worldLevelSize+" ws:"+worldSize);
+        var position = new Vec3(posX,0,posZ);
+        var level = generateLevel(position);
+        levels.push(level);
+        console.log("test X:"+wx);
+    }
+}
+
+levels.forEach(function(element) {
+    element.load();
+});
+
 // Define the foreground color for the UI as a Vec3. This is done so it can be sinply changed for all elements at once. For Colors the X component of the Vector equals Red, Y equals Green and Z equals Blue.
 var fgCol = new Vec3(0.5,0.5,0.9);
 
@@ -60,6 +85,28 @@ var ch = new UIElement(new Vec3(50,50,0), new Vec3(-10,-10,0),new Vec3(0,0,0), n
 // Move the selection marker to its starting position
 updateHud();
 
+function generateLevel(position){
+    var level = new Level();
+    level.setPosition(position);
+    for (var x = 0; x < worldLevelSize / worldLevelBlockSize; x++) {
+        for (var y = 0; y < worldLevelSize / worldLevelBlockSize; y++) {
+            var posX = -(worldLevelSize / 2) + (x * worldLevelBlockSize);
+            var posZ = -(worldLevelSize / 2) + (y * worldLevelBlockSize);
+
+            var position = new Vec3(posX,0,posZ);
+            // Create asset
+            asset = new Asset(position,new Vec3(worldLevelBlockSize,worldLevelBlockSize,worldLevelBlockSize),0,level); 
+            // Attach the cube mesh to the asset
+            m.attachto(asset);
+            // Add the asset to the list of placed assets
+            placedBlocks.push(asset);
+        }
+    }   
+    return level;
+}
+
+
+
 var j = 0;
 var z = 0;
 var k = 0;
@@ -77,6 +124,7 @@ function PlaceFeeeeest(){
     j -= 2;
     m2.attachto(as);
 }
+
 
 // called once per frame. Only used for input in this example
 function OnTick(){
@@ -117,6 +165,19 @@ function OnTick(){
     }else{
         deletePressedLastFrame = false;
     }
+    levels.forEach(function(element) {
+        var pos = element.getPosition();
+        var campos = game.getActiveCamera().getPosition();
+        var dx = pos.getX() - campos.getX();
+        var dz = pos.getZ() - campos.getZ();
+        var dist = Math.sqrt(dx * dx + dz * dz);
+        console.log("d:" + dist);
+        if(dist < worldLevelSize * 1.5){
+            element.load();
+        }else{
+            element.unload();
+        }
+    });
 }
 
 // Function to update 'selectedItem' after scroll input. If 'increaseSection' is true the next item will be choosen, otherwise the previous
@@ -254,3 +315,4 @@ function isPlaced(hitAsset){
 
     return false;
 }
+

@@ -1477,9 +1477,10 @@ JsValueRef EJSFunction::JSLevelGetPosition(JsValueRef callee, bool isConstructCa
 	JsValueRef output = JS_INVALID_REFERENCE;
 	void* vec;
 	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
-		Asset* element = static_cast<Asset*>(vec);
-		vec3 val = element->getPosition();
-		JsCreateExternalObject(&val, nullptr, &output);
+		ELevel* element = static_cast<ELevel*>(vec);
+		vec3 pos = element->getPosition();
+		vec3* val = new vec3(pos);
+		JsCreateExternalObject(val, nullptr, &output);
 		JsSetPrototype(output, JSVec3Prototype);
 	}
 	return output;
@@ -1505,9 +1506,10 @@ JsValueRef EJSFunction::JSLevelGetScale(JsValueRef callee, bool isConstructCall,
 	JsValueRef output = JS_INVALID_REFERENCE;
 	void* vec;
 	if (JsGetExternalData(arguments[0], &vec) == JsNoError) {
-		Asset* element = static_cast<Asset*>(vec);
-		vec3 val = element->getScale();
-		JsCreateExternalObject(&val, nullptr, &output);
+		ELevel* element = static_cast<ELevel*>(vec);
+		vec3 scale = element->getScale();
+		vec3* val = new vec3(scale);
+		JsCreateExternalObject(val, nullptr, &output);
 		JsSetPrototype(output, JSVec3Prototype);
 	}
 	return output;
