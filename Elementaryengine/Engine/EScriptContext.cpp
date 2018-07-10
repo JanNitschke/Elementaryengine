@@ -3,7 +3,18 @@
 #include <iostream>
 #include <comdef.h>
 #include <Game.h>
+#include <time.h>
+
 using namespace std;
+
+void CALLBACK PromiseContinuationCallback(JsValueRef task, void *callbackState)
+{
+	// Save promise task in taskQueue.
+	queue<JsValueRef> * q = (queue<JsValueRef> *)callbackState;
+	q->push(task);
+	JsAddRef(task, nullptr);
+}
+
 
 EScriptContext::EScriptContext()
 {
@@ -15,6 +26,9 @@ EScriptContext::EScriptContext()
 
 	// Now set the current execution context.
 	JsSetCurrentContext(context);
+
+	JsSetPromiseContinuationCallback(PromiseContinuationCallback, &taskQueue);
+
 
 	// Convert your script result to String in JavaScript; redundant if your script returns a String
 	JsValueRef resultJSString;
@@ -31,7 +45,6 @@ EScriptContext::EScriptContext()
 	AddBindings();
 
 }
-
 
 EScriptContext::~EScriptContext()
 {
@@ -51,7 +64,7 @@ void EScriptContext::loadScript(wstring script)
 
 void EScriptContext::RunFunction(const char * name)
 {
-	JsValueRef func, funcPropId, global, undefined, result;
+	JsValueRef func, funcPropId, undefined, result;
 	JsGetGlobalObject(&global);
 	JsGetUndefinedValue(&undefined);
 	JsValueRef args[] = { undefined };
@@ -59,6 +72,13 @@ void EScriptContext::RunFunction(const char * name)
 	JsGetProperty(global, funcPropId, &func);
 	// note that args[0] is thisArg of the call; actual args start at index 1
 	JsCallFunction(func, args, 1, &result);
+	// Execute promise tasks stored in taskQueue
+	while (!taskQueue.empty()) {
+		JsValueRef task = taskQueue.front();
+		taskQueue.pop();
+		JsCallFunction(task, &global, 1, &result);
+		JsRelease(task, nullptr);
+	}
 }
 
 void EScriptContext::ReadScript(wstring filename)
@@ -112,6 +132,14 @@ void EScriptContext::ReadScript(wstring filename)
 
 	// Run the script.
 	JsRunScript(script.c_str(), currentSourceContext++, L"", &result);
+
+	// Execute promise tasks stored in taskQueue
+	while (!taskQueue.empty()) {
+		JsValueRef task = taskQueue.front();
+		taskQueue.pop();
+		JsCallFunction(task, &global, 1, &result);
+		JsRelease(task, nullptr);
+	}
 
 	JsValueRef vref;
 	JsGetAndClearException(&vref);

@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include "EJSFunctions.h"
+#include <queue>
 
 using namespace std;
 
@@ -45,10 +46,12 @@ public:
 
 private:
 	wstring script;
+	queue<JsValueRef> taskQueue;
 
 	JsRuntimeHandle runtime;
 	JsContextRef context;
 	JsValueRef result;
+	JsValueRef global;
 	unsigned currentSourceContext = 0;
 
 	// setup prototypes

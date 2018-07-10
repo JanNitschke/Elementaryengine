@@ -68,21 +68,26 @@ void EGeometryPass::Render()
 	meshGeometryShader->use();
 	meshUniformVP.Update();
 
+	EMultiDrawContainer* mulCont = nullptr;
+
 	for each (auto level in Game::levels) {
 		if (level->isLoaded()) {
 			for each(auto asset in level->assets) {
 				for each (AssetComponent* component in asset->components)
 				{
-					if ((dynamic_cast<EMeshReference*>(component) != nullptr)) {
-						RenderMesh((EMeshReference*)component);
+					EMeshReference* emr;
+					if ((emr = dynamic_cast<EMeshReference*>(component)) != nullptr) {
+						RenderMesh(emr);
 					}
 				}
-				if ((dynamic_cast<EMultiDrawContainer*>(asset) != nullptr)) {
-					RenderMultiDraw((EMultiDrawContainer*)asset);
+				EMultiDrawContainer * mdc;
+				if ((mdc = dynamic_cast<EMultiDrawContainer*>(asset)) != nullptr) {
+					mulCont = mdc;
 				}
 			}
 		}
 	}
+	if(mulCont)	RenderMultiDraw(mulCont);
 
 	while ((err = glGetError()) != GL_NO_ERROR) {
 		cout << "OpenGL error geom end: " << err << endl;
@@ -108,7 +113,6 @@ void EGeometryPass::Initialize()
 
 void EGeometryPass::RenderMesh(EMeshReference * meshReference)
 {
-	meshGeometryShader->use();
 	Mesh * mesh = meshReference->mesh;
 	Asset * asset = meshReference->parent;
 

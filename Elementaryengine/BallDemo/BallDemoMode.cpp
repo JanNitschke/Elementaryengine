@@ -131,7 +131,7 @@ void BallDemoMode::Load()
 	Asset* a = new Asset(vec3(0,-0.9,0),vec3(20,0.1,20),0,assetShapes::cube);
 	a->setFriction(2);
 	EMeshReference* floorRef = new EMeshReference(cube);
-	floorRef->AttachTo(a);
+	//floorRef->AttachTo(a);
 	a->renderEnvironment = false;
 
 	PBRMaterial* pbrwood = new PBRMaterial();

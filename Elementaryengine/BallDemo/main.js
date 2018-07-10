@@ -41,8 +41,9 @@ var worldLevelSize = 25;
 var worldLevelBlockSize = 1;
 
 var levels = [];
+var levelProm = [];
 var loadedLevels = [];
-
+/*
 for (wx = 0; wx < worldSize; wx++) {
     for (wy = 0; wy < worldSize; wy++) {
         var posX = wx * worldLevelSize;
@@ -56,10 +57,33 @@ for (wx = 0; wx < worldSize; wx++) {
         console.log("test X:"+wx);
     }
 }
+*/
+function generateWorld() {
+    var positions = [];
+    return new Promise(function (resolve, reject) {
+        for (wx = 0; wx < worldSize; wx++) {
+            for (wy = 0; wy < worldSize; wy++) {
+                var posX = wx * worldLevelSize;
+                var posZ = wy * worldLevelSize;
+                posX -= worldSize / 2 * worldLevelSize;
+                posZ -= worldSize / 2 * worldLevelSize;
+                console.log("X:"+wx +" Y:"+wy+" PosX:" + posX+" lvls:"+worldLevelSize+" ws:"+worldSize);
+                var position = new Vec3(posX,0,posZ);
+                positions.push(position);
+                console.log("test X:"+wx);
+            }
+        }
+        positions.forEach(function(position) {
+            generateLevel(position).then(function(level) {
+                levels.push(level);
+            });
+        });
+        resolve();
+    });
 
-levels.forEach(function(element) {
-    element.load();
-});
+}
+
+generateWorld();
 
 // Define the foreground color for the UI as a Vec3. This is done so it can be sinply changed for all elements at once. For Colors the X component of the Vector equals Red, Y equals Green and Z equals Blue.
 var fgCol = new Vec3(0.5,0.5,0.9);
@@ -88,21 +112,24 @@ updateHud();
 function generateLevel(position){
     var level = new Level();
     level.setPosition(position);
-    for (var x = 0; x < worldLevelSize / worldLevelBlockSize; x++) {
-        for (var y = 0; y < worldLevelSize / worldLevelBlockSize; y++) {
-            var posX = -(worldLevelSize / 2) + (x * worldLevelBlockSize);
-            var posZ = -(worldLevelSize / 2) + (y * worldLevelBlockSize);
 
-            var position = new Vec3(posX,0,posZ);
-            // Create asset
-            asset = new Asset(position,new Vec3(worldLevelBlockSize,worldLevelBlockSize,worldLevelBlockSize),0,level); 
-            // Attach the cube mesh to the asset
-            m.attachto(asset);
-            // Add the asset to the list of placed assets
-            placedBlocks.push(asset);
-        }
-    }   
-    return level;
+    return new Promise(function (resolve, reject) {
+        for (var x = 0; x < worldLevelSize / worldLevelBlockSize; x++) {
+            for (var y = 0; y < worldLevelSize / worldLevelBlockSize; y++) {
+                var posX = -(worldLevelSize / 2) + (x * worldLevelBlockSize);
+                var posZ = -(worldLevelSize / 2) + (y * worldLevelBlockSize);
+    
+                var position = new Vec3(posX,-2,posZ);
+                // Create asset
+                asset = new Asset(position,new Vec3(worldLevelBlockSize,worldLevelBlockSize,worldLevelBlockSize),0,level); 
+                // Attach the cube mesh to the asset
+                m.attachto(asset);
+                // Add the asset to the list of placed assets
+                placedBlocks.push(asset);
+            }
+        } 
+        resolve(level);
+    });
 }
 
 
@@ -171,7 +198,6 @@ function OnTick(){
         var dx = pos.getX() - campos.getX();
         var dz = pos.getZ() - campos.getZ();
         var dist = Math.sqrt(dx * dx + dz * dz);
-        console.log("d:" + dist);
         if(dist < worldLevelSize * 1.5){
             element.load();
         }else{
