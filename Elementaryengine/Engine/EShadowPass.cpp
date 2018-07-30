@@ -124,10 +124,15 @@ void EShadowPass::Render()
 			meshUniformVP.Update();
 			currentLayer++;
 
+			float lightLength = l->color.length() * 5;
+			float lightRadius = lightLength * lightLength * lightLength;
 
 			for each (auto level in Game::levels) {
 				if (level->isLoaded()) {
 					for each(auto asset in level->assets) {
+						vec3 diffrence = l->getPosition() - asset->getPosition();
+						float distanceCubed = (diffrence.x * diffrence.x + diffrence.x * diffrence.x + diffrence.x * diffrence.x);
+						if(distanceCubed <)
 						for each (AssetComponent* component in asset->components)
 						{
 							if ((dynamic_cast<EMeshReference*>(component) != nullptr)) {

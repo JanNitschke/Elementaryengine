@@ -12,6 +12,7 @@ public:
 	~AssetComponent();
 	virtual void AttachTo(Asset* a);
 	virtual	void Detach();
+	virtual vec3 getPosition();
 	Asset* parent;
 };
 

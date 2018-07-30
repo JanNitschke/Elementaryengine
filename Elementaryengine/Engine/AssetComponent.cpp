@@ -27,3 +27,8 @@ void AssetComponent::Detach()
 		parent->components.erase(std::remove(parent->components.begin(), parent->components.end(), this), parent->components.end());
 	}
 }
+
+vec3 AssetComponent::getPosition()
+{
+	return parent->getPosition();
+}

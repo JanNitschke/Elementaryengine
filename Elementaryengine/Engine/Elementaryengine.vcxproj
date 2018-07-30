@@ -262,6 +262,7 @@
   <ItemGroup>
     <Text Include="EnvShader.geom" />
     <Text Include="LightmapShader.frag" />
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Feather Engine.rc" />

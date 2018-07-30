@@ -312,5 +312,6 @@
     <Text Include="EnvShader.geom">
       <Filter>shaders</Filter>
     </Text>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
 </Project>
